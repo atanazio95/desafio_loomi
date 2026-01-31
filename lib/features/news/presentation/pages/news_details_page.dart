@@ -12,6 +12,25 @@ class NewsDetailsPage extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
+            expandedHeight: 300.0,
+
+            // 2. ISSO É O IMPORTANTE: Mantém a barra visível ao rolar
+            pinned: true,
+
+            // 3. Define a cor do botão de voltar (Seta)
+            iconTheme: const IconThemeData(
+              color: Colors
+                  .white, // Seta branca para contrastar com a imagem/barra preta
+              shadows: [
+                Shadow(
+                  color: Colors.black,
+                  blurRadius: 10,
+                ), // Sombra pra garantir leitura
+              ],
+            ),
+
+            // 4. Cor da barra quando ela estiver "fechada" (lá no topo)
+            backgroundColor: Colors.black,
             // ... configurações ...
             flexibleSpace: FlexibleSpaceBar(
               background: Hero(
