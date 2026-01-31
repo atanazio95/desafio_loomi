@@ -34,7 +34,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final result = await dataSource.checkAuthStatus();
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure());
+      return const Right(false);
     }
   }
 }

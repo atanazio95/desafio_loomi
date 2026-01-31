@@ -1,5 +1,6 @@
 import 'package:desafio_loomi_flutter/features/auth/domain/entities/user_entity.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/repositories/auth_repository.dart';
+import 'package:desafio_loomi_flutter/features/auth/domain/usecases/check_auth_status_usecase.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/usecases/login_usecase.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_event.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_state.dart';
@@ -8,11 +9,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase loginUseCase;
   final AuthRepository authRepository;
+  final CheckAuthStatusUseCase checkAuthStatusUseCase;
 
-  AuthBloc({required this.loginUseCase, required this.authRepository})
-    : super(AuthInitial()) {
+  AuthBloc({
+    required this.loginUseCase,
+    required this.authRepository,
+    required this.checkAuthStatusUseCase,
+  }) : super(AuthInitial()) {
     on<LoginSubmitted>(_onLoginSubmitted);
-    on<CheckAuthStatus>(_onCheckAuthStatus);
+    on<AuthCheckRequested>(_onCheckAuthStatus);
     on<LogoutRequested>(_onLogoutRequested);
   }
   Future<void> _onLoginSubmitted(
@@ -35,15 +40,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onCheckAuthStatus(
-    CheckAuthStatus event,
+    AuthCheckRequested event,
     Emitter<AuthState> emit,
   ) async {
-    final result = await authRepository.checkAuthStatus();
-    result.fold(
-      (failure) => emit(AuthUnauthenticated()),
-      (isLogged) =>
-          isLogged ? emit(AuthAuthenticated()) : emit(AuthUnauthenticated()),
-    );
+    emit(AuthLoading());
+
+    // Chama o UseCase que retorna true ou false
+    final isLoggedIn = await checkAuthStatusUseCase();
+
+    if (isLoggedIn) {
+      emit(AuthAuthenticated()); // Vai para a Home
+    } else {
+      emit(AuthUnauthenticated()); // Vai para o Login
+    }
   }
 
   Future<void> _onLogoutRequested(
