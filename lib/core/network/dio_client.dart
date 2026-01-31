@@ -6,7 +6,8 @@ class DioClient {
   DioClient()
     : _dio = Dio(
         BaseOptions(
-          baseUrl: '',
+          baseUrl: 'https://flutter-challenge.wiremockapi.cloud',
+          contentType: Headers.jsonContentType,
           connectTimeout: const Duration(seconds: 10),
           receiveTimeout: const Duration(seconds: 10),
         ),
