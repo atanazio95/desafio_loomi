@@ -17,6 +17,6 @@ class LoginSubmitted extends AuthEvent {
   List<Object> get props => [username, password];
 }
 
-class CheckAuthStatus extends AuthEvent {}
-
 class LogoutRequested extends AuthEvent {}
+
+class AuthCheckRequested extends AuthEvent {}
