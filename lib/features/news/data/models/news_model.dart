@@ -9,6 +9,7 @@ class NewsModel extends NewsEntity {
     required super.datePublished,
     required super.imageUrl,
     required super.relatedNews,
+    super.isFavorite,
   });
 
   factory NewsModel.fromJson(Map<String, dynamic> json) {
@@ -22,9 +23,9 @@ class NewsModel extends NewsEntity {
       imgUrl = json['image'] ?? '';
     }
 
-    String authorName = 'Loomi News';
+    String authorName = 'Autor Desconhecido';
     if (json['authors'] != null && (json['authors'] as List).isNotEmpty) {
-      authorName = json['authors'][0]['name'] ?? 'Loomi News';
+      authorName = json['authors'][0]['name'] ?? 'Autor Desconhecido';
     }
 
     return NewsModel(
@@ -33,14 +34,42 @@ class NewsModel extends NewsEntity {
       author: authorName,
       summary:
           json['description'] ?? json['summary'] ?? json['newsResume'] ?? '',
-      datePublished: json['publishedAt'] ?? '',
+      datePublished: json['date_published'] ?? json['publishedAt'] ?? '',
       imageUrl: imgUrl,
-
       relatedNews: json['relatedNews'] != null
           ? (json['relatedNews'] as List)
                 .map((e) => NewsModel.fromJson(e))
                 .toList()
           : [],
+      isFavorite: json['isFavorite'] ?? false,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'summary': summary,
+      'date_published': datePublished,
+
+      'authors': [
+        {'name': author},
+      ],
+      'image': {'src': imageUrl},
+      'isFavorite': isFavorite,
+      'relatedNews': relatedNews.map((e) {
+        if (e is NewsModel) return e.toJson();
+        return {
+          'id': e.id,
+          'title': e.title,
+          'authors': [
+            {'name': e.author},
+          ],
+          'summary': e.summary,
+          'date_published': e.datePublished,
+          'image': {'src': e.imageUrl},
+        };
+      }).toList(),
+    };
   }
 }

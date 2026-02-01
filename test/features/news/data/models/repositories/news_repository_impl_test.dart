@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:desafio_loomi_flutter/core/errors/failures.dart';
-import 'package:desafio_loomi_flutter/features/news/data/datasources/news_remote_datasource.dart';
+import 'package:desafio_loomi_flutter/features/news/data/datasources/news_remote_datasource_impl.dart';
 import 'package:desafio_loomi_flutter/features/news/data/models/news_model.dart';
 import 'package:desafio_loomi_flutter/features/news/data/repositories/news_repository_impl.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';

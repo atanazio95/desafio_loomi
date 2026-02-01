@@ -8,3 +8,10 @@ abstract class NewsEvent extends Equatable {
 }
 
 class NewsFetched extends NewsEvent {}
+
+class ToggleFavoriteHome extends NewsEvent {
+  final String id;
+  ToggleFavoriteHome(this.id);
+}
+
+class RefreshFavorites extends NewsEvent {}

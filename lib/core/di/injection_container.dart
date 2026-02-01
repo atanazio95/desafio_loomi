@@ -1,11 +1,12 @@
 import 'package:desafio_loomi_flutter/core/network/dio_client.dart';
+import 'package:desafio_loomi_flutter/core/services/favorites_manager.dart';
 import 'package:desafio_loomi_flutter/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:desafio_loomi_flutter/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/repositories/auth_repository.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/usecases/check_auth_status_usecase.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/usecases/login_usecase.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:desafio_loomi_flutter/features/news/data/datasources/news_remote_datasource.dart';
+import 'package:desafio_loomi_flutter/features/news/data/datasources/news_remote_datasource_impl.dart';
 import 'package:desafio_loomi_flutter/features/news/data/repositories/news_repository_impl.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/repositories/news_repository.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/usecases/get_news_details_usecase.dart'; // <--- IMPORTANTE
@@ -42,6 +43,7 @@ Future<void> init() async {
 
   // ! Core
   sl.registerLazySingleton(() => DioClient());
+  sl.registerLazySingleton(() => FavoritesManager(sharedPreferences: sl()));
 
   // ! External
   final sharedPreferences = await SharedPreferences.getInstance();
@@ -67,8 +69,10 @@ Future<void> init() async {
   );
 
   // Presentation (Blocs)
-  sl.registerFactory(() => NewsBloc(getNewsUseCase: sl()));
   sl.registerFactory(
-    () => NewsDetailsBloc(getNewsDetailsUseCase: sl()),
+    () => NewsBloc(getNewsUseCase: sl(), favoritesManager: sl()),
+  );
+  sl.registerFactory(
+    () => NewsDetailsBloc(getNewsDetailsUseCase: sl(), favoritesManager: sl()),
   ); // <--- NOVO (Bloc de Detalhes)
 }
