@@ -1,3 +1,4 @@
+import 'package:desafio_loomi_flutter/core/presentation/custom_home_app_bar.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_event.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
@@ -17,13 +18,12 @@ class NewsPage extends StatefulWidget {
 
 class _NewsPageState extends State<NewsPage> {
   final _scrollController = ScrollController();
-  final _searchController = TextEditingController(); // Novo: Controle da busca
+  final _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    // Dispara o fetch inicial
     context.read<NewsBloc>().add(NewsFetched());
   }
 
@@ -50,32 +50,39 @@ class _NewsPageState extends State<NewsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Loomi News'),
-        centerTitle: true,
-        // Adicionando botão para ir ao perfil (requisito do PDF)
-        leading: IconButton(
-          icon: const Icon(Icons.person_outline),
-          onPressed: () => context.push('/profile'),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              // 1. DISPARA O EVENTO (Isso vai limpar o SharedPreferences e o Estado)
-              context.read<AuthBloc>().add(LogoutRequested());
-
-              // 2. NAVEGA (Opcional se você tiver um Listener global, mas pode manter aqui)
-              context.go('/login');
-            },
-          ),
-        ],
+      backgroundColor: Colors.white,
+      appBar: CustomHomeAppBar(
+        selectedTab: 0, // 0 pois esta é a aba de Notícias
+        onTabChanged: (index) {
+          if (index == 1) {
+            // Lógica para navegar para o perfil se necessário
+            // context.go('/profile');
+          }
+        },
       ),
       body: Column(
         children: [
-          // --- CAMPO DE BUSCA (Requisito do PDF) ---
+          // Título da Seção (Opcional, se quiser manter o estilo das mensagens anteriores)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+              child: Text(
+                'Nortus',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+
+          // --- CAMPO DE BUSCA ---
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
@@ -87,7 +94,6 @@ class _NewsPageState extends State<NewsPage> {
                 contentPadding: const EdgeInsets.symmetric(vertical: 0),
               ),
               onChanged: (value) {
-                // Aqui você pode disparar um evento de busca no seu Bloc
                 // context.read<NewsBloc>().add(NewsSearchChanged(value));
               },
             ),
@@ -121,6 +127,7 @@ class _NewsPageState extends State<NewsPage> {
                     }
                     return ListView.builder(
                       controller: _scrollController,
+                      padding: const EdgeInsets.only(top: 8),
                       itemCount: state.hasReachedMax
                           ? state.news.length
                           : state.news.length + 1,

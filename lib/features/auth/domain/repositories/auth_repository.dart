@@ -7,6 +7,7 @@ abstract class AuthRepository {
     UserEntity user, {
     bool keepLoggedIn,
   });
+  Future<Either<Failure, UserEntity>> register(UserEntity user);
   Future<Either<Failure, void>> logout();
   Future<Either<Failure, bool>> checkAuthStatus();
 }

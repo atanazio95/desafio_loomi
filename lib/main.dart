@@ -24,10 +24,6 @@ class MyApp extends StatelessWidget {
           // O di.sl<AuthBloc>() busca a instância configurada no seu GetIt
           create: (context) => di.sl<AuthBloc>(),
         ),
-        // Se você quiser que o NewsBloc também seja global:
-        // BlocProvider<NewsBloc>(
-        //   create: (context) => di.sl<NewsBloc>(),
-        // ),
       ],
       child: MaterialApp.router(
         routerConfig: routerConfig,

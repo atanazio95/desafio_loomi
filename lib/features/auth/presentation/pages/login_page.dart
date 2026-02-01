@@ -14,24 +14,63 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  int _selectedTab = 0;
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  int _selectedTab = 0; // 0: Login, 1: Registro
   bool _isPasswordStep = false;
   bool _keepLoggedIn = false;
   bool _obscurePassword = true;
+  bool _obscurePasswordConfirmed = true;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  bool get _isRegisterMode => _selectedTab == 1;
+
+  // --- VALIDAÇÕES ---
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) return 'Informe seu e-mail';
+
+    // Validação de formato apenas no cadastro
+    if (_isRegisterMode) {
+      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+      if (!emailRegex.hasMatch(value)) return 'E-mail em formato inválido';
+    }
+
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) return 'Informe sua senha';
+    if (_isRegisterMode) {
+      if (value.length < 8) return 'Mínimo de 8 caracteres';
+      if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d).+$').hasMatch(value)) {
+        return 'Deve conter ao menos uma letra e um número';
+      }
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     const primaryBlue = Color(0xFF1876D2);
-    const darkBlueNortus = Color(0xFF0D478C);
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // 1. MARCA D'ÁGUA (Escudo)
+          // 1. MARCA D'ÁGUA
           Positioned(
             top: size.height * 0.05,
             right: -size.width * 0.45,
@@ -62,23 +101,16 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
 
-          // 3. CARD DINÂMICO
-          // --- CARD DINÂMICO E SELETOR ---
+          // 3. CARD DINÂMICO E SELETOR
           Align(
             alignment: Alignment.bottomCenter,
             child: Stack(
               clipBehavior: Clip.none,
               alignment: Alignment.topCenter,
               children: [
-                // 1. O CARD AZUL
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(
-                    24,
-                    60,
-                    24,
-                    40,
-                  ), // Ajustado padding inferior
+                  padding: const EdgeInsets.fromLTRB(24, 60, 24, 40),
                   decoration: const BoxDecoration(
                     color: Color(0xFF0D478C),
                     borderRadius: BorderRadius.only(
@@ -89,7 +121,6 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // CONTAINER BRANCO (Inputs)
                       AnimatedSize(
                         duration: const Duration(milliseconds: 300),
                         child: Container(
@@ -98,41 +129,80 @@ class _LoginPageState extends State<LoginPage> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(24),
                           ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TextFormField(
-                                controller: _emailController,
-                                enabled: true,
-                                decoration: _inputDecoration(
-                                  'Digite seu e-mail',
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _isRegisterMode
+                                      ? 'Crie sua conta'
+                                      : 'Acesse sua conta',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.black87,
+                                  ),
                                 ),
-                              ),
-                              if (_isPasswordStep) ...[
-                                const SizedBox(height: 20),
-                                TextFormField(
-                                  controller: _passwordController,
-                                  obscureText: _obscurePassword,
-                                  decoration:
-                                      _inputDecoration(
-                                        'Digite sua senha',
-                                      ).copyWith(
-                                        suffixIcon: IconButton(
-                                          icon: Icon(
-                                            _obscurePassword
-                                                ? Icons.visibility_off_outlined
-                                                : Icons.visibility_outlined,
-                                            color: Colors.black,
-                                          ),
-                                          onPressed: () => setState(
-                                            () => _obscurePassword =
-                                                !_obscurePassword,
-                                          ),
-                                        ),
+                                const SizedBox(height: 24),
+
+                                _buildTextFormField(
+                                  controller: _emailController,
+                                  label: 'Digite seu E-mail',
+                                  validator: _validateEmail,
+                                  keyboardType: TextInputType.emailAddress,
+                                ),
+
+                                if (_isRegisterMode || _isPasswordStep) ...[
+                                  const SizedBox(height: 16),
+                                  _buildTextFormField(
+                                    controller: _passwordController,
+                                    label: 'Digite a Senha',
+                                    validator: _validatePassword,
+                                    obscureText: _obscurePassword,
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscurePassword
+                                            ? Icons.visibility_off_outlined
+                                            : Icons.visibility_outlined,
+                                        color: Colors.black,
                                       ),
-                                ),
-                                if (_isPasswordStep) ...[
+                                      onPressed: () => setState(
+                                        () => _obscurePassword =
+                                            !_obscurePassword,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+
+                                if (_isRegisterMode) ...[
+                                  const SizedBox(height: 16),
+                                  _buildTextFormField(
+                                    controller: _confirmPasswordController,
+                                    label: 'Confirme Senha',
+                                    obscureText: _obscurePasswordConfirmed,
+                                    validator: (value) {
+                                      if (value != _passwordController.text)
+                                        return 'As senhas não coincidem';
+                                      return null;
+                                    },
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscurePasswordConfirmed
+                                            ? Icons.visibility_off_outlined
+                                            : Icons.visibility_outlined,
+                                        color: Colors.black,
+                                      ),
+                                      onPressed: () => setState(
+                                        () => _obscurePasswordConfirmed =
+                                            !_obscurePasswordConfirmed,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+
+                                if (!_isRegisterMode && _isPasswordStep) ...[
                                   const SizedBox(height: 12),
                                   Row(
                                     children: [
@@ -141,15 +211,11 @@ class _LoginPageState extends State<LoginPage> {
                                         width: 24,
                                         child: Checkbox(
                                           value: _keepLoggedIn,
-                                          activeColor: const Color(
-                                            0xFF0D478C,
-                                          ), // O azul escuro que você definiu
-                                          onChanged: (value) {
-                                            setState(
-                                              () => _keepLoggedIn =
-                                                  value ?? false,
-                                            );
-                                          },
+                                          activeColor: const Color(0xFF0D478C),
+                                          onChanged: (value) => setState(
+                                            () =>
+                                                _keepLoggedIn = value ?? false,
+                                          ),
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
                                               4,
@@ -173,26 +239,21 @@ class _LoginPageState extends State<LoginPage> {
                                     ],
                                   ),
                                 ],
+
+                                const SizedBox(height: 24),
+                                _buildActionButton(),
                               ],
-                              const SizedBox(height: 24),
-                              _buildActionButton(),
-                            ],
+                            ),
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 24),
-
-                      // --- RODAPÉ COM LINKS (ADIÇÃO SOLICITADA) ---
                       Wrap(
                         alignment: WrapAlignment.center,
                         crossAxisAlignment: WrapCrossAlignment.center,
                         spacing: 12,
                         children: [
-                          _footerTextLink('Esqueci a senha', () {
-                            // Lógica de recuperar senha
-                          }),
-                          // O ponto separador
+                          _footerTextLink('Esqueci a senha', () {}),
                           Container(
                             width: 4,
                             height: 4,
@@ -201,16 +262,12 @@ class _LoginPageState extends State<LoginPage> {
                               shape: BoxShape.circle,
                             ),
                           ),
-                          _footerTextLink('Continuar sem conta', () {
-                            // Rota do seu desafio
-                          }),
+                          _footerTextLink('Continuar sem conta', () {}),
                         ],
                       ),
                     ],
                   ),
                 ),
-
-                // 2. SELETOR DE ABAS (Fica na frente)
                 Positioned(
                   top: -28,
                   left: 24,
@@ -257,14 +314,50 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  InputDecoration _inputDecoration(String hint) {
-    return InputDecoration(
-      hintText: hint,
-      filled: true,
-      fillColor: Colors.grey[100],
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
+  // --- WIDGET DE INPUT COM LABEL INTERNO ---
+  Widget _buildTextFormField({
+    required TextEditingController controller,
+    required String label,
+    bool obscureText = false,
+    TextInputType? keyboardType,
+    Widget? suffixIcon,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      validator: validator,
+      onChanged: (value) => setState(() {}),
+      style: GoogleFonts.inter(
+        fontSize: 16,
+        color: Colors.black,
+        fontWeight: FontWeight.w500,
+      ),
+      decoration: InputDecoration(
+        labelText: label,
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+        labelStyle: GoogleFonts.inter(
+          color: controller.text.isNotEmpty
+              ? const Color(0xFF0D478C)
+              : Colors.grey[500],
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
+        floatingLabelStyle: GoogleFonts.inter(
+          color: const Color(0xFF1876D2),
+          fontWeight: FontWeight.w700,
+          fontSize: 12,
+        ),
+        filled: true,
+        fillColor: Colors.grey[100],
+        contentPadding: const EdgeInsets.fromLTRB(16, 30, 16, 12),
+        suffixIcon: suffixIcon,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        errorStyle: const TextStyle(height: 0.8, fontSize: 12),
       ),
     );
   }
@@ -273,8 +366,27 @@ class _LoginPageState extends State<LoginPage> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          context.go('/news'); // Navega se logar com sucesso
-        } else if (state is AuthError) {
+          if (_isRegisterMode) {
+            // MOSTRA SNACKBAR E VOLTA PARA LOGIN (SEM LOGAR)
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Usuário cadastrado com sucesso!'),
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+            setState(() {
+              _selectedTab = 0;
+              _isPasswordStep = false;
+              _emailController.clear();
+              _passwordController.clear();
+              _confirmPasswordController.clear();
+            });
+          } else {
+            context.go('/news');
+          }
+        }
+        if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: Colors.red),
           );
@@ -285,23 +397,30 @@ class _LoginPageState extends State<LoginPage> {
           width: double.infinity,
           height: 54,
           child: ElevatedButton(
-            // No seu _buildActionButton dentro da LoginPage:
             onPressed: () {
-              if (_isPasswordStep) {
-                context.read<AuthBloc>().add(
-                  LoginSubmitted(
-                    username: _emailController.text,
-                    password: _passwordController.text,
-                    keepLoggedIn:
-                        _keepLoggedIn, // A variável que controlamos com o setState do Checkbox
-                  ),
-                );
-              } else {
-                setState(() => _isPasswordStep = true);
+              if (_formKey.currentState!.validate()) {
+                if (_isRegisterMode) {
+                  context.read<AuthBloc>().add(
+                    RegisterSubmitted(
+                      username: _emailController.text,
+                      password: _passwordController.text,
+                    ),
+                  );
+                } else if (!_isPasswordStep) {
+                  setState(() => _isPasswordStep = true);
+                } else {
+                  context.read<AuthBloc>().add(
+                    LoginSubmitted(
+                      username: _emailController.text,
+                      password: _passwordController.text,
+                      keepLoggedIn: _keepLoggedIn,
+                    ),
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF1876D2),
+              backgroundColor: const Color(0xFF1876D2),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -316,7 +435,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   )
                 : Text(
-                    'Entrar',
+                    _isRegisterMode ? 'Cadastrar' : 'Entrar',
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -330,7 +449,13 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildTabButton(String label, bool isSelected, int index) {
     return GestureDetector(
-      onTap: () => setState(() => _selectedTab = index),
+      onTap: () => setState(() {
+        _selectedTab = index;
+        _isPasswordStep = false;
+        _formKey.currentState?.reset();
+        _passwordController.clear();
+        _confirmPasswordController.clear();
+      }),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         decoration: BoxDecoration(

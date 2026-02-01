@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class AuthRemoteDatasource {
   Future<bool> login(String username, String password);
+  Future<UserModel> register(String username, String password);
   Future<void> logout();
   Future<bool> checkAuthStatus();
 }
@@ -40,6 +41,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDatasource {
     } catch (e) {
       throw ServerFailure();
     }
+  }
+
+  // No arquivo de implementação:
+
+  @override
+  Future<UserModel> register(String login, String password) async {
+    // Simulamos o tempo de resposta do servidor
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Como não existe endpoint, retornamos um modelo "mockado"
+    // para que o fluxo do Bloc continue funcionando.
+    return UserModel(login: login, password: password);
   }
 
   @override

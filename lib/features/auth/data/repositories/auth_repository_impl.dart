@@ -35,6 +35,21 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, UserEntity>> register(UserEntity user) async {
+    try {
+      // Chamada ao DataSource (API)
+      final userModel = await dataSource.register(user.login, user.password);
+
+      // Opcional: Se o cadastro já logar o usuário automaticamente,
+      // você pode salvar a flag no SharedPreferences aqui também.
+
+      return Right(userModel);
+    } catch (e) {
+      return Left(ServerFailure());
+    }
+  }
+
+  @override
   Future<Either<Failure, void>> logout() async {
     try {
       // 1. Limpa a flag de persistência no SharedPreferences
