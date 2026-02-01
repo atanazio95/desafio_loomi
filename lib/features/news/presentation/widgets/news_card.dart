@@ -69,7 +69,7 @@ class NewsCard extends StatelessWidget {
 
               // 2. Categoria e Título
               Text(
-                news.summary.toUpperCase(), // Voltar para corrigir
+                news.category.toUpperCase(), // Voltar para corrigir
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w900,

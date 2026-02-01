@@ -3,28 +3,32 @@ import 'package:equatable/equatable.dart';
 class NewsEntity extends Equatable {
   final String id;
   final String title;
+  final String category;
   final String author;
   final String summary;
   final String datePublished;
   final String imageUrl;
   final List<NewsEntity> relatedNews;
-  final bool isFavorite; // Campo novo
+  final bool isFavorite;
 
   const NewsEntity({
     required this.id,
     required this.title,
+    required this.category,
     required this.author,
     required this.summary,
     required this.datePublished,
     required this.imageUrl,
-    this.relatedNews = const [],
+    required this.relatedNews,
     this.isFavorite = false,
   });
 
-  // --- AQUI ESTÁ A FUNÇÃO QUE FALTAVA ---
+  // O método copyWith permite atualizar campos específicos (como isFavorite)
+  // sem perder o restante dos dados da entidade.
   NewsEntity copyWith({
     String? id,
     String? title,
+    String? category,
     String? author,
     String? summary,
     String? datePublished,
@@ -35,6 +39,7 @@ class NewsEntity extends Equatable {
     return NewsEntity(
       id: id ?? this.id,
       title: title ?? this.title,
+      category: category ?? this.category,
       author: author ?? this.author,
       summary: summary ?? this.summary,
       datePublished: datePublished ?? this.datePublished,
@@ -48,11 +53,12 @@ class NewsEntity extends Equatable {
   List<Object?> get props => [
     id,
     title,
+    category,
     author,
     summary,
     datePublished,
     imageUrl,
     relatedNews,
-    isFavorite, // Importante estar aqui para o Bloc detectar a mudança
+    isFavorite,
   ];
 }

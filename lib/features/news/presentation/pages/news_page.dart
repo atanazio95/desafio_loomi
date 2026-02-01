@@ -1,13 +1,12 @@
+import 'package:desafio_loomi_flutter/core/presentation/custom_drawer.dart';
 import 'package:desafio_loomi_flutter/core/presentation/custom_home_app_bar.dart';
-import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_event.dart';
+import 'package:desafio_loomi_flutter/core/presentation/header.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_state.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/widgets/news_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 
 class NewsPage extends StatefulWidget {
   const NewsPage({super.key});
@@ -51,6 +50,7 @@ class _NewsPageState extends State<NewsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      drawer: const CustomDrawer(),
       appBar: CustomHomeAppBar(
         selectedTab: 0, // 0 pois esta é a aba de Notícias
         onTabChanged: (index) {
@@ -62,42 +62,7 @@ class _NewsPageState extends State<NewsPage> {
       ),
       body: Column(
         children: [
-          // Título da Seção (Opcional, se quiser manter o estilo das mensagens anteriores)
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-              child: Text(
-                'Nortus',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ),
-
-          // --- CAMPO DE BUSCA ---
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 8.0,
-            ),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Buscar notícias...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
-              ),
-              onChanged: (value) {
-                // context.read<NewsBloc>().add(NewsSearchChanged(value));
-              },
-            ),
-          ),
+          const NewsHeader(),
 
           // --- LISTAGEM ---
           Expanded(
