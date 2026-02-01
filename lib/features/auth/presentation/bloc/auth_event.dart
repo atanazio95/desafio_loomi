@@ -10,11 +10,13 @@ abstract class AuthEvent extends Equatable {
 class LoginSubmitted extends AuthEvent {
   final String username;
   final String password;
+  final bool keepLoggedIn; // Adicione este campo
 
-  const LoginSubmitted({required this.username, required this.password});
-
-  @override
-  List<Object> get props => [username, password];
+  LoginSubmitted({
+    required this.username,
+    required this.password,
+    this.keepLoggedIn = false, // Adicione ao construtor
+  });
 }
 
 class LogoutRequested extends AuthEvent {}

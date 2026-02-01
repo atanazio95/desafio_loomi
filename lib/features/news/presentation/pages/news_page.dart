@@ -1,3 +1,5 @@
+import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_event.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_state.dart';
@@ -59,7 +61,13 @@ class _NewsPageState extends State<NewsPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => context.go('/login'),
+            onPressed: () {
+              // 1. DISPARA O EVENTO (Isso vai limpar o SharedPreferences e o Estado)
+              context.read<AuthBloc>().add(LogoutRequested());
+
+              // 2. NAVEGA (Opcional se você tiver um Listener global, mas pode manter aqui)
+              context.go('/login');
+            },
           ),
         ],
       ),

@@ -27,6 +27,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     final result = await loginUseCase(
       UserEntity(login: event.username, password: event.password),
+      keepLoggedIn: event.keepLoggedIn,
     );
 
     result.fold(

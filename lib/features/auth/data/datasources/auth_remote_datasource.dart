@@ -1,8 +1,8 @@
+import 'package:desafio_loomi_flutter/core/errors/failures.dart';
+import 'package:desafio_loomi_flutter/core/network/dio_client.dart';
+import 'package:desafio_loomi_flutter/features/auth/data/models/user_model.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../core/errors/failures.dart';
-import '../../../../core/network/dio_client.dart';
-import '../models/user_model.dart';
 
 abstract class AuthRemoteDatasource {
   Future<bool> login(String username, String password);
@@ -31,7 +31,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDatasource {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        await sharedPreferences.setBool('is_logged_in', true);
         return true;
       } else {
         throw ServerFailure();
@@ -45,8 +44,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDatasource {
 
   @override
   Future<void> logout() async {
-    await sharedPreferences.remove('is_logged_in');
-    await sharedPreferences.remove('auth_token');
+    await sharedPreferences.setBool('is_logged_in', false);
   }
 
   @override

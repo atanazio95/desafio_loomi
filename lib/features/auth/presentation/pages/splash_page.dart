@@ -1,10 +1,12 @@
-import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_event.dart';
-import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_state.dart';
+// lib/features/auth/presentation/pages/splash_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_event.dart';
+import '../bloc/auth_state.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -24,39 +26,50 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Future<void> _startSplash() async {
-    // Inicia verificação de auth
+    // 1. Dispara a verificação no SharedPreferences
     context.read<AuthBloc>().add(AuthCheckRequested());
 
-    // Delay mínimo para exibir o "Nortus"
+    // 2. Aguarda o tempo visual da marca (1.5 segundos)
     await Future.delayed(const Duration(milliseconds: 1500));
 
     if (!mounted) return;
 
-    _canNavigate = true;
+    // 3. Verifica se o Bloc já deu uma resposta enquanto o delay acontecia
+    final currentState = context.read<AuthBloc>().state;
 
-    // Se já recebeu o estado, navega agora
-    if (_pendingState != null) {
-      _navigate(_pendingState!);
+    if (currentState is AuthAuthenticated ||
+        currentState is AuthUnauthenticated ||
+        currentState is AuthError) {
+      _navigate(currentState);
+    } else {
+      // Se ainda estiver em AuthInitial ou AuthLoading, libera para o Listener navegar depois
+      setState(() {
+        _canNavigate = true;
+      });
     }
   }
 
   void _navigate(AuthState state) {
     if (state is AuthAuthenticated) {
-      context.go('/news');
-    } else if (state is AuthUnauthenticated) {
-      context.go('/login');
-    } else if (state is AuthError) {
+      context.go('/news'); // Altere para sua rota principal
+    } else {
       context.go('/login');
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // ESTE É O BLOCO QUE VOCÊ PERGUNTOU:
     return BlocListener<AuthBloc, AuthState>(
+      listenWhen: (previous, current) =>
+          current is AuthAuthenticated ||
+          current is AuthUnauthenticated ||
+          current is AuthError,
       listener: (context, state) {
         if (_canNavigate) {
           _navigate(state);
         } else {
+          // Se o check for mais rápido que 1.5s, guardamos o resultado aqui
           _pendingState = state;
         }
       },
@@ -69,7 +82,6 @@ class _SplashPageState extends State<SplashPage> {
               color: Colors.white,
               fontSize: 48,
               fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
             ),
           ),
         ),

@@ -1,4 +1,8 @@
+import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_event.dart';
+import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,7 +17,9 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   int _selectedTab = 0;
-  bool _isPasswordStep = false; // Controla se estamos na fase da senha
+  bool _isPasswordStep = false;
+  bool _keepLoggedIn = false;
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
           // 2. TÍTULO NORTUS
           SafeArea(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(24, size.height * 0.08, 24, 0),
+              padding: EdgeInsets.fromLTRB(20, size.height * 0.05, 24, 0),
               child: Text(
                 'Nortus',
                 style: GoogleFonts.inter(
@@ -96,25 +102,77 @@ class _LoginPageState extends State<LoginPage> {
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildFieldLabel('E-mail'),
                               TextFormField(
                                 controller: _emailController,
-                                enabled: !_isPasswordStep,
+                                enabled: true,
                                 decoration: _inputDecoration(
                                   'Digite seu e-mail',
                                 ),
                               ),
                               if (_isPasswordStep) ...[
                                 const SizedBox(height: 20),
-                                _buildFieldLabel('Senha'),
                                 TextFormField(
                                   controller: _passwordController,
-                                  obscureText: true,
-                                  autofocus: true,
-                                  decoration: _inputDecoration(
-                                    'Digite sua senha',
-                                  ),
+                                  obscureText: _obscurePassword,
+                                  decoration:
+                                      _inputDecoration(
+                                        'Digite sua senha',
+                                      ).copyWith(
+                                        suffixIcon: IconButton(
+                                          icon: Icon(
+                                            _obscurePassword
+                                                ? Icons.visibility_off_outlined
+                                                : Icons.visibility_outlined,
+                                            color: Colors.black,
+                                          ),
+                                          onPressed: () => setState(
+                                            () => _obscurePassword =
+                                                !_obscurePassword,
+                                          ),
+                                        ),
+                                      ),
                                 ),
+                                if (_isPasswordStep) ...[
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        height: 24,
+                                        width: 24,
+                                        child: Checkbox(
+                                          value: _keepLoggedIn,
+                                          activeColor: const Color(
+                                            0xFF0D478C,
+                                          ), // O azul escuro que você definiu
+                                          onChanged: (value) {
+                                            setState(
+                                              () => _keepLoggedIn =
+                                                  value ?? false,
+                                            );
+                                          },
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      GestureDetector(
+                                        onTap: () => setState(
+                                          () => _keepLoggedIn = !_keepLoggedIn,
+                                        ),
+                                        child: Text(
+                                          'Mantenha-me conectado',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ],
                               const SizedBox(height: 24),
                               _buildActionButton(),
@@ -199,20 +257,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // Métodos Auxiliares para limpar o código
-  Widget _buildFieldLabel(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        label,
-        style: GoogleFonts.inter(
-          color: const Color(0xFF0D478C),
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
@@ -226,38 +270,61 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildActionButton() {
-    const darkBlueNortus = Color(0xFF0D478C);
-
-    return SizedBox(
-      width: double.infinity,
-      height: 54,
-      child: ElevatedButton(
-        onPressed: () {
-          // Se ainda não estiver na etapa da senha e o e-mail não estiver vazio
-          if (!_isPasswordStep && _emailController.text.isNotEmpty) {
-            setState(() => _isPasswordStep = true);
-          } else if (_isPasswordStep) {
-            // AQUI: Lógica final de autenticação (ex: chamada ao Bloc ou API)
-            print("Tentando logar com: ${_emailController.text}");
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: darkBlueNortus, // Cor exata: #0D478C
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthAuthenticated) {
+          context.go('/news'); // Navega se logar com sucesso
+        } else if (state is AuthError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+          );
+        }
+      },
+      builder: (context, state) {
+        return SizedBox(
+          width: double.infinity,
+          height: 54,
+          child: ElevatedButton(
+            // No seu _buildActionButton dentro da LoginPage:
+            onPressed: () {
+              if (_isPasswordStep) {
+                context.read<AuthBloc>().add(
+                  LoginSubmitted(
+                    username: _emailController.text,
+                    password: _passwordController.text,
+                    keepLoggedIn:
+                        _keepLoggedIn, // A variável que controlamos com o setState do Checkbox
+                  ),
+                );
+              } else {
+                setState(() => _isPasswordStep = true);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF1876D2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: state is AuthLoading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(
+                    'Entrar',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
           ),
-        ),
-        child: Text(
-          _isPasswordStep ? 'Entrar' : 'Próximo',
-          style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -267,14 +334,14 @@ class _LoginPageState extends State<LoginPage> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF0D478C) : Colors.transparent,
+          color: isSelected ? const Color(0xFF1876D2) : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
         ),
         child: Center(
           child: Text(
             label,
             style: GoogleFonts.inter(
-              color: isSelected ? Colors.white : const Color(0xFF0D478C),
+              color: isSelected ? Colors.white : Colors.black,
               fontWeight: FontWeight.w600,
             ),
           ),
