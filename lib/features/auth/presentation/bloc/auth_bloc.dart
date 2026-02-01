@@ -2,21 +2,25 @@ import 'package:desafio_loomi_flutter/features/auth/domain/entities/user_entity.
 import 'package:desafio_loomi_flutter/features/auth/domain/repositories/auth_repository.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/usecases/check_auth_status_usecase.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/usecases/login_usecase.dart';
+import 'package:desafio_loomi_flutter/features/auth/domain/usecases/register_usecase.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_event.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase loginUseCase;
+  final RegisterUseCase registerUseCase;
   final AuthRepository authRepository;
   final CheckAuthStatusUseCase checkAuthStatusUseCase;
 
   AuthBloc({
     required this.loginUseCase,
+    required this.registerUseCase,
     required this.authRepository,
     required this.checkAuthStatusUseCase,
   }) : super(AuthInitial()) {
     on<LoginSubmitted>(_onLoginSubmitted);
+    on<RegisterSubmitted>(_onRegisterSubmitted);
     on<AuthCheckRequested>(_onCheckAuthStatus);
     on<LogoutRequested>(_onLogoutRequested);
   }
@@ -27,6 +31,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     final result = await loginUseCase(
       UserEntity(login: event.username, password: event.password),
+      keepLoggedIn: event.keepLoggedIn,
     );
 
     result.fold(
@@ -36,6 +41,27 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ),
       ),
       (success) => emit(AuthAuthenticated()),
+    );
+  }
+
+  Future<void> _onRegisterSubmitted(
+    RegisterSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+
+    // O registerUseCase agora retorna o sucesso simulado do DataSource
+    final result = await registerUseCase(
+      UserEntity(login: event.username, password: event.password),
+    );
+
+    result.fold(
+      (failure) => emit(const AuthError(message: "Erro ao simular cadastro")),
+      (user) {
+        // DICA: Se quiser que ele já fique logado no SharedPreferences:
+        // authRepository.saveSession(true);
+        emit(AuthAuthenticated());
+      },
     );
   }
 

@@ -5,6 +5,7 @@ import 'package:desafio_loomi_flutter/features/auth/data/repositories/auth_repos
 import 'package:desafio_loomi_flutter/features/auth/domain/repositories/auth_repository.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/usecases/check_auth_status_usecase.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/usecases/login_usecase.dart';
+import 'package:desafio_loomi_flutter/features/auth/domain/usecases/register_usecase.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:desafio_loomi_flutter/features/news/data/datasources/news_remote_datasource_impl.dart';
 import 'package:desafio_loomi_flutter/features/news/data/repositories/news_repository_impl.dart';
@@ -22,6 +23,7 @@ Future<void> init() async {
   sl.registerFactory(
     () => AuthBloc(
       loginUseCase: sl(),
+      registerUseCase: sl(),
       authRepository: sl(),
       checkAuthStatusUseCase: sl(),
     ),
@@ -29,6 +31,7 @@ Future<void> init() async {
 
   // UseCases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
+  sl.registerLazySingleton(() => RegisterUseCase(sl()));
   sl.registerLazySingleton(() => CheckAuthStatusUseCase(sl()));
 
   // Repository
@@ -53,9 +56,7 @@ Future<void> init() async {
 
   // UseCases
   sl.registerLazySingleton(() => GetNewsUseCase(sl()));
-  sl.registerLazySingleton(
-    () => GetNewsDetailsUseCase(sl()),
-  ); // <--- NOVO (Detalhes)
+  sl.registerLazySingleton(() => GetNewsDetailsUseCase(sl()));
 
   // Repository
   // Nota: O mesmo repositório serve para Listagem e Detalhes
@@ -74,5 +75,5 @@ Future<void> init() async {
   );
   sl.registerFactory(
     () => NewsDetailsBloc(getNewsDetailsUseCase: sl(), favoritesManager: sl()),
-  ); // <--- NOVO (Bloc de Detalhes)
+  );
 }

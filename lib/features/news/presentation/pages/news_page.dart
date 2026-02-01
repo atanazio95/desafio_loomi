@@ -1,10 +1,12 @@
+import 'package:desafio_loomi_flutter/core/presentation/custom_drawer.dart';
+import 'package:desafio_loomi_flutter/core/presentation/custom_home_app_bar.dart';
+import 'package:desafio_loomi_flutter/core/presentation/header.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_state.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/widgets/news_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 
 class NewsPage extends StatefulWidget {
   const NewsPage({super.key});
@@ -15,13 +17,12 @@ class NewsPage extends StatefulWidget {
 
 class _NewsPageState extends State<NewsPage> {
   final _scrollController = ScrollController();
-  final _searchController = TextEditingController(); // Novo: Controle da busca
+  final _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    // Dispara o fetch inicial
     context.read<NewsBloc>().add(NewsFetched());
   }
 
@@ -48,42 +49,20 @@ class _NewsPageState extends State<NewsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Loomi News'),
-        centerTitle: true,
-        // Adicionando botão para ir ao perfil (requisito do PDF)
-        leading: IconButton(
-          icon: const Icon(Icons.person_outline),
-          onPressed: () => context.push('/profile'),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => context.go('/login'),
-          ),
-        ],
+      backgroundColor: Colors.white,
+      drawer: const CustomDrawer(),
+      appBar: CustomHomeAppBar(
+        selectedTab: 0, // 0 pois esta é a aba de Notícias
+        onTabChanged: (index) {
+          if (index == 1) {
+            // Lógica para navegar para o perfil se necessário
+            // context.go('/profile');
+          }
+        },
       ),
       body: Column(
         children: [
-          // --- CAMPO DE BUSCA (Requisito do PDF) ---
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Buscar notícias...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
-              ),
-              onChanged: (value) {
-                // Aqui você pode disparar um evento de busca no seu Bloc
-                // context.read<NewsBloc>().add(NewsSearchChanged(value));
-              },
-            ),
-          ),
+          const NewsHeader(),
 
           // --- LISTAGEM ---
           Expanded(
@@ -113,6 +92,7 @@ class _NewsPageState extends State<NewsPage> {
                     }
                     return ListView.builder(
                       controller: _scrollController,
+                      padding: const EdgeInsets.only(top: 8),
                       itemCount: state.hasReachedMax
                           ? state.news.length
                           : state.news.length + 1,

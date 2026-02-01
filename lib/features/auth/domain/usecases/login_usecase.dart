@@ -7,7 +7,12 @@ class LoginUseCase {
   final AuthRepository repository;
 
   LoginUseCase(this.repository);
-  Future<Either<Failure, bool>> call(UserEntity user) async {
-    return await repository.login(user);
+
+  // O segredo é adicionar o parâmetro nomeado aqui:
+  Future<Either<Failure, UserEntity>> call(
+    UserEntity user, {
+    bool keepLoggedIn = false,
+  }) async {
+    return await repository.login(user, keepLoggedIn: keepLoggedIn);
   }
 }
