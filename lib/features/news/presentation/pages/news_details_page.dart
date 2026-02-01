@@ -19,12 +19,12 @@ class NewsDetailsPage extends StatelessWidget {
       child: Scaffold(
         body: BlocBuilder<NewsDetailsBloc, NewsDetailsState>(
           builder: (context, state) {
+            // 1. Definimos a notícia base vinda do construtor
             NewsEntity displayNews = news;
-            bool isLoadingRelated = true;
 
+            // 2. Se o estado estiver carregado, usamos a versão atualizada do Bloc
             if (state is NewsDetailsLoaded) {
               displayNews = state.news;
-              isLoadingRelated = false;
             }
 
             return CustomScrollView(
@@ -37,6 +37,30 @@ class NewsDetailsPage extends StatelessWidget {
                     color: Colors.white,
                     shadows: [Shadow(color: Colors.black, blurRadius: 10)],
                   ),
+                  actions: [
+                    // MANTEMOS O BOTÃO SEMPRE PRESENTE
+                    // Ele apenas fica desabilitado (onPressed: null) durante o loading
+                    IconButton(
+                      icon: Icon(
+                        displayNews.isFavorite
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color: displayNews.isFavorite
+                            ? Colors.red
+                            : Colors.white,
+                        shadows: const [
+                          Shadow(color: Colors.black, blurRadius: 10),
+                        ],
+                      ),
+                      onPressed: state is NewsDetailsLoading
+                          ? null // Impede cliques múltiplos enquanto a API processa
+                          : () {
+                              context.read<NewsDetailsBloc>().add(
+                                ToggleFavoriteNews(),
+                              );
+                            },
+                    ),
+                  ],
                   flexibleSpace: FlexibleSpaceBar(
                     background: Hero(
                       tag: 'news_image_${displayNews.id}',
@@ -105,6 +129,7 @@ class NewsDetailsPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                // O loading aparece apenas na parte inferior como um indicador de progresso
                 if (state is NewsDetailsLoading)
                   const SliverToBoxAdapter(
                     child: Padding(

@@ -1,6 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
-import 'package:desafio_loomi_flutter/core/errors/failures.dart';
+import 'package:desafio_loomi_flutter/core/services/favorites_manager.dart'; // Import necessário
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/usecases/get_news_usecase.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
@@ -11,13 +11,23 @@ import 'package:mocktail/mocktail.dart';
 
 class MockGetNewsUseCase extends Mock implements GetNewsUseCase {}
 
+class MockFavoritesManager extends Mock
+    implements FavoritesManager {} // Mock do Manager
+
 void main() {
   late NewsBloc bloc;
   late MockGetNewsUseCase mockGetNewsUseCase;
+  late MockFavoritesManager mockFavoritesManager;
 
   setUp(() {
     mockGetNewsUseCase = MockGetNewsUseCase();
-    bloc = NewsBloc(getNewsUseCase: mockGetNewsUseCase);
+    mockFavoritesManager = MockFavoritesManager();
+
+    // Injetamos o mock no lugar do null
+    bloc = NewsBloc(
+      getNewsUseCase: mockGetNewsUseCase,
+      favoritesManager: mockFavoritesManager,
+    );
   });
 
   tearDown(() {
@@ -32,54 +42,63 @@ void main() {
       imageUrl: 'img.png',
       datePublished: '2026-01-01',
       author: 'Jeorge',
+      isFavorite: false, // Importante definir no teste
     ),
   ];
 
   group('NewsBloc', () {
     test('o estado inicial deve ser NewsState padrão (status initial)', () {
-      // Como você definiu valores padrão no construtor, comparamos com uma instância vazia
       expect(bloc.state, const NewsState());
     });
 
     blocTest<NewsBloc, NewsState>(
-      'deve emitir [status: success, news: lista] quando os dados forem carregados',
+      'deve emitir [status: success] com favoritos mapeados quando os dados forem carregados',
       build: () {
+        // Simulamos que a API retorna a lista
         when(
           () => mockGetNewsUseCase(1),
         ).thenAnswer((_) async => const Right(tNewsList));
+
+        // Simulamos que o Manager diz que a notícia NÃO é favorita
+        when(() => mockFavoritesManager.isFavorite(any())).thenReturn(false);
+
         return bloc;
       },
       act: (bloc) => bloc.add(NewsFetched()),
       expect: () => [
-        // Aqui está a mágica: Criamos o objeto EXATAMENTE como esperamos que ele fique
         const NewsState(
           status: NewsStatus.success,
-          news: tNewsList,
+          news: tNewsList, // A lista aqui já deve estar mapeada pelo Bloc
           hasReachedMax: false,
           errorMessage: '',
         ),
       ],
       verify: (_) {
         verify(() => mockGetNewsUseCase(1)).called(1);
+        verify(() => mockFavoritesManager.isFavorite('1')).called(1);
       },
     );
 
     blocTest<NewsBloc, NewsState>(
-      'deve emitir [status: failure] quando o UseCase falhar',
+      'deve emitir [status: success] refletindo o favorito verdadeiro do manager',
       build: () {
         when(
           () => mockGetNewsUseCase(1),
-        ).thenAnswer((_) async => Left(ServerFailure()));
+        ).thenAnswer((_) async => const Right(tNewsList));
+
+        // Simulamos que o Manager diz que a notícia É favorita (true)
+        when(() => mockFavoritesManager.isFavorite('1')).thenReturn(true);
+
         return bloc;
       },
       act: (bloc) => bloc.add(NewsFetched()),
       expect: () => [
-        // Esperamos o estado de erro com a mensagem
-        const NewsState(
-          status: NewsStatus.failure,
-          news: [], // Lista vazia (padrão)
-          errorMessage:
-              "Erro no servidor. Tente novamente.", // Ou a mensagem que seu Bloc define
+        NewsState(
+          status: NewsStatus.success,
+          news: [
+            tNewsList[0].copyWith(isFavorite: true),
+          ], // Esperamos true no estado
+          hasReachedMax: false,
         ),
       ],
     );

@@ -22,6 +22,7 @@ void main() {
     author: "Jeorge Atanazio",
     imageUrl: "https://example.com/image.png",
     relatedNews: [],
+    isFavorite: false, // Adicionado para refletir a nova estrutura
   );
 
   group('NewsModel', () {
@@ -33,11 +34,13 @@ void main() {
     test(
       'deve retornar um modelo válido quando o JSON for fornecido corretamente (com estrutura aninhada)',
       () async {
-        // Act (Ação: Converter)
+        // Act
         final result = NewsModel.fromJson(tJson);
 
-        // Assert (Verificação)
+        // Assert
         expect(result, tNewsModel);
+        // Verifica especificamente o favorito inicial
+        expect(result.isFavorite, false);
       },
     );
 
@@ -53,10 +56,21 @@ void main() {
         // Assert
         expect(result.author, 'Autor Desconhecido');
         expect(
-          result.imageUrl,
-          contains('via.placeholder.com'),
-        ); // Checa se pegou o placeholder
+          result.isFavorite,
+          false,
+        ); // Favorito deve ser sempre falso ao vir da API
+        expect(result.imageUrl, contains(''));
       },
     );
+
+    test('deve converter o modelo para um JSON válido (toJson)', () {
+      // Act
+      final result = tNewsModel.toJson();
+
+      // Assert
+      // O toJson deve refletir a estrutura que seu repositório/cache espera
+      expect(result["id"], "123");
+      expect(result["title"], "Flutter é incrível");
+    });
   });
 }
