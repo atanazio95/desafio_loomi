@@ -4,4 +4,5 @@ import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.
 
 abstract class NewsRepository {
   Future<Either<Failure, List<NewsEntity>>> getNews(int page);
+  Future<Either<Failure, NewsEntity>> getNewsDetails(String id);
 }

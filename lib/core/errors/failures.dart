@@ -7,8 +7,8 @@ abstract class Failure extends Equatable {
   List<Object> get props => [];
 }
 
-// erro ou timeout
+// erro or timeout
 class ServerFailure extends Failure {}
 
-// erro de persistencia ler ou salvar
+// erro offline read or save
 class CacheFailure extends Failure {}

@@ -21,6 +21,7 @@ void main() {
     datePublished: "2026-01-31T10:00:00Z",
     author: "Jeorge Atanazio",
     imageUrl: "https://example.com/image.png",
+    relatedNews: [],
   );
 
   group('NewsModel', () {

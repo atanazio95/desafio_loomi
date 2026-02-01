@@ -17,7 +17,6 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
 
-    // Dispara o evento assim que a tela abre
     context.read<AuthBloc>().add(AuthCheckRequested());
   }
 
@@ -39,7 +38,6 @@ class _SplashPageState extends State<SplashPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Logo ou Loading
               CircularProgressIndicator(),
               SizedBox(height: 16),
               Text("Carregando...", style: TextStyle(color: Colors.grey)),

@@ -20,7 +20,6 @@ class _NewsPageState extends State<NewsPage> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    // Dispara a busca inicial assim que a tela abre
     context.read<NewsBloc>().add(NewsFetched());
   }
 
@@ -40,7 +39,6 @@ class _NewsPageState extends State<NewsPage> {
     if (!_scrollController.hasClients) return false;
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.offset;
-    // Se chegou a 90% da tela, carrega mais
     return currentScroll >= (maxScroll * 0.9);
   }
 
@@ -54,7 +52,6 @@ class _NewsPageState extends State<NewsPage> {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              // Logout simples para testar (Em produção chamaria o AuthBloc)
               context.go('/login');
             },
           ),
@@ -74,12 +71,10 @@ class _NewsPageState extends State<NewsPage> {
               }
               return ListView.builder(
                 controller: _scrollController,
-                // Se não acabou a lista, adicionamos +1 item (que é o loading do rodapé)
                 itemCount: state.hasReachedMax
                     ? state.news.length
                     : state.news.length + 1,
                 itemBuilder: (BuildContext context, int index) {
-                  // Se o índice for maior que a lista, desenha o Loader
                   if (index >= state.news.length) {
                     return const Center(
                       child: Padding(
@@ -88,8 +83,6 @@ class _NewsPageState extends State<NewsPage> {
                       ),
                     );
                   }
-
-                  // Senão, desenha o Card da notícia
                   return NewsCard(news: state.news[index]);
                 },
               );

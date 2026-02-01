@@ -6,7 +6,6 @@ import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_state
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_transform/stream_transform.dart';
 
-// Constante para evitar chamadas excessivas no scroll (Debounce/Throttle)
 const throttleDuration = Duration(milliseconds: 100);
 
 EventTransformer<E> throttleDroppable<E>(Duration duration) {
@@ -21,7 +20,6 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
   NewsBloc({required this.getNewsUseCase}) : super(const NewsState()) {
     on<NewsFetched>(
       _onNewsFetched,
-      // O transformador evita spam de eventos quando o usuário rola rápido
       transformer: throttleDroppable(throttleDuration),
     );
   }
@@ -30,13 +28,10 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
     NewsFetched event,
     Emitter<NewsState> emit,
   ) async {
-    // 1. Se já chegou no fim (API retornou vazio antes), para tudo.
     if (state.hasReachedMax) return;
 
     try {
-      // 2. Verifica se é a Primeira Carga (Lista vazia/Estado inicial)
       if (state.status == NewsStatus.initial) {
-        // Pede a página 1
         final result = await getNewsUseCase(1);
 
         result.fold(
@@ -54,11 +49,7 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
             ),
           ),
         );
-      }
-      // 3. Carga Incremental (Rolou para baixo)
-      else {
-        // Cálculo da próxima página baseado no tamanho atual da lista
-        // Ex: 10 itens ~/ 10 = 1.  1 + 1 = Página 2.
+      } else {
         final nextPage = (state.news.length ~/ 10) + 1;
 
         final result = await getNewsUseCase(nextPage);
@@ -66,7 +57,6 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
         result.fold(
           (failure) => emit(state.copyWith(status: NewsStatus.failure)),
           (newNews) {
-            // Se a lista veio vazia, significa que acabou as notícias
             emit(
               newNews.isEmpty
                   ? state.copyWith(hasReachedMax: true)
@@ -80,7 +70,6 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
         );
       }
     } catch (_) {
-      // Captura erros genéricos não tratados pelo UseCase
       emit(state.copyWith(status: NewsStatus.failure));
     }
   }

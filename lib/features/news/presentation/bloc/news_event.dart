@@ -7,5 +7,4 @@ abstract class NewsEvent extends Equatable {
   List<Object> get props => [];
 }
 
-// A UI só grita: "Traz notícia!"
 class NewsFetched extends NewsEvent {}

@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 
 abstract class NewsRemoteDataSource {
   Future<List<NewsModel>> getNews(int page);
+  Future<NewsModel> getNewsDetails(String id);
 }
 
 class NewsRemoteDataSourceImpl implements NewsRemoteDataSource {
@@ -20,11 +21,9 @@ class NewsRemoteDataSourceImpl implements NewsRemoteDataSource {
         queryParameters: {'page': page},
       );
 
-      // O Dio já faz o decode para Map ou List
       final dynamic responseData = response.data;
       List<dynamic> list = [];
 
-      // Verifica formato da resposta (Paginação da Loomi)
       if (responseData is Map<String, dynamic> &&
           responseData.containsKey('data')) {
         list = responseData['data'];
@@ -33,10 +32,21 @@ class NewsRemoteDataSourceImpl implements NewsRemoteDataSource {
       }
 
       return list.map((e) => NewsModel.fromJson(e)).toList();
-    } on DioException catch (e) {
-      // Se quiser logar o erro: print(e.message);
+    } on DioException catch (_) {
       throw ServerFailure();
-    } catch (e) {
+    } catch (_) {
+      throw ServerFailure();
+    }
+  }
+
+  @override
+  Future<NewsModel> getNewsDetails(String id) async {
+    try {
+      final response = await dioClient.dio.get('/news/$id/details');
+      return NewsModel.fromJson(response.data);
+    } on DioException catch (_) {
+      throw ServerFailure();
+    } catch (_) {
       throw ServerFailure();
     }
   }

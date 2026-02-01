@@ -45,13 +45,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
 
-    // Chama o UseCase que retorna true ou false
     final isLoggedIn = await checkAuthStatusUseCase();
 
     if (isLoggedIn) {
-      emit(AuthAuthenticated()); // Vai para a Home
+      emit(AuthAuthenticated());
     } else {
-      emit(AuthUnauthenticated()); // Vai para o Login
+      emit(AuthUnauthenticated());
     }
   }
 

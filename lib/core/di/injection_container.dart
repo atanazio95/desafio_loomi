@@ -8,18 +8,16 @@ import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.
 import 'package:desafio_loomi_flutter/features/news/data/datasources/news_remote_datasource.dart';
 import 'package:desafio_loomi_flutter/features/news/data/repositories/news_repository_impl.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/repositories/news_repository.dart';
+import 'package:desafio_loomi_flutter/features/news/domain/usecases/get_news_details_usecase.dart'; // <--- IMPORTANTE
 import 'package:desafio_loomi_flutter/features/news/domain/usecases/get_news_usecase.dart';
+import 'package:desafio_loomi_flutter/features/news/presentation/bloc/details/news_details_bloc.dart'; // <--- IMPORTANTE
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Importe o AuthBloc aqui depois que criarmos ele
-
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  // ! Features - Auth
-  // Bloc (Vamos registrar depois)
   sl.registerFactory(
     () => AuthBloc(
       loginUseCase: sl(),
@@ -50,12 +48,17 @@ Future<void> init() async {
   sl.registerLazySingleton(() => sharedPreferences);
 
   // ! Features - News
+
   // UseCases
   sl.registerLazySingleton(() => GetNewsUseCase(sl()));
+  sl.registerLazySingleton(
+    () => GetNewsDetailsUseCase(sl()),
+  ); // <--- NOVO (Detalhes)
 
   // Repository
+  // Nota: O mesmo repositório serve para Listagem e Detalhes
   sl.registerLazySingleton<NewsRepository>(
-    () => NewsRepositoryImpl(dataSource: sl()),
+    () => NewsRepositoryImpl(remoteDataSource: sl()),
   );
 
   // Data Sources
@@ -63,6 +66,9 @@ Future<void> init() async {
     () => NewsRemoteDataSourceImpl(dioClient: sl()),
   );
 
-  // Presentation (Bloc)
+  // Presentation (Blocs)
   sl.registerFactory(() => NewsBloc(getNewsUseCase: sl()));
+  sl.registerFactory(
+    () => NewsDetailsBloc(getNewsDetailsUseCase: sl()),
+  ); // <--- NOVO (Bloc de Detalhes)
 }

@@ -27,7 +27,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Pegando a cor primária do tema (definida no main.dart)
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
@@ -41,7 +40,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             );
           } else if (state is AuthAuthenticated) {
-            // Navega para a Home (ainda vamos criar, mas já deixa pronto)
             context.go('/news');
           }
         },
@@ -55,7 +53,6 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // --- LOGO / TÍTULO ---
                     Icon(Icons.flutter_dash, size: 80, color: primaryColor),
                     const SizedBox(height: 16),
                     Text(
@@ -74,8 +71,6 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(color: Colors.grey),
                     ),
                     const SizedBox(height: 48),
-
-                    // --- CAMPO DE USUÁRIO ---
                     TextFormField(
                       controller: _userController,
                       decoration: InputDecoration(
@@ -93,8 +88,6 @@ class _LoginPageState extends State<LoginPage> {
                       },
                     ),
                     const SizedBox(height: 16),
-
-                    // --- CAMPO DE SENHA ---
                     TextFormField(
                       controller: _passwordController,
                       obscureText: !_isPasswordVisible,
@@ -121,28 +114,23 @@ class _LoginPageState extends State<LoginPage> {
                         if (value == null || value.length < 8) {
                           return 'A senha deve ter pelo menos 8 caracteres';
                         }
-                        // Regex simples para garantir letra e número (opcional)
+
                         if (!RegExp(
                           r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$',
                         ).hasMatch(value)) {
-                          // Nota: Para facilitar o teste com "senha123", removi a regex restrita,
-                          // mas em produção você usaria isso.
-                          // return 'Senha deve ter letras e números';
+                          // for use password senha123, removed validation
                         }
                         return null;
                       },
                     ),
 
-                    // --- ESQUECI MINHA SENHA ---
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text(
-                                "Funcionalidade não implementada no desafio",
-                              ),
+                              content: Text("Funcionalidade não implementada"),
                             ),
                           );
                         },
@@ -150,8 +138,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 24),
-
-                    // --- BOTÃO DE LOGIN ---
                     SizedBox(
                       height: 50,
                       child: ElevatedButton(
@@ -166,7 +152,6 @@ class _LoginPageState extends State<LoginPage> {
                             ? null
                             : () {
                                 if (_formKey.currentState!.validate()) {
-                                  // Dispara o evento para o BLoC
                                   context.read<AuthBloc>().add(
                                     LoginSubmitted(
                                       username: _userController.text,
@@ -193,8 +178,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 24),
-
-                    // --- DIVISOR ---
                     const Row(
                       children: [
                         Expanded(child: Divider()),
@@ -209,8 +192,6 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                     const SizedBox(height: 24),
-
-                    // --- BOTÃO DE CRIAR CONTA ---
                     SizedBox(
                       height: 50,
                       child: OutlinedButton(
@@ -223,9 +204,7 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text(
-                                "Funcionalidade não implementada no desafio",
-                              ),
+                              content: Text("Funcionalidade não implementada"),
                             ),
                           );
                         },
