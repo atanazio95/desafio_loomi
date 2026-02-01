@@ -16,7 +16,6 @@ class NewsState extends Equatable {
     this.errorMessage = '',
   });
 
-  // Copiar o estado mantendo os valores anteriores (Imutabilidade)
   NewsState copyWith({
     NewsStatus? status,
     List<NewsEntity>? news,

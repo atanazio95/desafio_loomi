@@ -5,14 +5,24 @@ import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.
 import 'package:desafio_loomi_flutter/features/news/domain/repositories/news_repository.dart';
 
 class NewsRepositoryImpl implements NewsRepository {
-  final NewsRemoteDataSource dataSource;
+  final NewsRemoteDataSource remoteDataSource;
 
-  NewsRepositoryImpl({required this.dataSource});
+  NewsRepositoryImpl({required this.remoteDataSource});
 
   @override
   Future<Either<Failure, List<NewsEntity>>> getNews(int page) async {
     try {
-      final result = await dataSource.getNews(page);
+      final result = await remoteDataSource.getNews(page);
+      return Right(result);
+    } catch (e) {
+      return Left(ServerFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, NewsEntity>> getNewsDetails(String id) async {
+    try {
+      final result = await remoteDataSource.getNewsDetails(id);
       return Right(result);
     } catch (e) {
       return Left(ServerFailure());

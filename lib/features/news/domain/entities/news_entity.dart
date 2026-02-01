@@ -1,13 +1,13 @@
-// lib/features/news/domain/entities/news_entity.dart
 import 'package:equatable/equatable.dart';
 
 class NewsEntity extends Equatable {
   final String id;
   final String author;
   final String title;
-  final String summary; // Substitui description e content
-  final String imageUrl; // Nome mais limpo que urlToImage
-  final String datePublished; // Mais fiel ao date_published da API
+  final String summary;
+  final String imageUrl;
+  final String datePublished;
+  final List<NewsEntity> relatedNews;
 
   const NewsEntity({
     required this.id,
@@ -16,9 +16,17 @@ class NewsEntity extends Equatable {
     required this.summary,
     required this.imageUrl,
     required this.datePublished,
+    this.relatedNews = const [],
   });
 
   @override
-  // Removemos content e description do props também
-  List<Object?> get props => [id, title, datePublished];
+  List<Object?> get props => [
+    id,
+    title,
+    author,
+    summary,
+    datePublished,
+    imageUrl,
+    relatedNews,
+  ];
 }

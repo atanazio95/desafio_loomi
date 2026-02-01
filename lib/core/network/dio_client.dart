@@ -15,17 +15,14 @@ class DioClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          // Delay de 3s(pedido no desafio)
+          // Delay 3s
           await Future.delayed(const Duration(seconds: 3));
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          // log para visualizar em necessidade de debugg. (retirar depois)
-          print('RESPONSE[${response.statusCode}] => DATA: ${response.data}');
           return handler.next(response);
         },
         onError: (DioException e, handler) {
-          print('ERROR[${e.response?.statusCode}] => MESSAGE: ${e.message}');
           return handler.next(e);
         },
       ),

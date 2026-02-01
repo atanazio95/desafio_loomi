@@ -3,12 +3,12 @@ import 'package:desafio_loomi_flutter/core/errors/failures.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/repositories/news_repository.dart';
 
-class GetNewsUseCase {
+class GetNewsDetailsUseCase {
   final NewsRepository repository;
 
-  GetNewsUseCase(this.repository);
+  GetNewsDetailsUseCase(this.repository);
 
-  Future<Either<Failure, List<NewsEntity>>> call(int page) async {
-    return await repository.getNews(page);
+  Future<Either<Failure, NewsEntity>> call(String id) async {
+    return await repository.getNewsDetails(id);
   }
 }

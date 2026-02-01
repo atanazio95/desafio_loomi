@@ -10,26 +10,25 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final routerConfig = GoRouter(
-  initialLocation: '/', // <--- MUDANÇA 1: Começa na raiz (Splash)
+  initialLocation: '/',
   routes: [
-    // --- ROTA DA SPLASH (NOVA) ---
+    // initial route of splash
     GoRoute(
       path: '/',
       builder: (context, state) => BlocProvider(
-        create: (_) =>
-            sl<AuthBloc>(), // Injeta o AuthBloc para verificar o token
+        create: (_) => sl<AuthBloc>(),
         child: const SplashPage(),
       ),
     ),
 
-    // --- ROTA DE LOGIN ---
+    // login route
     GoRoute(
       path: '/login',
       builder: (context, state) =>
           BlocProvider(create: (_) => sl<AuthBloc>(), child: const LoginPage()),
     ),
 
-    // --- ROTAS DE NEWS ---
+    // news route
     GoRoute(
       path: '/news',
       builder: (context, state) =>

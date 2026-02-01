@@ -7,8 +7,6 @@ class LoginUseCase {
   final AuthRepository repository;
 
   LoginUseCase(this.repository);
-
-  // O "call" permite que usemos a classe como uma função: loginUseCase(user)
   Future<Either<Failure, bool>> call(UserEntity user) async {
     return await repository.login(user);
   }
