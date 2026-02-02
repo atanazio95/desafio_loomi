@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 
 class CustomHomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final int selectedTab;
-  final Function(int) onTabChanged;
+  // Removi o onTabChanged pois usaremos o GoRouter para mudar a stack
 
   const CustomHomeAppBar({
     super.key,
     required this.selectedTab,
-    required this.onTabChanged,
+    required Null Function(dynamic index) onTabChanged,
   });
 
   @override
@@ -31,18 +32,29 @@ class CustomHomeAppBar extends StatelessWidget implements PreferredSizeWidget {
             fit: BoxFit.contain,
           ),
           const SizedBox(width: 32),
-          _buildNavButton('Notícias', 0),
+          // Passamos o contexto para o builder de botões
+          _buildNavButton(context, 'Notícias', 0, '/news'),
           const SizedBox(width: 24),
-          _buildNavButton('Meu perfil', 1),
+          _buildNavButton(context, 'Meu perfil', 1, '/profile'),
         ],
       ),
     );
   }
 
-  Widget _buildNavButton(String label, int index) {
+  Widget _buildNavButton(
+    BuildContext context,
+    String label,
+    int index,
+    String route,
+  ) {
     final isSelected = selectedTab == index;
     return GestureDetector(
-      onTap: () => onTabChanged(index),
+      onTap: () {
+        // Se já estiver na aba, não faz nada, senão navega
+        if (!isSelected) {
+          context.go(route);
+        }
+      },
       child: Text(
         label,
         style: GoogleFonts.inter(

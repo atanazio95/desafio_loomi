@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:desafio_loomi_flutter/core/errors/failures.dart';
 import 'package:desafio_loomi_flutter/features/auth/data/datasources/auth_remote_datasource.dart';
-import 'package:desafio_loomi_flutter/features/auth/domain/entities/user_entity.dart';
+import 'package:desafio_loomi_flutter/features/auth/domain/entities/auth_entity.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/repositories/auth_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,13 +10,11 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({required this.dataSource});
 
   @override
-  // CORREÇÃO: O tipo de retorno deve ser UserEntity, não bool
-  Future<Either<Failure, UserEntity>> login(
-    UserEntity user, {
+  Future<Either<Failure, AuthEntity>> login(
+    AuthEntity user, {
     bool keepLoggedIn = false,
   }) async {
     try {
-      // 1. O DataSource faz o login (verifique se ele retorna UserModel ou UserEntity)
       final result = await dataSource.login(user.login, user.password);
 
       // Se o login foi bem sucedido (assumindo que o dataSource lança erro se falhar)
@@ -35,7 +33,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserEntity>> register(UserEntity user) async {
+  Future<Either<Failure, AuthEntity>> register(AuthEntity user) async {
     try {
       // Chamada ao DataSource (API)
       final userModel = await dataSource.register(user.login, user.password);

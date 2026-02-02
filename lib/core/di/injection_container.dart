@@ -1,3 +1,5 @@
+import 'package:desafio_loomi_flutter/features/user/domain/usecases/update_user_profile_usecase.dart';
+import 'package:dio/dio.dart'; // <--- ADICIONE ESTE IMPORT
 import 'package:desafio_loomi_flutter/core/network/dio_client.dart';
 import 'package:desafio_loomi_flutter/core/services/favorites_manager.dart';
 import 'package:desafio_loomi_flutter/features/auth/data/datasources/auth_remote_datasource.dart';
@@ -10,16 +12,22 @@ import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.
 import 'package:desafio_loomi_flutter/features/news/data/datasources/news_remote_datasource_impl.dart';
 import 'package:desafio_loomi_flutter/features/news/data/repositories/news_repository_impl.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/repositories/news_repository.dart';
-import 'package:desafio_loomi_flutter/features/news/domain/usecases/get_news_details_usecase.dart'; // <--- IMPORTANTE
+import 'package:desafio_loomi_flutter/features/news/domain/usecases/get_news_details_usecase.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/usecases/get_news_usecase.dart';
-import 'package:desafio_loomi_flutter/features/news/presentation/bloc/details/news_details_bloc.dart'; // <--- IMPORTANTE
+import 'package:desafio_loomi_flutter/features/news/presentation/bloc/details/news_details_bloc.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
+import 'package:desafio_loomi_flutter/features/user/data/datasources/user_datasources.dart';
+import 'package:desafio_loomi_flutter/features/user/data/repositories/user_repository_impl.dart';
+import 'package:desafio_loomi_flutter/features/user/domain/repositories/user_repository.dart';
+import 'package:desafio_loomi_flutter/features/user/domain/usecases/get_user_profile_usecase.dart';
+import 'package:desafio_loomi_flutter/features/user/presentation/bloc/user_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
+  // ! Features - Auth
   sl.registerFactory(
     () => AuthBloc(
       loginUseCase: sl(),
@@ -52,6 +60,13 @@ Future<void> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
 
+  // --- CORREÇÃO AQUI ---
+  // Registramos o Dio puro para que o UserDataSourceImpl possa encontrá-lo
+  if (!sl.isRegistered<Dio>()) {
+    sl.registerLazySingleton(() => Dio());
+  }
+  // ---------------------
+
   // ! Features - News
 
   // UseCases
@@ -59,7 +74,6 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetNewsDetailsUseCase(sl()));
 
   // Repository
-  // Nota: O mesmo repositório serve para Listagem e Detalhes
   sl.registerLazySingleton<NewsRepository>(
     () => NewsRepositoryImpl(remoteDataSource: sl()),
   );
@@ -76,4 +90,25 @@ Future<void> init() async {
   sl.registerFactory(
     () => NewsDetailsBloc(getNewsDetailsUseCase: sl(), favoritesManager: sl()),
   );
+
+  // ! Features - User
+
+  // Bloc
+  sl.registerFactory(
+    () => UserBloc(
+      getUserProfileUseCase: sl(),
+      updateUserProfileUseCase: sl(), // <--- Adicione isso
+    ),
+  );
+  // UseCases
+  sl.registerLazySingleton(() => GetUserProfileUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateUserProfileUseCase(sl()));
+
+  // Repository
+  sl.registerLazySingleton<UserRepository>(
+    () => UserRepositoryImpl(dataSource: sl()),
+  );
+
+  // Data Source
+  sl.registerLazySingleton<UserDataSource>(() => UserDataSourceImpl(dio: sl()));
 }

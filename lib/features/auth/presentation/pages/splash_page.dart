@@ -59,7 +59,6 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ESTE É O BLOCO QUE VOCÊ PERGUNTOU:
     return BlocListener<AuthBloc, AuthState>(
       listenWhen: (previous, current) =>
           current is AuthAuthenticated ||

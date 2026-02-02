@@ -1,4 +1,4 @@
-import 'package:desafio_loomi_flutter/features/auth/domain/entities/user_entity.dart';
+import 'package:desafio_loomi_flutter/features/auth/domain/entities/auth_entity.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/repositories/auth_repository.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/usecases/check_auth_status_usecase.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/usecases/login_usecase.dart';
@@ -30,7 +30,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     final result = await loginUseCase(
-      UserEntity(login: event.username, password: event.password),
+      AuthEntity(login: event.username, password: event.password),
       keepLoggedIn: event.keepLoggedIn,
     );
 
@@ -52,7 +52,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     // O registerUseCase agora retorna o sucesso simulado do DataSource
     final result = await registerUseCase(
-      UserEntity(login: event.username, password: event.password),
+      AuthEntity(login: event.username, password: event.password),
     );
 
     result.fold(
@@ -84,7 +84,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     LogoutRequested event,
     Emitter<AuthState> emit,
   ) async {
-    await authRepository.logout();
+    try {
+      print("Iniciando logout no repository...");
+      await authRepository.logout();
+      print("Logout no repository concluído.");
+    } catch (e) {
+      print("Erro no logout do repository: $e");
+      // Mesmo com erro, talvez queira deslogar o user na UI?
+    }
+
+    print("Emitindo AuthUnauthenticated...");
     emit(AuthUnauthenticated());
   }
 }

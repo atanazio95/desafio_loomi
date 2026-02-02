@@ -14,4 +14,6 @@ class ToggleFavoriteHome extends NewsEvent {
   ToggleFavoriteHome(this.id);
 }
 
+class GetSavedNews extends NewsEvent {}
+
 class RefreshFavorites extends NewsEvent {}
