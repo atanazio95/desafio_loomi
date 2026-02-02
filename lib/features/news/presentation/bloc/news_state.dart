@@ -1,39 +1,39 @@
+// Em lib/features/news/presentation/bloc/news_state.dart
+
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:equatable/equatable.dart';
 
-enum NewsStatus { initial, success, failure }
-
 class NewsState extends Equatable {
-  final NewsStatus status;
   final List<NewsEntity> news;
   final List<NewsEntity> savedNews;
-  final bool hasReachedMax;
-  final String errorMessage;
+  final bool isLoading;
+  final String? error;
+  final int currentPage; // [NOVO]
 
   const NewsState({
-    this.status = NewsStatus.initial,
-    this.news = const <NewsEntity>[],
-    this.savedNews = const <NewsEntity>[],
-    this.hasReachedMax = false,
-    this.errorMessage = '',
+    this.news = const [],
+    this.savedNews = const [],
+    this.isLoading = false,
+    this.error,
+    this.currentPage = 1, // [NOVO] Inicia na 1
   });
 
   NewsState copyWith({
-    NewsStatus? status,
     List<NewsEntity>? news,
     List<NewsEntity>? savedNews,
-    bool? hasReachedMax,
-    String? errorMessage,
+    bool? isLoading,
+    String? error,
+    int? currentPage, // [NOVO]
   }) {
     return NewsState(
-      status: status ?? this.status,
       news: news ?? this.news,
       savedNews: savedNews ?? this.savedNews,
-      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
-      errorMessage: errorMessage ?? this.errorMessage,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+      currentPage: currentPage ?? this.currentPage, // [NOVO]
     );
   }
 
   @override
-  List<Object> get props => [status, news, hasReachedMax, errorMessage];
+  List<Object?> get props => [news, savedNews, isLoading, error, currentPage];
 }

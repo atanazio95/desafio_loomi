@@ -7,13 +7,20 @@ abstract class NewsEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class NewsFetched extends NewsEvent {}
+class GetNewsEvent extends NewsEvent {
+  final int page;
+
+  const GetNewsEvent({required this.page});
+
+  @override
+  List<Object> get props => [page];
+}
 
 class ToggleFavoriteHome extends NewsEvent {
   final String id;
-  ToggleFavoriteHome(this.id);
+
+  const ToggleFavoriteHome(this.id);
+
+  @override
+  List<Object> get props => [id];
 }
-
-class GetSavedNews extends NewsEvent {}
-
-class RefreshFavorites extends NewsEvent {}

@@ -24,7 +24,7 @@ class NewsRepositoryImpl implements NewsRepository {
       await Future.delayed(const Duration(milliseconds: 800));
 
       // Retorna a lista que acabamos de criar
-      return Right(NewsMock.getNews());
+      return Right(NewsMock.getNews(page));
     }
   }
 
