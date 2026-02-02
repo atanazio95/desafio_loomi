@@ -19,28 +19,31 @@ class NewsHeader extends StatelessWidget {
             Row(
               children: [
                 Builder(
-                  builder: (context) => IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    // Icons.notes é mais fino e moderno que o Icons.menu
-                    icon: const Icon(
-                      Icons.notes,
-                      size: 32,
-                      color: Colors.black,
-                    ),
+                  builder: (context) => ElevatedButton(
                     onPressed: () => Scaffold.of(context).openDrawer(),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      elevation: 0,
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                    ),
+                    child: Image.asset(
+                      'assets/assets/menu_loomi.png',
+                      width: 24,
+                      height: 24,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  'Nortus',
-                  style: GoogleFonts.spaceGrotesk(
-                    // Alinhando com a fonte do Drawer
-                    fontSize: 32,
-                    fontWeight: FontWeight.w700,
-                    height: 1.0,
-                    color: Colors.black,
-                  ),
+                Image.asset(
+                  'assets/assets/nortus.png',
+                  width: 89,
+                  height: 20,
+                  fit: BoxFit
+                      .contain, // Garante que a imagem se ajuste sem distorcer
                 ),
               ],
             ),

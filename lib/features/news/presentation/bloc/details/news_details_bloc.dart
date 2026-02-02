@@ -35,7 +35,7 @@ class NewsDetailsBloc extends Bloc<NewsDetailsEvent, NewsDetailsState> {
     on<ToggleFavoriteNews>((event, emit) async {
       if (state is NewsDetailsLoaded) {
         final currentNews = (state as NewsDetailsLoaded).news;
-        await favoritesManager.toggleFavorite(currentNews.id);
+        await favoritesManager.toggleFavorite(currentNews);
 
         final updatedNews = currentNews.copyWith(
           isFavorite: !currentNews.isFavorite,

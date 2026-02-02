@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
-  int _selectedTab = 0; // 0: Login, 1: Registro
+  int _selectedTab = 0;
   bool _isPasswordStep = false;
   bool _keepLoggedIn = false;
   bool _obscurePassword = true;
@@ -160,6 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                                     controller: _passwordController,
                                     label: 'Digite a Senha',
                                     validator: _validatePassword,
+
                                     obscureText: _obscurePassword,
                                     suffixIcon: IconButton(
                                       icon: Icon(
@@ -173,6 +174,7 @@ class _LoginPageState extends State<LoginPage> {
                                             !_obscurePassword,
                                       ),
                                     ),
+                                    maxLength: 15,
                                   ),
                                 ],
 
@@ -199,6 +201,7 @@ class _LoginPageState extends State<LoginPage> {
                                             !_obscurePasswordConfirmed,
                                       ),
                                     ),
+                                    maxLength: 15,
                                   ),
                                 ],
 
@@ -322,6 +325,7 @@ class _LoginPageState extends State<LoginPage> {
     TextInputType? keyboardType,
     Widget? suffixIcon,
     String? Function(String?)? validator,
+    int? maxLength,
   }) {
     return TextFormField(
       controller: controller,
@@ -334,6 +338,7 @@ class _LoginPageState extends State<LoginPage> {
         color: Colors.black,
         fontWeight: FontWeight.w500,
       ),
+      maxLength: maxLength ?? 15,
       decoration: InputDecoration(
         labelText: label,
         floatingLabelBehavior: FloatingLabelBehavior.auto,
@@ -367,7 +372,6 @@ class _LoginPageState extends State<LoginPage> {
       listener: (context, state) {
         if (state is AuthAuthenticated) {
           if (_isRegisterMode) {
-            // MOSTRA SNACKBAR E VOLTA PARA LOGIN (SEM LOGAR)
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: const Text('Usuário cadastrado com sucesso!'),

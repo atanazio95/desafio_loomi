@@ -1,12 +1,12 @@
 import 'package:desafio_loomi_flutter/core/errors/failures.dart';
 import 'package:desafio_loomi_flutter/core/network/dio_client.dart';
-import 'package:desafio_loomi_flutter/features/auth/data/models/user_model.dart';
+import 'package:desafio_loomi_flutter/features/auth/data/models/auth_model.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class AuthRemoteDatasource {
   Future<bool> login(String username, String password);
-  Future<UserModel> register(String username, String password);
+  Future<AuthModel> register(String username, String password);
   Future<void> logout();
   Future<bool> checkAuthStatus();
 }
@@ -23,7 +23,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDatasource {
   @override
   Future<bool> login(String username, String password) async {
     try {
-      final userModel = UserModel(login: username, password: password);
+      final userModel = AuthModel(login: username, password: password);
 
       final response = await dioClient.dio.post(
         '/auth',
@@ -46,13 +46,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDatasource {
   // No arquivo de implementação:
 
   @override
-  Future<UserModel> register(String login, String password) async {
+  Future<AuthModel> register(String login, String password) async {
     // Simulamos o tempo de resposta do servidor
     await Future.delayed(const Duration(seconds: 1));
 
     // Como não existe endpoint, retornamos um modelo "mockado"
     // para que o fluxo do Bloc continue funcionando.
-    return UserModel(login: login, password: password);
+    return AuthModel(login: login, password: password);
   }
 
   @override

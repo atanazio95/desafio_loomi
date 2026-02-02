@@ -1,5 +1,3 @@
-// ignore_for_file: invalid_use_of_visible_for_testing_member
-
 import 'package:desafio_loomi_flutter/core/errors/failures.dart';
 import 'package:desafio_loomi_flutter/core/services/favorites_manager.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/usecases/get_news_usecase.dart';
@@ -20,6 +18,50 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
 
     // ADICIONADO: Evento para sincronizar ao voltar da tela de detalhes
     on<RefreshFavorites>(_onRefreshFavorites);
+    on<GetSavedNews>(_onGetSavedNews);
+  }
+  Future<void> _onGetSavedNews(
+    GetSavedNews event,
+    Emitter<NewsState> emit,
+  ) async {
+    // Não precisa de loading nem try/catch complexo
+    // Busca direto da memória/disco local
+    final savedItems = favoritesManager.getSavedNews();
+
+    // Atualiza o isFavorite para garantir (embora já deva estar true)
+    final checkedItems = savedItems
+        .map((n) => n.copyWith(isFavorite: true))
+        .toList();
+
+    emit(
+      state.copyWith(
+        savedNews: checkedItems,
+        // Não altere o status principal para não afetar a tela de Feed se estiverem compartilhando Bloc
+      ),
+    );
+  }
+
+  Future<void> _onToggleFavoriteHome(
+    ToggleFavoriteHome event,
+    Emitter<NewsState> emit,
+  ) async {
+    // Precisamos achar o objeto completo na lista atual para salvar
+    try {
+      final newsItem = state.news.firstWhere((n) => n.id == event.id);
+
+      // Salva o objeto completo
+      await favoritesManager.toggleFavorite(newsItem);
+
+      // Atualiza UI
+      final updatedList = state.news.map((n) {
+        if (n.id == event.id) return n.copyWith(isFavorite: !n.isFavorite);
+        return n;
+      }).toList();
+
+      emit(state.copyWith(news: updatedList));
+    } catch (e) {
+      print("Erro: Notícia não encontrada na lista para favoritar");
+    }
   }
 
   Future<void> _onNewsFetched(
@@ -83,22 +125,6 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
     } catch (_) {
       emit(state.copyWith(status: NewsStatus.failure));
     }
-  }
-
-  Future<void> _onToggleFavoriteHome(
-    ToggleFavoriteHome event,
-    Emitter<NewsState> emit,
-  ) async {
-    await favoritesManager.toggleFavorite(event.id);
-
-    final updatedList = state.news.map((n) {
-      if (n.id == event.id) {
-        return n.copyWith(isFavorite: !n.isFavorite);
-      }
-      return n;
-    }).toList();
-
-    emit(state.copyWith(news: updatedList));
   }
 
   // ADICIONADO: Lógica de sincronização sem nova chamada de API

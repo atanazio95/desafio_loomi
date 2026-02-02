@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:desafio_loomi_flutter/core/errors/failures.dart';
 import 'package:desafio_loomi_flutter/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:desafio_loomi_flutter/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:desafio_loomi_flutter/features/auth/domain/entities/user_entity.dart';
+import 'package:desafio_loomi_flutter/features/auth/domain/entities/auth_entity.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -20,7 +20,7 @@ void main() {
 
   const tLogin = 'jeorge@loomi.com';
   const tPassword = '123';
-  const tUserEntity = UserEntity(login: tLogin, password: tPassword);
+  const tUserEntity = AuthEntity(login: tLogin, password: tPassword);
 
   group('AuthRepositoryImpl', () {
     // --- TESTES DE LOGIN ---
