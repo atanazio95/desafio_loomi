@@ -1,7 +1,7 @@
 import 'package:desafio_loomi_flutter/core/presentation/custom_drawer.dart';
+import 'package:desafio_loomi_flutter/core/presentation/custom_footer.dart';
 import 'package:desafio_loomi_flutter/core/presentation/custom_home_app_bar.dart';
-// Importe seu Header real aqui
-import 'package:desafio_loomi_flutter/core/presentation/header.dart';
+import 'package:desafio_loomi_flutter/core/presentation/header.dart'; // Seu Header
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart';
@@ -22,6 +22,7 @@ class _NewsPageState extends State<NewsPage> {
   @override
   void initState() {
     super.initState();
+    // Carrega a primeira página ao iniciar
     context.read<NewsBloc>().add(const GetNewsEvent(page: 1));
   }
 
@@ -30,8 +31,10 @@ class _NewsPageState extends State<NewsPage> {
     return Scaffold(
       backgroundColor: Colors.white,
 
+      // Drawer para o menu lateral
       drawer: const CustomDrawer(),
 
+      // AppBar com abas
       appBar: CustomHomeAppBar(
         selectedTab: 0,
         onTabChanged: (index) {
@@ -41,32 +44,36 @@ class _NewsPageState extends State<NewsPage> {
 
       body: BlocBuilder<NewsBloc, NewsState>(
         builder: (context, state) {
-          // Loading Inicial (Tela Vazia)
+          // Loading Inicial (Tela inteira vazia)
           if (state.isLoading && state.news.isEmpty) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // Erro (Tela Vazia)
+          // Erro (Tela inteira vazia)
           if (state.error != null && state.news.isEmpty) {
             return Center(child: Text(state.error!));
           }
 
-          // FATIAMENTO
+          // --- FATIAMENTO DA LISTA ---
+          // Hero: Primeiros 2 itens
           final List<NewsEntity> heroNews = state.news.take(2).toList();
+          // Grid: Do 3º ao 6º item
           final List<NewsEntity> gridNews = state.news.skip(2).take(4).toList();
+          // Recentes: Do 7º em diante (Cresce com a paginação)
           final List<NewsEntity> recentNews = state.news.skip(6).toList();
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 40),
+            // [CORREÇÃO] Padding zero aqui para o Footer encostar nas bordas
+            padding: EdgeInsets.zero,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // HEADER IMPORTADO
+                // HEADER (Importado)
                 const NewsHeader(),
 
                 const SizedBox(height: 16),
 
-                // --- 1. HERO ---
+                // --- 1. HERO SECTION (Cards Grandes) ---
                 if (heroNews.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -84,7 +91,7 @@ class _NewsPageState extends State<NewsPage> {
                     ),
                   ),
 
-                // --- 2. GRID ---
+                // --- 2. GRID SECTION (Cards Pequenos) ---
                 if (gridNews.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -112,7 +119,8 @@ class _NewsPageState extends State<NewsPage> {
 
                 const SizedBox(height: 32),
 
-                // --- 3. HEADER "MAIS RECENTES" ---
+                // --- 3. CABEÇALHO "MAIS RECENTES" ---
+                // Este container ocupa a largura total (sem padding no pai)
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -136,32 +144,50 @@ class _NewsPageState extends State<NewsPage> {
                           color: const Color(0xFF0F172A),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFF0F172A)),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              "Ver mais",
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: const Color(0xFF0F172A),
+
+                      // [ALTERAÇÃO] Botão agora é clicável com InkWell
+                      InkWell(
+                        onTap: () {
+                          ScaffoldMessenger.of(context).clearSnackBars();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "Funcionalidade ainda não implementada.",
                               ),
+                              duration: Duration(seconds: 2),
                             ),
-                            const SizedBox(width: 4),
-                            const Icon(
-                              Icons.chevron_right,
-                              size: 16,
-                              color: Color(0xFF0F172A),
-                            ),
-                          ],
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(
+                          20,
+                        ), // Para o clique respeitar a borda
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFF0F172A)),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            children: [
+                              Text(
+                                "Ver mais",
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xFF0F172A),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.chevron_right,
+                                size: 16,
+                                color: Color(0xFF0F172A),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -191,14 +217,14 @@ class _NewsPageState extends State<NewsPage> {
 
                 const SizedBox(height: 32),
 
-                // --- 5. BOTÃO "VER MAIS" COM LOADING ---
+                // --- 5. BOTÃO "VER MAIS" (Paginação) ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: SizedBox(
                     width: double.infinity,
                     height: 56, // Altura conforme spec
                     child: OutlinedButton(
-                      // Desabilita clique se já estiver carregando
+                      // Bloqueia clique durante carregamento
                       onPressed: state.isLoading
                           ? null
                           : () {
@@ -213,6 +239,7 @@ class _NewsPageState extends State<NewsPage> {
                         ),
                         padding: const EdgeInsets.all(10),
                       ),
+                      // Troca texto por Loading girando
                       child: state.isLoading
                           ? const SizedBox(
                               height: 24,
@@ -243,6 +270,12 @@ class _NewsPageState extends State<NewsPage> {
                     ),
                   ),
                 ),
+
+                const SizedBox(height: 48),
+
+                // --- 6. FOOTER ---
+                // Fora de qualquer Padding horizontal para ocupar tudo
+                const CustomFooter(),
               ],
             ),
           );
@@ -262,9 +295,10 @@ class _NewsPageState extends State<NewsPage> {
 }
 
 // ==========================================================
-// COMPONENTES VISUAIS AUXILIARES
+// COMPONENTES VISUAIS (Cards)
 // ==========================================================
 
+// 1. HERO CARD
 class _HeroNewsCard extends StatelessWidget {
   final NewsEntity news;
   final VoidCallback onTap;
@@ -365,6 +399,7 @@ class _HeroNewsCard extends StatelessWidget {
   }
 }
 
+// 2. GRID CARD
 class _GridNewsCard extends StatelessWidget {
   final NewsEntity news;
   final VoidCallback onTap;
@@ -458,6 +493,7 @@ class _GridNewsCard extends StatelessWidget {
   }
 }
 
+// 3. RECENT CARD
 class _RecentNewsCard extends StatelessWidget {
   final NewsEntity news;
   final VoidCallback onTap;
