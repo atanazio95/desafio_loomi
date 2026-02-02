@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:desafio_loomi_flutter/core/errors/failures.dart';
+import 'package:desafio_loomi_flutter/core/mock/news_mock.dart';
 import 'package:desafio_loomi_flutter/features/news/data/datasources/news_remote_datasource_impl.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/repositories/news_repository.dart';
@@ -12,12 +13,31 @@ class NewsRepositoryImpl implements NewsRepository {
   @override
   Future<Either<Failure, List<NewsEntity>>> getNews(int page) async {
     try {
+      // Tenta a API (vai falhar se estiver ruim)
       final result = await remoteDataSource.getNews(page);
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure());
+      // FALBACK PARA O MOCK
+      print("⚠️ API Error: $e. Using Mock Data.");
+
+      // Simula delay de rede
+      await Future.delayed(const Duration(milliseconds: 800));
+
+      // Retorna a lista que acabamos de criar
+      return Right(NewsMock.getNews());
     }
   }
+
+  // Modelo original da chamada
+  // @override
+  // Future<Either<Failure, List<NewsEntity>>> getNews(int page) async {
+  //   try {
+  //     final result = await remoteDataSource.getNews(page);
+  //     return Right(result);
+  //   } catch (e) {
+  //     return Left(ServerFailure());
+  //   }
+  // }
 
   @override
   Future<Either<Failure, NewsEntity>> getNewsDetails(String id) async {
