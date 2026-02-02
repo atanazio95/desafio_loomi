@@ -5,6 +5,7 @@ class NewsEntity extends Equatable {
   final String title;
   final String category;
   final String author;
+  final String description;
   final String summary;
   final String datePublished;
   final String imageUrl;
@@ -16,6 +17,7 @@ class NewsEntity extends Equatable {
     required this.title,
     required this.category,
     required this.author,
+    required this.description,
     required this.summary,
     required this.datePublished,
     required this.imageUrl,
@@ -31,6 +33,7 @@ class NewsEntity extends Equatable {
     String? category,
     String? author,
     String? summary,
+    String? description,
     String? datePublished,
     String? imageUrl,
     List<NewsEntity>? relatedNews,
@@ -41,6 +44,7 @@ class NewsEntity extends Equatable {
       title: title ?? this.title,
       category: category ?? this.category,
       author: author ?? this.author,
+      description: description ?? this.description,
       summary: summary ?? this.summary,
       datePublished: datePublished ?? this.datePublished,
       imageUrl: imageUrl ?? this.imageUrl,
@@ -55,6 +59,7 @@ class NewsEntity extends Equatable {
     title,
     category,
     author,
+    description,
     summary,
     datePublished,
     imageUrl,

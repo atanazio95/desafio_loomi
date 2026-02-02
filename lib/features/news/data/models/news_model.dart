@@ -11,6 +11,7 @@ class NewsModel extends NewsEntity {
     required super.imageUrl,
     required super.relatedNews,
     super.isFavorite,
+    required super.description,
   });
 
   factory NewsModel.fromJson(Map<String, dynamic> json) {
@@ -39,6 +40,7 @@ class NewsModel extends NewsEntity {
       title: json['title'] ?? '',
       category: categoryName,
       author: authorName,
+      // O resumo pode vir de 'summary' ou 'description' curto
       summary: json['summary'] ?? json['description'] ?? '',
       datePublished: json['publishedAt'] ?? json['date_published'] ?? '',
       imageUrl: imgUrl,
@@ -48,6 +50,12 @@ class NewsModel extends NewsEntity {
                 .toList()
           : [],
       isFavorite: json['isFavorite'] ?? false,
+
+      // [CORREÇÃO AQUI]
+      // Tenta pegar o conteúdo completo. Se a API não tiver 'content',
+      // pega a 'description'. Se não tiver, repete o 'summary' para não ficar vazio.
+      description:
+          json['content'] ?? json['description'] ?? json['summary'] ?? '',
     );
   }
 
@@ -57,6 +65,8 @@ class NewsModel extends NewsEntity {
       'title': title,
       'categories': [category],
       'summary': summary,
+      'description':
+          description, // [ADICIONADO] Para não perder ao converter de volta
       'publishedAt': datePublished,
       'authors': [
         {'name': author},
@@ -64,7 +74,6 @@ class NewsModel extends NewsEntity {
       'image': {'src': imageUrl},
       'isFavorite': isFavorite,
       'relatedNews': relatedNews.map((e) {
-        // Se for model, usa o toJson dele, se for Entity, mapeia manualmente
         if (e is NewsModel) return e.toJson();
         return {
           'id': e.id,
@@ -72,6 +81,7 @@ class NewsModel extends NewsEntity {
           'categories': [e.category],
           'summary': e.summary,
           'publishedAt': e.datePublished,
+          'description': e.description,
           'authors': [
             {'name': e.author},
           ],

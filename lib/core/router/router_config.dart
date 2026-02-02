@@ -10,13 +10,14 @@ import 'package:desafio_loomi_flutter/features/news/presentation/pages/news_page
 import 'package:desafio_loomi_flutter/features/profile/presentation/pages/edit_profile_page.dart';
 import 'package:desafio_loomi_flutter/features/profile/presentation/pages/profile_page.dart';
 import 'package:desafio_loomi_flutter/features/user/presentation/bloc/user_bloc.dart';
+import 'package:desafio_loomi_flutter/features/user/presentation/bloc/user_event.dart'; // Importante para o GetUserProfile
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final routerConfig = GoRouter(
   initialLocation: '/',
   routes: [
-    // initial route of splash
+    // --- SPLASH ---
     GoRoute(
       path: '/',
       builder: (context, state) => BlocProvider(
@@ -25,62 +26,72 @@ final routerConfig = GoRouter(
       ),
     ),
 
-    // login route
+    // --- LOGIN ---
     GoRoute(
       path: '/login',
       builder: (context, state) =>
           BlocProvider(create: (_) => sl<AuthBloc>(), child: const LoginPage()),
     ),
 
-    // news route
+    // --- NEWS (FEED) ---
     GoRoute(
       path: '/news',
       builder: (context, state) =>
           BlocProvider(create: (_) => sl<NewsBloc>(), child: const NewsPage()),
+      // Sub-rotas de News (Opcional manter aqui ou mover para fora)
       routes: [
         GoRoute(
-          path: 'details',
+          path: 'details', // Caminho final: /news/details
           builder: (context, state) {
-            final news = state.extra as NewsEntity;
-            return NewsDetailsPage(news: news);
+            // 1. Recebendo o Map
+            final args = state.extra as Map<String, dynamic>;
+            final news = args['news'] as NewsEntity;
+            final newsBloc = args['bloc'] as NewsBloc;
+
+            // 2. Passando o Bloc existente via value
+            return BlocProvider.value(
+              value: newsBloc,
+              child: NewsDetailsPage(news: news),
+            );
           },
         ),
       ],
     ),
 
+    // --- PROFILE (Movido para o Top Level) ---
     GoRoute(
       path: '/profile',
       builder: (context, state) {
         return MultiBlocProvider(
           providers: [
             BlocProvider.value(value: sl<AuthBloc>()),
-            // Adicionamos o UserBloc e já chamamos o evento de buscar
+            // UserBloc buscando dados ao abrir
             BlocProvider(create: (_) => sl<UserBloc>()..add(GetUserProfile())),
+            // NewsBloc para listar favoritos
             BlocProvider(create: (_) => sl<NewsBloc>()..add(GetSavedNews())),
           ],
           child: const ProfilePage(),
         );
       },
     ),
-    // Rota de Edição de Perfil
+
+    // --- EDIT PROFILE (Movido para o Top Level) ---
     GoRoute(
       path: '/edit-profile',
       builder: (context, state) {
-        // 1. Verifica se o extra existe e é do tipo correto
+        // Verifica se recebemos o Bloc da tela anterior
         final extraBloc = state.extra is UserBloc
             ? state.extra as UserBloc
             : null;
 
         if (extraBloc != null) {
-          // CENÁRIO A: Navegação normal (Veio do Perfil)
-          // Reutilizamos o bloc existente (já com dados carregados)
+          // Reutiliza o bloc (já com dados)
           return BlocProvider.value(
             value: extraBloc,
             child: const EditProfilePage(),
           );
         } else {
-          // CENÁRIO B: Hot Reload, Deep Link ou URL direta
-          // Criamos uma nova instância e buscamos os dados do zero
+          // Fallback: cria um novo se recarregar a página direto
           return BlocProvider(
             create: (_) => sl<UserBloc>()..add(GetUserProfile()),
             child: const EditProfilePage(),
