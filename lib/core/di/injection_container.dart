@@ -84,9 +84,7 @@ Future<void> init() async {
   );
 
   // Presentation (Blocs)
-  sl.registerFactory(
-    () => NewsBloc(getNewsUseCase: sl(), favoritesManager: sl()),
-  );
+  sl.registerFactory(() => NewsBloc(getNewsUseCase: sl()));
   sl.registerFactory(
     () => NewsDetailsBloc(getNewsDetailsUseCase: sl(), favoritesManager: sl()),
   );

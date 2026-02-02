@@ -67,8 +67,6 @@ final routerConfig = GoRouter(
             BlocProvider.value(value: sl<AuthBloc>()),
             // UserBloc buscando dados ao abrir
             BlocProvider(create: (_) => sl<UserBloc>()..add(GetUserProfile())),
-            // NewsBloc para listar favoritos
-            BlocProvider(create: (_) => sl<NewsBloc>()..add(GetSavedNews())),
           ],
           child: const ProfilePage(),
         );
