@@ -15,8 +15,12 @@ class NewsDetailsPage extends StatelessWidget {
   const NewsDetailsPage({super.key, required this.news});
 
   // --- 1. LÓGICA DE TOGGLE ---
-  void _onFavoriteToggle(BuildContext context, bool isCurrentlyFavorited) {
-    context.read<NewsBloc>().add(ToggleFavoriteHome(news.id));
+  void _onFavoriteToggle(
+    BuildContext context,
+    String newsId,
+    bool isCurrentlyFavorited,
+  ) {
+    context.read<NewsBloc>().add(ToggleFavoriteHome(newsId));
 
     if (isCurrentlyFavorited) {
       _showRemoveSnackBar(context);
@@ -112,6 +116,22 @@ class NewsDetailsPage extends StatelessWidget {
     );
   }
 
+  // --- SNACKBAR DE AVISO (SEM MAIS ITENS) ---
+  void _showNoMoreItemsSnackBar(BuildContext context) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Não há mais itens para serem exibidos',
+          style: GoogleFonts.inter(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF334155), // Um cinza escuro elegante
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     const brandBlue = Color(0xFF1876D2);
@@ -177,33 +197,27 @@ class NewsDetailsPage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Badge Categoria
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors
-                              .white, // Fundo branco (ou brandBlue opaco se preferir o estilo antigo)
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: brandBlue.withOpacity(
-                              0.5,
-                            ), // Borda azul sutil
-                          ),
+                          border: Border.all(color: brandBlue.withOpacity(0.5)),
                         ),
                         child: Text(
-                          news.category.toUpperCase(), // Ex: Economia
+                          news.category.toUpperCase(),
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: textBlack, // Texto preto conforme imagem
+                            color: textBlack,
                           ),
                         ),
                       ),
 
-                      // Botão Favorito (Reactive)
+                      // Botão Favorito Principal
                       BlocBuilder<NewsBloc, NewsState>(
                         builder: (context, state) {
                           final isFavorited =
@@ -213,14 +227,16 @@ class NewsDetailsPage extends StatelessWidget {
                               );
 
                           return GestureDetector(
-                            onTap: () =>
-                                _onFavoriteToggle(context, isFavorited),
+                            onTap: () => _onFavoriteToggle(
+                              context,
+                              news.id,
+                              isFavorited,
+                            ),
                             child: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
-                                // Borda exata solicitada
                                 border: Border.all(
                                   color: const Color(0xFFD0D0D0),
                                   width: 1.01,
@@ -229,9 +245,8 @@ class NewsDetailsPage extends StatelessWidget {
                               child: Icon(
                                 isFavorited ? Icons.star : Icons.star_border,
                                 color: isFavorited
-                                    ? Colors
-                                          .yellow // Amarelo se ativo
-                                    : Colors.black, // Preto se inativo
+                                    ? Colors.yellow
+                                    : Colors.black,
                                 size: 24,
                               ),
                             ),
@@ -261,14 +276,14 @@ class NewsDetailsPage extends StatelessWidget {
                     'Publicado: $formattedDate',
                     style: GoogleFonts.inter(
                       fontSize: 14,
-                      color: textBlack.withOpacity(0.7), // Um pouco mais escuro
+                      color: textBlack.withOpacity(0.7),
                       fontWeight: FontWeight.w400,
                     ),
                   ),
 
                   const SizedBox(height: 24),
 
-                  // --- 4. IMAGEM (Sem Stack) ---
+                  // --- 4. IMAGEM ---
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
@@ -289,10 +304,9 @@ class NewsDetailsPage extends StatelessWidget {
 
                   const SizedBox(height: 8),
 
-                  // Legenda
                   Center(
                     child: Text(
-                      "Imagem ilustrativa da notícia", // Ou news.caption se tiver
+                      "Imagem ilustrativa da notícia",
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: textGrey,
@@ -303,7 +317,7 @@ class NewsDetailsPage extends StatelessWidget {
 
                   const SizedBox(height: 32),
 
-                  // --- 5. RESUMO (Card) ---
+                  // --- 5. RESUMO ---
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
@@ -363,7 +377,7 @@ class NewsDetailsPage extends StatelessWidget {
 
                   const SizedBox(height: 32),
 
-                  // --- 7. CATEGORIAS ---
+                  // --- 7. CATEGORIAS (TAGS) ---
                   Text(
                     "Categorias",
                     style: GoogleFonts.inter(
@@ -392,12 +406,205 @@ class NewsDetailsPage extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
-                            color: brandBlue,
+                            color: textBlack,
                           ),
                         ),
                       );
                     }).toList(),
                   ),
+
+                  const SizedBox(height: 48),
+
+                  // --- 8. NOTÍCIAS RELACIONADAS ---
+                  if (news.relatedNews.isNotEmpty) ...[
+                    // Título
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 8,
+                      ),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF9FAFB),
+                        border: Border(
+                          top: BorderSide(color: Color(0xFFE2E8F0), width: 1),
+                        ),
+                      ),
+                      child: Text(
+                        "Notícias relacionadas",
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF1E293B),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Grid
+                    GridView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 24,
+                            childAspectRatio: 0.70,
+                          ),
+                      itemCount: news.relatedNews.length,
+                      itemBuilder: (context, index) {
+                        final related = news.relatedNews[index];
+                        return InkWell(
+                          onTap: () {
+                            final newsBloc = context.read<NewsBloc>();
+                            context.push(
+                              '/news/details',
+                              extra: {'news': related, 'bloc': newsBloc},
+                            );
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.network(
+                                      related.imageUrl,
+                                      height: 120,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Container(
+                                        height: 120,
+                                        color: Colors.grey[200],
+                                        child: const Icon(
+                                          Icons.broken_image,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: BlocBuilder<NewsBloc, NewsState>(
+                                      builder: (context, state) {
+                                        final isRelFav =
+                                            state.savedNews.any(
+                                              (n) => n.id == related.id,
+                                            ) ||
+                                            state.news.any(
+                                              (n) =>
+                                                  n.id == related.id &&
+                                                  n.isFavorite,
+                                            );
+
+                                        return GestureDetector(
+                                          onTap: () => _onFavoriteToggle(
+                                            context,
+                                            related.id,
+                                            isRelFav,
+                                          ),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(6),
+                                            decoration: const BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Icon(
+                                              isRelFav
+                                                  ? Icons.star
+                                                  : Icons.star_border,
+                                              color: isRelFav
+                                                  ? Colors.yellow
+                                                  : Colors.black,
+                                              size: 18,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                "BRAND: ${related.category.toUpperCase()}",
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.grey,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                related.title,
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: textBlack,
+                                  height: 1.2,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "12 horas atrás",
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+
+                    // [AJUSTE] Espaço reduzido de 32 para 16
+                    const SizedBox(height: 16),
+
+                    // --- BOTÃO VER MAIS ---
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: OutlinedButton(
+                        onPressed: () {
+                          // [LÓGICA] Mostra aviso de que não há mais itens
+                          _showNoMoreItemsSnackBar(context);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xFFE2E8F0)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Ver mais",
+                              style: GoogleFonts.inter(
+                                color: textBlack,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Icon(
+                              Icons.keyboard_arrow_down,
+                              color: textBlack,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+
                   const SizedBox(height: 40),
                 ],
               ),
