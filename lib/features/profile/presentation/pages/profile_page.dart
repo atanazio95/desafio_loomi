@@ -4,16 +4,33 @@ import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_event.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_state.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
+import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart'; // Importante
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_state.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/widgets/news_card.dart';
 import 'package:desafio_loomi_flutter/features/user/presentation/bloc/user_bloc.dart';
+import 'package:desafio_loomi_flutter/features/user/presentation/bloc/user_event.dart'; // Importante
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  @override
+  void initState() {
+    super.initState();
+    // [ESTRATÉGICO] Dispara o carregamento do perfil se ele ainda não existir no estado global
+    final userBloc = context.read<UserBloc>();
+    if (userBloc.state is! UserLoaded) {
+      userBloc.add(GetUserProfile());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +41,7 @@ class ProfilePage extends StatelessWidget {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthUnauthenticated) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (context.mounted) {
-              context.pushReplacement('/login');
-            }
-          });
+          context.pushReplacement('/login');
         }
       },
       child: Scaffold(
@@ -37,7 +50,6 @@ class ProfilePage extends StatelessWidget {
         body: Column(
           children: [
             const ProfileHeader(),
-
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -46,10 +58,9 @@ class ProfilePage extends StatelessWidget {
                   children: [
                     const SizedBox(height: 40),
 
-                    // --- DADOS DO USUÁRIO (VINDOS DA API) ---
+                    // --- DADOS DO USUÁRIO ---
                     BlocBuilder<UserBloc, UserState>(
                       builder: (context, state) {
-                        // 1. Loading
                         if (state is UserLoading) {
                           return const Center(
                             child: Padding(
@@ -59,7 +70,6 @@ class ProfilePage extends StatelessWidget {
                           );
                         }
 
-                        // 2. Erro
                         if (state is UserError) {
                           return Center(
                             child: Text(
@@ -69,11 +79,8 @@ class ProfilePage extends StatelessWidget {
                           );
                         }
 
-                        // 3. Sucesso (Dados Carregados)
                         if (state is UserLoaded) {
                           final user = state.user;
-
-                          // Formata o endereço (Cidade, Estado)
                           final addressText = user.address != null
                               ? '${user.address!.city}, ${user.address!.state}'
                               : 'Localização não informada';
@@ -81,37 +88,28 @@ class ProfilePage extends StatelessWidget {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // NOME
                               Text(
                                 user.name,
                                 style: GoogleFonts.spaceGrotesk(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w700,
-                                  height: 1.0,
                                   color: Colors.black,
                                 ),
                               ),
                               const SizedBox(height: 6),
-
-                              // EMAIL
                               Text(
                                 user.email,
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  height: 1.0,
                                   color: Colors.black,
                                 ),
                               ),
                               const SizedBox(height: 20),
-
-                              // LOCALIZAÇÃO
                               Row(
                                 children: [
                                   const Icon(
                                     Icons.location_on_outlined,
                                     size: 18,
-                                    color: Colors.black,
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
@@ -119,7 +117,6 @@ class ProfilePage extends StatelessWidget {
                                     style: GoogleFonts.inter(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
-                                      height: 1.0,
                                       color: Colors.black,
                                     ),
                                   ),
@@ -128,8 +125,6 @@ class ProfilePage extends StatelessWidget {
                             ],
                           );
                         }
-
-                        // Estado Inicial (vazio ou placeholder)
                         return const SizedBox.shrink();
                       },
                     ),
@@ -141,23 +136,7 @@ class ProfilePage extends StatelessWidget {
                       height: 48,
                       width: double.infinity,
                       child: OutlinedButton(
-                        // [ATUALIZAÇÃO IMPORTANTE AQUI]
-                        onPressed: () async {
-                          final userBloc = context.read<UserBloc>();
-
-                          // Aguarda o retorno da tela de edição
-                          // Passamos o bloc via extra para manter a injeção
-                          final result = await context.push<bool>(
-                            '/edit-profile',
-                            extra: userBloc,
-                          );
-
-                          // Se result for true, significa que o usuário salvou com sucesso.
-                          // Disparamos o evento para recarregar a tela.
-                          if (result == true) {
-                            userBloc.add(GetUserProfile());
-                          }
-                        },
+                        onPressed: () => context.push('/edit-profile'),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(
                             color: borderColorDefault,
@@ -181,9 +160,8 @@ class ProfilePage extends StatelessWidget {
                       height: 48,
                       width: double.infinity,
                       child: OutlinedButton(
-                        onPressed: () {
-                          context.read<AuthBloc>().add(LogoutRequested());
-                        },
+                        onPressed: () =>
+                            context.read<AuthBloc>().add(LogoutRequested()),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(
                             color: borderColorDanger,
@@ -214,7 +192,6 @@ class ProfilePage extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            height: 1.0,
                             color: brandBlue,
                           ),
                         ),
@@ -232,10 +209,9 @@ class ProfilePage extends StatelessWidget {
 
                     const SizedBox(height: 24),
 
-                    // --- LISTA DE FAVORITOS (BlocBuilder) ---
+                    // --- LISTA DE FAVORITOS ---
                     BlocBuilder<NewsBloc, NewsState>(
                       builder: (context, state) {
-                        // 2. Lista Vazia
                         if (state.savedNews.isEmpty) {
                           return Center(
                             child: Padding(
@@ -253,7 +229,6 @@ class ProfilePage extends StatelessWidget {
                           );
                         }
 
-                        // 3. Sucesso
                         return ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -262,18 +237,19 @@ class ProfilePage extends StatelessWidget {
                               const SizedBox(height: 16),
                           itemBuilder: (context, index) {
                             final news = state.savedNews[index];
-
                             return NewsCard(
                               news: news,
                               onFavoriteToggle: () {
-                                // Lógica de toggle
+                                // [ESTRATÉGICO] Remove dos favoritos pela tela de perfil
+                                context.read<NewsBloc>().add(
+                                  ToggleFavoriteHome(news.id),
+                                );
                               },
                             );
                           },
                         );
                       },
                     ),
-
                     const SizedBox(height: 40),
                   ],
                 ),

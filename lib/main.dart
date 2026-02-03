@@ -1,6 +1,8 @@
+import 'package:desafio_loomi_flutter/core/di/injection_container.dart';
 import 'package:desafio_loomi_flutter/core/router/router_config.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart'; // Adicione se necessário
+import 'package:desafio_loomi_flutter/features/user/presentation/bloc/user_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/di/injection_container.dart' as di;
@@ -20,10 +22,9 @@ class MyApp extends StatelessWidget {
     // Usamos MultiBlocProvider para injetar Blocs globais
     return MultiBlocProvider(
       providers: [
-        BlocProvider<AuthBloc>(
-          // O di.sl<AuthBloc>() busca a instância configurada no seu GetIt
-          create: (context) => di.sl<AuthBloc>(),
-        ),
+        BlocProvider<AuthBloc>(create: (_) => sl<AuthBloc>()),
+        BlocProvider<NewsBloc>(create: (_) => sl<NewsBloc>()),
+        BlocProvider<UserBloc>(create: (_) => sl<UserBloc>()),
       ],
       child: MaterialApp.router(
         routerConfig: routerConfig,

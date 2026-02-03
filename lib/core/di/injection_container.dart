@@ -84,7 +84,7 @@ Future<void> init() async {
   );
 
   // Presentation (Blocs)
-  sl.registerFactory(() => NewsBloc(getNewsUseCase: sl()));
+  sl.registerLazySingleton(() => NewsBloc(getNewsUseCase: sl()));
   sl.registerFactory(
     () => NewsDetailsBloc(getNewsDetailsUseCase: sl(), favoritesManager: sl()),
   );
@@ -92,7 +92,7 @@ Future<void> init() async {
   // ! Features - User
 
   // Bloc
-  sl.registerFactory(
+  sl.registerLazySingleton(
     () => UserBloc(
       getUserProfileUseCase: sl(),
       updateUserProfileUseCase: sl(), // <--- Adicione isso
