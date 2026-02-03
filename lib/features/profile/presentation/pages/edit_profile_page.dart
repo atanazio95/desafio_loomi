@@ -243,195 +243,198 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                  'Configurações de usuário',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    height: 1.0,
-                    color: textBlack,
-                  ),
-                ),
-                const SizedBox(height: 32),
+                        'Configurações de usuário',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          height: 1.0,
+                          color: textBlack,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
 
-                // Language, timezone and date section
-                FormSectionHeader(title: 'Ajustes de idioma, fuso horário e data'),
-                const SizedBox(height: 16),
-                AppDropdown(
-                  label: 'Idioma',
-                  value: _selectedLanguage,
-                  items: _languages,
-                  onChanged: (val) => setState(() => _selectedLanguage = val),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: AppDropdown(
-                        label: 'Formatação de data',
-                        value: _selectedDateFormat,
-                        items: _dateFormats,
+                      // Language, timezone and date section
+                      FormSectionHeader(
+                        title: 'Ajustes de idioma, fuso horário e data',
+                      ),
+                      const SizedBox(height: 16),
+                      AppDropdown(
+                        label: 'Idioma',
+                        value: _selectedLanguage,
+                        items: _languages,
                         onChanged: (val) =>
-                            setState(() => _selectedDateFormat = val),
+                            setState(() => _selectedLanguage = val),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: AppDropdown(
-                        label: 'Fuso horário',
-                        value: _selectedTimezone,
-                        items: _timezones,
-                        onChanged: (val) =>
-                            setState(() => _selectedTimezone = val),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-                const Divider(color: Color(0xFFE0E0E0)),
-                const SizedBox(height: 24),
-
-                // User info section
-                AppTextField(
-                  label: 'Nome Completo',
-                  controller: _nameController,
-                ),
-                const SizedBox(height: 16),
-                AppTextField(
-                  label: 'E-mail',
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                ),
-
-                const SizedBox(height: 24),
-                const Divider(color: Color(0xFFE0E0E0)),
-                const SizedBox(height: 24),
-
-                // Address section
-                AppTextField(
-                  label: 'CEP',
-                  controller: _zipCodeController,
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: AppTextField(
-                        label: 'Rua',
-                        controller: _streetController,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      flex: 1,
-                      child: AppTextField(
-                        label: 'Número',
-                        controller: _numberController,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                AppTextField(
-                  label: 'Logradouro',
-                  controller: _neighborhoodController,
-                ),
-                const SizedBox(height: 16),
-                AppTextField(
-                  label: 'Complemento',
-                  controller: _complementController,
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: AppTextField(
-                        label: 'Cidade',
-                        controller: _cityController,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      flex: 1,
-                      child: AppTextField(
-                        label: 'UF',
-                        controller: _stateController,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 48),
-
-                BlocBuilder<UserBloc, UserState>(
-                  builder: (context, state) {
-                    final isLoading = state is UserLoading;
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: SizedBox(
-                            height: 48,
-                            child: OutlinedButton(
-                              onPressed: () => context.pop(),
-                              style: OutlinedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                side: const BorderSide(color: textBlack),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(48),
-                                ),
-                              ),
-                              child: Text(
-                                'Cancelar',
-                                style: GoogleFonts.inter(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: textBlack,
-                                ),
-                              ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AppDropdown(
+                              label: 'Formatação de data',
+                              value: _selectedDateFormat,
+                              items: _dateFormats,
+                              onChanged: (val) =>
+                                  setState(() => _selectedDateFormat = val),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: SizedBox(
-                            height: 48,
-                            child: ElevatedButton(
-                              onPressed: isLoading ? null : _onSubmit,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: brandBlue,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(48),
-                                ),
-                                elevation: 0,
-                              ),
-                              child: isLoading
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: AppDropdown(
+                              label: 'Fuso horário',
+                              value: _selectedTimezone,
+                              items: _timezones,
+                              onChanged: (val) =>
+                                  setState(() => _selectedTimezone = val),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+                      const Divider(color: Color(0xFFE0E0E0)),
+                      const SizedBox(height: 24),
+
+                      // User info section
+                      AppTextField(
+                        label: 'Nome Completo',
+                        controller: _nameController,
+                      ),
+                      const SizedBox(height: 16),
+                      AppTextField(
+                        label: 'E-mail',
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+
+                      const SizedBox(height: 24),
+                      const Divider(color: Color(0xFFE0E0E0)),
+                      const SizedBox(height: 24),
+
+                      // Address section
+                      AppTextField(
+                        label: 'CEP',
+                        controller: _zipCodeController,
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: AppTextField(
+                              label: 'Rua',
+                              controller: _streetController,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            flex: 1,
+                            child: AppTextField(
+                              label: 'Número',
+                              controller: _numberController,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      AppTextField(
+                        label: 'Logradouro',
+                        controller: _neighborhoodController,
+                      ),
+                      const SizedBox(height: 16),
+                      AppTextField(
+                        label: 'Complemento',
+                        controller: _complementController,
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: AppTextField(
+                              label: 'Cidade',
+                              controller: _cityController,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            flex: 1,
+                            child: AppTextField(
+                              label: 'UF',
+                              controller: _stateController,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 48),
+
+                      BlocBuilder<UserBloc, UserState>(
+                        builder: (context, state) {
+                          final isLoading = state is UserLoading;
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  height: 48,
+                                  child: OutlinedButton(
+                                    onPressed: () => context.pop(),
+                                    style: OutlinedButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      side: const BorderSide(color: textBlack),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(48),
                                       ),
-                                    )
-                                  : Text(
-                                      'Salvar',
+                                    ),
+                                    child: Text(
+                                      'Cancelar',
                                       style: GoogleFonts.inter(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
-                                        color: Colors.white,
+                                        color: textBlack,
                                       ),
                                     ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                const SizedBox(height: 24),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: SizedBox(
+                                  height: 48,
+                                  child: ElevatedButton(
+                                    onPressed: isLoading ? null : _onSubmit,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: brandBlue,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(48),
+                                      ),
+                                      elevation: 0,
+                                    ),
+                                    child: isLoading
+                                        ? const SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                        : Text(
+                                            'Salvar',
+                                            style: GoogleFonts.inter(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -444,5 +447,4 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
     );
   }
-
 }
