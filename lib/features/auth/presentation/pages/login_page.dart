@@ -1,6 +1,10 @@
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_event.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_state.dart';
+import 'package:desafio_loomi_flutter/features/auth/presentation/widgets/auth_primary_button.dart';
+import 'package:desafio_loomi_flutter/features/auth/presentation/widgets/auth_text_form_field.dart';
+import 'package:desafio_loomi_flutter/features/auth/presentation/widgets/footer_text_link.dart';
+import 'package:desafio_loomi_flutter/features/auth/presentation/widgets/tab_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -142,20 +146,20 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 const SizedBox(height: 24),
 
-                                _buildTextFormField(
+                                AuthTextFormField(
                                   controller: _emailController,
                                   label: 'Digite seu E-mail',
                                   validator: _validateEmail,
                                   keyboardType: TextInputType.emailAddress,
+                                  onChanged: () => setState(() {}),
                                 ),
 
                                 if (_isRegisterMode || _isPasswordStep) ...[
                                   const SizedBox(height: 16),
-                                  _buildTextFormField(
+                                  AuthTextFormField(
                                     controller: _passwordController,
                                     label: 'Digite a Senha',
                                     validator: _validatePassword,
-
                                     obscureText: _obscurePassword,
                                     suffixIcon: IconButton(
                                       icon: Icon(
@@ -170,12 +174,13 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                     ),
                                     maxLength: 15,
+                                    onChanged: () => setState(() {}),
                                   ),
                                 ],
 
                                 if (_isRegisterMode) ...[
                                   const SizedBox(height: 16),
-                                  _buildTextFormField(
+                                  AuthTextFormField(
                                     controller: _confirmPasswordController,
                                     label: 'Confirme Senha',
                                     obscureText: _obscurePasswordConfirmed,
@@ -197,6 +202,7 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                     ),
                                     maxLength: 15,
+                                    onChanged: () => setState(() {}),
                                   ),
                                 ],
 
@@ -239,7 +245,63 @@ class _LoginPageState extends State<LoginPage> {
                                 ],
 
                                 const SizedBox(height: 24),
-                                _buildActionButton(),
+                                BlocConsumer<AuthBloc, AuthState>(
+                                  listener: (context, state) {
+                                    if (state is AuthAuthenticated) {
+                                      if (_isRegisterMode) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Usuário cadastrado com sucesso!'),
+                                            backgroundColor: Colors.green,
+                                            behavior: SnackBarBehavior.floating,
+                                          ),
+                                        );
+                                        setState(() {
+                                          _selectedTab = 0;
+                                          _isPasswordStep = false;
+                                          _emailController.clear();
+                                          _passwordController.clear();
+                                          _confirmPasswordController.clear();
+                                        });
+                                      } else {
+                                        context.go('/news');
+                                      }
+                                    }
+                                    if (state is AuthError) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+                                      );
+                                    }
+                                  },
+                                  builder: (context, state) {
+                                    return AuthPrimaryButton(
+                                      label: _isRegisterMode ? 'Cadastrar' : 'Entrar',
+                                      isLoading: state is AuthLoading,
+                                      onPressed: () {
+                                        if (_formKey.currentState!.validate()) {
+                                          if (_isRegisterMode) {
+                                            context.read<AuthBloc>().add(
+                                              RegisterSubmitted(
+                                                username: _emailController.text,
+                                                password: _passwordController.text,
+                                              ),
+                                            );
+                                          } else if (!_isPasswordStep) {
+                                            setState(() => _isPasswordStep = true);
+                                          } else {
+                                            context.read<AuthBloc>().add(
+                                              LoginSubmitted(
+                                                username: _emailController.text,
+                                                password: _passwordController.text,
+                                                keepLoggedIn: _keepLoggedIn,
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
                               ],
                             ),
                           ),
@@ -251,7 +313,7 @@ class _LoginPageState extends State<LoginPage> {
                         crossAxisAlignment: WrapCrossAlignment.center,
                         spacing: 12,
                         children: [
-                          _footerTextLink('Esqueci a senha', () {}),
+                          FooterTextLink(label: 'Esqueci a senha', onTap: () {}),
                           Container(
                             width: 4,
                             height: 4,
@@ -260,7 +322,7 @@ class _LoginPageState extends State<LoginPage> {
                               shape: BoxShape.circle,
                             ),
                           ),
-                          _footerTextLink('Continuar sem conta', () {}),
+                          FooterTextLink(label: 'Continuar sem conta', onTap: () {}),
                         ],
                       ),
                     ],
@@ -287,17 +349,29 @@ class _LoginPageState extends State<LoginPage> {
                     child: Row(
                       children: [
                         Expanded(
-                          child: _buildTabButton(
-                            'Acessar conta',
-                            _selectedTab == 0,
-                            0,
+                          child: TabButton(
+                            label: 'Acessar conta',
+                            isSelected: _selectedTab == 0,
+                            onTap: () => setState(() {
+                              _selectedTab = 0;
+                              _isPasswordStep = false;
+                              _formKey.currentState?.reset();
+                              _passwordController.clear();
+                              _confirmPasswordController.clear();
+                            }),
                           ),
                         ),
                         Expanded(
-                          child: _buildTabButton(
-                            'Não tenho conta',
-                            _selectedTab == 1,
-                            1,
+                          child: TabButton(
+                            label: 'Não tenho conta',
+                            isSelected: _selectedTab == 1,
+                            onTap: () => setState(() {
+                              _selectedTab = 1;
+                              _isPasswordStep = false;
+                              _formKey.currentState?.reset();
+                              _passwordController.clear();
+                              _confirmPasswordController.clear();
+                            }),
                           ),
                         ),
                       ],
@@ -312,180 +386,4 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildTextFormField({
-    required TextEditingController controller,
-    required String label,
-    bool obscureText = false,
-    TextInputType? keyboardType,
-    Widget? suffixIcon,
-    String? Function(String?)? validator,
-    int? maxLength,
-  }) {
-    return TextFormField(
-      controller: controller,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      validator: validator,
-      onChanged: (value) => setState(() {}),
-      style: GoogleFonts.inter(
-        fontSize: 16,
-        color: Colors.black,
-        fontWeight: FontWeight.w500,
-      ),
-      maxLength: maxLength ?? 15,
-      decoration: InputDecoration(
-        labelText: label,
-        floatingLabelBehavior: FloatingLabelBehavior.auto,
-        labelStyle: GoogleFonts.inter(
-          color: controller.text.isNotEmpty
-              ? const Color(0xFF0D478C)
-              : Colors.grey[500],
-          fontWeight: FontWeight.w500,
-          fontSize: 16,
-        ),
-        floatingLabelStyle: GoogleFonts.inter(
-          color: const Color(0xFF1876D2),
-          fontWeight: FontWeight.w700,
-          fontSize: 12,
-        ),
-        filled: true,
-        fillColor: Colors.grey[100],
-        contentPadding: const EdgeInsets.fromLTRB(16, 30, 16, 12),
-        suffixIcon: suffixIcon,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        errorStyle: const TextStyle(height: 0.8, fontSize: 12),
-      ),
-    );
-  }
-
-  Widget _buildActionButton() {
-    return BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is AuthAuthenticated) {
-          if (_isRegisterMode) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Usuário cadastrado com sucesso!'),
-                backgroundColor: Colors.green,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-            setState(() {
-              _selectedTab = 0;
-              _isPasswordStep = false;
-              _emailController.clear();
-              _passwordController.clear();
-              _confirmPasswordController.clear();
-            });
-          } else {
-            context.go('/news');
-          }
-        }
-        if (state is AuthError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
-          );
-        }
-      },
-      builder: (context, state) {
-        return SizedBox(
-          width: double.infinity,
-          height: 54,
-          child: ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                if (_isRegisterMode) {
-                  context.read<AuthBloc>().add(
-                    RegisterSubmitted(
-                      username: _emailController.text,
-                      password: _passwordController.text,
-                    ),
-                  );
-                } else if (!_isPasswordStep) {
-                  setState(() => _isPasswordStep = true);
-                } else {
-                  context.read<AuthBloc>().add(
-                    LoginSubmitted(
-                      username: _emailController.text,
-                      password: _passwordController.text,
-                      keepLoggedIn: _keepLoggedIn,
-                    ),
-                  );
-                }
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1876D2),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: state is AuthLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : Text(
-                    _isRegisterMode ? 'Cadastrar' : 'Entrar',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildTabButton(String label, bool isSelected, int index) {
-    return GestureDetector(
-      onTap: () => setState(() {
-        _selectedTab = index;
-        _isPasswordStep = false;
-        _formKey.currentState?.reset();
-        _passwordController.clear();
-        _confirmPasswordController.clear();
-      }),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF1876D2) : Colors.transparent,
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: GoogleFonts.inter(
-              color: isSelected ? Colors.white : Colors.black,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _footerTextLink(String label, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Text(
-        label,
-        style: GoogleFonts.inter(
-          color: Colors.white,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          decoration: TextDecoration.underline,
-          decorationColor: Colors.white,
-        ),
-      ),
-    );
-  }
 }

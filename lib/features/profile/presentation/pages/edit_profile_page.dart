@@ -1,5 +1,7 @@
-import 'package:desafio_loomi_flutter/core/presentation/custom_footer.dart';
 import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
+import 'package:desafio_loomi_flutter/core/widgets/app_dropdown.dart';
+import 'package:desafio_loomi_flutter/core/widgets/app_text_field.dart';
+import 'package:desafio_loomi_flutter/core/widgets/form_section_header.dart';
 import 'package:desafio_loomi_flutter/features/user/domain/entities/user_entity.dart';
 import 'package:desafio_loomi_flutter/features/user/presentation/bloc/user_bloc.dart';
 import 'package:flutter/material.dart';
@@ -247,9 +249,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 const SizedBox(height: 32),
 
                 // Language, timezone and date section
-                _sectionTitle('Ajustes de idioma, fuso horário e data'),
+                FormSectionHeader(title: 'Ajustes de idioma, fuso horário e data'),
                 const SizedBox(height: 16),
-                _buildDropdown(
+                AppDropdown(
                   label: 'Idioma',
                   value: _selectedLanguage,
                   items: _languages,
@@ -259,7 +261,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildDropdown(
+                      child: AppDropdown(
                         label: 'Formatação de data',
                         value: _selectedDateFormat,
                         items: _dateFormats,
@@ -269,7 +271,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: _buildDropdown(
+                      child: AppDropdown(
                         label: 'Fuso horário',
                         value: _selectedTimezone,
                         items: _timezones,
@@ -285,12 +287,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 const SizedBox(height: 24),
 
                 // User info section
-                _buildTextField(
+                AppTextField(
                   label: 'Nome Completo',
                   controller: _nameController,
                 ),
                 const SizedBox(height: 16),
-                _buildTextField(
+                AppTextField(
                   label: 'E-mail',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -301,7 +303,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 const SizedBox(height: 24),
 
                 // Address section
-                _buildTextField(
+                AppTextField(
                   label: 'CEP',
                   controller: _zipCodeController,
                   keyboardType: TextInputType.number,
@@ -311,7 +313,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   children: [
                     Expanded(
                       flex: 2,
-                      child: _buildTextField(
+                      child: AppTextField(
                         label: 'Rua',
                         controller: _streetController,
                       ),
@@ -319,7 +321,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     const SizedBox(width: 12),
                     Expanded(
                       flex: 1,
-                      child: _buildTextField(
+                      child: AppTextField(
                         label: 'Número',
                         controller: _numberController,
                       ),
@@ -327,12 +329,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                _buildTextField(
+                AppTextField(
                   label: 'Logradouro',
                   controller: _neighborhoodController,
                 ),
                 const SizedBox(height: 16),
-                _buildTextField(
+                AppTextField(
                   label: 'Complemento',
                   controller: _complementController,
                 ),
@@ -341,7 +343,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   children: [
                     Expanded(
                       flex: 2,
-                      child: _buildTextField(
+                      child: AppTextField(
                         label: 'Cidade',
                         controller: _cityController,
                       ),
@@ -349,7 +351,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     const SizedBox(width: 12),
                     Expanded(
                       flex: 1,
-                      child: _buildTextField(
+                      child: AppTextField(
                         label: 'UF',
                         controller: _stateController,
                       ),
@@ -433,128 +435,4 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget _sectionTitle(String title) {
-    return Text(
-      title,
-      style: GoogleFonts.inter(
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-        height: 1.0,
-        color: const Color(0xFF0B1125),
-      ),
-    );
-  }
-
-  Widget _buildLabel(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6.0),
-      child: Text(
-        text,
-        style: GoogleFonts.inter(
-          fontSize: 10,
-          fontWeight: FontWeight.w500,
-          height: 1.0,
-          color: const Color(0xFF0B1125),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDropdown({
-    required String label,
-    required String? value,
-    required List<String> items,
-    required Function(String?) onChanged,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildLabel(label),
-        DropdownButtonFormField<String>(
-          value: value,
-          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
-          style: GoogleFonts.inter(fontSize: 14, color: Colors.black),
-          isExpanded: true,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                color: Color(0xFF1876D2),
-                width: 1.5,
-              ),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 14,
-            ),
-          ),
-          items: items
-              .map(
-                (String item) => DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(
-                    item,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(),
-                  ),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-        SizedBox(height: 20),
-        CustomFooter(),
-      ],
-    );
-  }
-
-  Widget _buildTextField({
-    required String label,
-    required TextEditingController controller,
-    TextInputType? keyboardType,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildLabel(label),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          style: GoogleFonts.inter(fontSize: 14),
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                color: Color(0xFF1876D2),
-                width: 1.5,
-              ),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 14,
-            ),
-            isDense: true,
-          ),
-          validator: (value) =>
-              value == null || value.isEmpty ? 'Obrigatório' : null,
-        ),
-      ],
-    );
-  }
 }
