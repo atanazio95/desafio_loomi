@@ -24,3 +24,11 @@ class ToggleFavoriteHome extends NewsEvent {
   @override
   List<Object> get props => [id];
 }
+
+class SearchNewsEvent extends NewsEvent {
+  final String query;
+  const SearchNewsEvent(this.query);
+
+  @override
+  List<Object> get props => [query];
+}
