@@ -1,4 +1,5 @@
 import 'package:desafio_loomi_flutter/core/presentation/custom_footer.dart';
+import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:desafio_loomi_flutter/features/user/domain/entities/user_entity.dart';
 import 'package:desafio_loomi_flutter/features/user/presentation/bloc/user_bloc.dart';
 import 'package:flutter/material.dart';
@@ -225,7 +226,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
           }
         },
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: Responsive.horizontalPadding(context),
+            vertical: 16,
+          ),
           child: Form(
             key: _formKey,
             child: Column(

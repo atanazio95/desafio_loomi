@@ -1,13 +1,19 @@
 import 'package:dartz/dartz.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:desafio_loomi_flutter/core/errors/failures.dart';
 import 'package:desafio_loomi_flutter/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/entities/auth_entity.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/repositories/auth_repository.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource dataSource;
-  AuthRepositoryImpl({required this.dataSource});
+  final SharedPreferences sharedPreferences;
+
+  AuthRepositoryImpl({
+    required this.dataSource,
+    required this.sharedPreferences,
+  });
 
   @override
   Future<Either<Failure, AuthEntity>> login(
@@ -15,11 +21,10 @@ class AuthRepositoryImpl implements AuthRepository {
     bool keepLoggedIn = false,
   }) async {
     try {
-      final result = await dataSource.login(user.login, user.password);
+      await dataSource.login(user.login, user.password);
 
       if (keepLoggedIn) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('is_logged_in', true);
+        await sharedPreferences.setBool('is_logged_in', true);
       }
 
       return Right(user);
@@ -41,8 +46,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> logout() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('is_logged_in', false);
+      await sharedPreferences.setBool('is_logged_in', false);
       await dataSource.logout();
       return const Right(null);
     } catch (e) {
@@ -53,8 +57,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, bool>> checkAuthStatus() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final isLoggedIn = prefs.getBool('is_logged_in') ?? false;
+      final isLoggedIn = sharedPreferences.getBool('is_logged_in') ?? false;
       return Right(isLoggedIn);
     } catch (e) {
       return const Right(false);
