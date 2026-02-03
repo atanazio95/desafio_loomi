@@ -4,11 +4,10 @@ import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_event.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_state.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
-import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart'; // Importante
+import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_state.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/widgets/news_card.dart';
 import 'package:desafio_loomi_flutter/features/user/presentation/bloc/user_bloc.dart';
-import 'package:desafio_loomi_flutter/features/user/presentation/bloc/user_event.dart'; // Importante
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -25,7 +24,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    // [ESTRATÉGICO] Dispara o carregamento do perfil se ele ainda não existir no estado global
     final userBloc = context.read<UserBloc>();
     if (userBloc.state is! UserLoaded) {
       userBloc.add(GetUserProfile());
@@ -58,7 +56,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     const SizedBox(height: 40),
 
-                    // --- DADOS DO USUÁRIO ---
                     BlocBuilder<UserBloc, UserState>(
                       builder: (context, state) {
                         if (state is UserLoading) {
@@ -131,7 +128,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     const SizedBox(height: 48),
 
-                    // --- BOTÕES DE AÇÃO ---
                     SizedBox(
                       height: 48,
                       width: double.infinity,
@@ -183,7 +179,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     const SizedBox(height: 48),
 
-                    // --- ABA FAVORITOS ---
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -209,7 +204,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     const SizedBox(height: 24),
 
-                    // --- LISTA DE FAVORITOS ---
+                    // Favorites section
                     BlocBuilder<NewsBloc, NewsState>(
                       builder: (context, state) {
                         if (state.savedNews.isEmpty) {
@@ -240,7 +235,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             return NewsCard(
                               news: news,
                               onFavoriteToggle: () {
-                                // [ESTRATÉGICO] Remove dos favoritos pela tela de perfil
                                 context.read<NewsBloc>().add(
                                   ToggleFavoriteHome(news.id),
                                 );

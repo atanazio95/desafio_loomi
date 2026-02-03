@@ -50,7 +50,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
 
-    // O registerUseCase agora retorna o sucesso simulado do DataSource
+    // registerUseCase returns simulated success from DataSource
     final result = await registerUseCase(
       AuthEntity(login: event.username, password: event.password),
     );
@@ -58,8 +58,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(const AuthError(message: "Erro ao simular cadastro")),
       (user) {
-        // DICA: Se quiser que ele já fique logado no SharedPreferences:
-        // authRepository.saveSession(true);
+        // Tip: to auto-login after register, call authRepository.saveSession(true);
         emit(AuthAuthenticated());
       },
     );
@@ -85,15 +84,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
-      print("Iniciando logout no repository...");
       await authRepository.logout();
-      print("Logout no repository concluído.");
-    } catch (e) {
-      print("Erro no logout do repository: $e");
-      // Mesmo com erro, talvez queira deslogar o user na UI?
+    } catch (_) {
+      // Even on error, we still emit unauthenticated so the UI logs the user out
     }
-
-    print("Emitindo AuthUnauthenticated...");
     emit(AuthUnauthenticated());
   }
 }

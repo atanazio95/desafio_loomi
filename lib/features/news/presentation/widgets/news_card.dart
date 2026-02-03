@@ -21,9 +21,7 @@ class NewsCard extends StatelessWidget {
       children: [
         InkWell(
           onTap: () {
-            // Pegamos a instância atual do Bloc
             final newsBloc = context.read<NewsBloc>();
-            // Navegamos passando o Map
             context.push(
               '/news/details',
               extra: {'news': news, 'bloc': newsBloc},
@@ -37,7 +35,6 @@ class NewsCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. Imagem com a Estrela no canto
                 Stack(
                   children: [
                     ClipRRect(
@@ -55,7 +52,6 @@ class NewsCard extends StatelessWidget {
                       ),
                     ),
 
-                    // O ÍCONE DE ESTRELA (Favorito)
                     Positioned(
                       top: 12,
                       right: 12,
@@ -66,7 +62,6 @@ class NewsCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
-                            // [NOVO] Borda adicionada para igualar ao DetailsPage
                             border: Border.all(
                               color: const Color(0xFFD0D0D0),
                               width: 1.01,
@@ -86,7 +81,6 @@ class NewsCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
 
-                // 2. Categoria e Título
                 Text(
                   news.category.toUpperCase(),
                   style: GoogleFonts.inter(
@@ -108,7 +102,6 @@ class NewsCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
 
-                // 3. Descrição Curta
                 Text(
                   news.summary,
                   maxLines: 2,
@@ -123,7 +116,6 @@ class NewsCard extends StatelessWidget {
             ),
           ),
         ),
-        // Divisor
         const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
       ],
     );

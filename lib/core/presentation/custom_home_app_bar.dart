@@ -4,8 +4,6 @@ import 'package:go_router/go_router.dart';
 
 class CustomHomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final int selectedTab;
-  // Removi o onTabChanged pois usaremos o GoRouter para mudar a stack
-
   const CustomHomeAppBar({
     super.key,
     required this.selectedTab,
@@ -32,7 +30,6 @@ class CustomHomeAppBar extends StatelessWidget implements PreferredSizeWidget {
             fit: BoxFit.contain,
           ),
           const SizedBox(width: 32),
-          // Passamos o contexto para o builder de botões
           _buildNavButton(context, 'Notícias', 0, '/news'),
           const SizedBox(width: 24),
           _buildNavButton(context, 'Meu perfil', 1, '/profile'),
@@ -50,7 +47,7 @@ class CustomHomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     final isSelected = selectedTab == index;
     return GestureDetector(
       onTap: () {
-        // Se já estiver na aba, não faz nada, senão navega
+        // If already on tab, do nothing; otherwise navigate
         if (!isSelected) {
           context.go(route);
         }

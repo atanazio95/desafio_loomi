@@ -8,7 +8,6 @@ class LoginUseCase {
 
   LoginUseCase(this.repository);
 
-  // O segredo é adicionar o parâmetro nomeado aqui:
   Future<Either<Failure, AuthEntity>> call(
     AuthEntity user, {
     bool keepLoggedIn = false,

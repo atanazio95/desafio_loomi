@@ -10,12 +10,12 @@ abstract class AuthEvent extends Equatable {
 class LoginSubmitted extends AuthEvent {
   final String username;
   final String password;
-  final bool keepLoggedIn; // Adicione este campo
+  final bool keepLoggedIn;
 
   LoginSubmitted({
     required this.username,
     required this.password,
-    this.keepLoggedIn = false, // Adicione ao construtor
+    this.keepLoggedIn = false,
   });
 }
 

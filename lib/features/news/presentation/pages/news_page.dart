@@ -59,7 +59,6 @@ class _NewsPageState extends State<NewsPage> {
               children: [
                 const NewsHeader(),
 
-                // --- FEEDBACK DE BUSCA ---
                 if (isSearching)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
@@ -85,12 +84,9 @@ class _NewsPageState extends State<NewsPage> {
 
                 const SizedBox(height: 16),
 
-                // --- LÓGICA DE EXIBIÇÃO ---
                 if (isSearching)
-                  // MODO BUSCA: Lista Simples
                   _buildSearchResults(displayList)
                 else
-                  // MODO NORMAL: Layout Complexo
                   _buildComplexLayout(context, state),
 
                 const CustomFooter(),
@@ -102,7 +98,6 @@ class _NewsPageState extends State<NewsPage> {
     );
   }
 
-  // --- WIDGET PARA MODO BUSCA ---
   Widget _buildSearchResults(List<NewsEntity> results) {
     if (results.isEmpty) {
       return Container(
@@ -130,7 +125,6 @@ class _NewsPageState extends State<NewsPage> {
     );
   }
 
-  // --- WIDGET PARA LAYOUT NORMAL (HERO + GRID + RECENT) ---
   Widget _buildComplexLayout(BuildContext context, NewsState state) {
     final List<NewsEntity> heroNews = state.news.take(2).toList();
     final List<NewsEntity> gridNews = state.news.skip(2).take(4).toList();
@@ -138,7 +132,6 @@ class _NewsPageState extends State<NewsPage> {
 
     return Column(
       children: [
-        // HERO
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
@@ -157,7 +150,6 @@ class _NewsPageState extends State<NewsPage> {
           ),
         ),
 
-        // GRID
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: GridView.builder(
@@ -180,7 +172,7 @@ class _NewsPageState extends State<NewsPage> {
 
         const SizedBox(height: 32),
 
-        // CABEÇALHO RECENTES
+        // Recent news section header
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           decoration: const BoxDecoration(
@@ -207,7 +199,7 @@ class _NewsPageState extends State<NewsPage> {
 
         const SizedBox(height: 24),
 
-        // LISTA RECENTES
+        // Recent news list
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: ListView.separated(
@@ -222,7 +214,7 @@ class _NewsPageState extends State<NewsPage> {
           ),
         ),
 
-        // BOTÃO PAGINAÇÃO
+        // Load more button
         Padding(
           padding: const EdgeInsets.all(24),
           child: _buildPaginationButton(context, state),
@@ -299,13 +291,7 @@ class _NewsPageState extends State<NewsPage> {
   }
 }
 
-// Os componentes _HeroNewsCard, _GridNewsCard e _RecentNewsCard permanecem iguais ao que você já tem.
-
-// ==========================================================
-// COMPONENTES VISUAIS (Cards)
-// ==========================================================
-
-// 1. HERO CARD
+// Hero news card (featured at top)
 class _HeroNewsCard extends StatelessWidget {
   final NewsEntity news;
   final VoidCallback onTap;
@@ -406,7 +392,7 @@ class _HeroNewsCard extends StatelessWidget {
   }
 }
 
-// 2. GRID CARD
+// Grid news card (2-column layout)
 class _GridNewsCard extends StatelessWidget {
   final NewsEntity news;
   final VoidCallback onTap;
@@ -500,7 +486,7 @@ class _GridNewsCard extends StatelessWidget {
   }
 }
 
-// 3. RECENT CARD
+// Recent news list item card
 class _RecentNewsCard extends StatelessWidget {
   final NewsEntity news;
   final VoidCallback onTap;

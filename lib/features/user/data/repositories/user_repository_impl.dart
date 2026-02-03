@@ -23,8 +23,6 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<Either<Failure, void>> updateUserProfile(UserEntity user) async {
     try {
-      // Converte a Entity (Domínio) para Model (Dados)
-      // Lembre-se de implementar o toModel() ou criar o objeto manualmente aqui
       final userModel = UserModel(
         id: user.id,
         name: user.name,
@@ -33,7 +31,7 @@ class UserRepositoryImpl implements UserRepository {
         dateFormat: user.dateFormat,
         timezone: user.timezone,
         address: user
-            .address, // O UserModel deve aceitar AddressEntity ou ter conversão
+            .address,
       );
 
       await dataSource.updateUserProfile(userModel);

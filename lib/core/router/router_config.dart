@@ -11,13 +11,8 @@ import 'package:go_router/go_router.dart';
 final routerConfig = GoRouter(
   initialLocation: '/',
   routes: [
-    // --- SPLASH ---
     GoRoute(path: '/', builder: (context, state) => const SplashPage()),
-
-    // --- LOGIN ---
     GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
-
-    // --- NEWS (FEED) ---
     GoRoute(
       path: '/news',
       builder: (context, state) => const NewsPage(),
@@ -33,10 +28,7 @@ final routerConfig = GoRouter(
       ],
     ),
 
-    // --- PROFILE ---
     GoRoute(path: '/profile', builder: (context, state) => const ProfilePage()),
-
-    // --- EDIT PROFILE ---
     GoRoute(
       path: '/edit-profile',
       builder: (context, state) => const EditProfilePage(),

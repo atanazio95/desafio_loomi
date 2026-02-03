@@ -11,19 +11,17 @@ class CustomDrawer extends StatelessWidget {
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: Column(
         children: [
-          // 20% de espaço acima
           const Spacer(flex: 1),
 
-          // --- HEADER: NOTÍCIAS ---
+          // Drawer header with back and title
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
               children: [
-                // Ícone de retorno com 20px e rotação de -180 graus
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: const Icon(
-                    Icons.arrow_back_ios_new, // Ou o ícone que você está usando
+                    Icons.arrow_back_ios_new,
                     size: 20,
                     color: Colors.black,
                   ),
@@ -46,13 +44,12 @@ class CustomDrawer extends StatelessWidget {
           const SizedBox(height: 16),
           const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
 
-          // --- LISTA DE DEMAIS ITENS ---
+          // Category list
           Expanded(
             flex: 6,
             child: ListView(
               padding: const EdgeInsets.only(top: 10),
               children: [
-                // Exemplo de item (Categorias)
                 _buildDrawerItem('Tecnologia'),
                 _buildDrawerItem('Inovação'),
                 _buildDrawerItem('Política'),
@@ -60,14 +57,13 @@ class CustomDrawer extends StatelessWidget {
             ),
           ),
 
-          // 20% de espaço abaixo
+          // 20% space below
           const Spacer(flex: 2),
         ],
       ),
     );
   }
 
-  // Widget auxiliar para os demais itens (18px)
   Widget _buildDrawerItem(String label) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 24),
