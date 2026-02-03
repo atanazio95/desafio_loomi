@@ -1,5 +1,5 @@
 import 'package:desafio_loomi_flutter/features/user/domain/usecases/update_user_profile_usecase.dart';
-import 'package:dio/dio.dart'; // <--- ADICIONE ESTE IMPORT
+import 'package:dio/dio.dart';
 import 'package:desafio_loomi_flutter/core/network/dio_client.dart';
 import 'package:desafio_loomi_flutter/core/services/favorites_manager.dart';
 import 'package:desafio_loomi_flutter/features/auth/data/datasources/auth_remote_datasource.dart';
@@ -60,12 +60,10 @@ Future<void> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
 
-  // --- CORREÇÃO AQUI ---
-  // Registramos o Dio puro para que o UserDataSourceImpl possa encontrá-lo
+  // Register raw Dio for UserDataSourceImpl
   if (!sl.isRegistered<Dio>()) {
     sl.registerLazySingleton(() => Dio());
   }
-  // ---------------------
 
   // ! Features - News
 
@@ -95,7 +93,7 @@ Future<void> init() async {
   sl.registerLazySingleton(
     () => UserBloc(
       getUserProfileUseCase: sl(),
-      updateUserProfileUseCase: sl(), // <--- Adicione isso
+      updateUserProfileUseCase: sl(),
     ),
   );
   // UseCases

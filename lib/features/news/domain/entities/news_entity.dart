@@ -25,8 +25,7 @@ class NewsEntity extends Equatable {
     this.isFavorite = false,
   });
 
-  // O método copyWith permite atualizar campos específicos (como isFavorite)
-  // sem perder o restante dos dados da entidade.
+  // copyWith allows updating specific fields (e.g. isFavorite) without losing the rest.
   NewsEntity copyWith({
     String? id,
     String? title,

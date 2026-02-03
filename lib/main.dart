@@ -1,7 +1,7 @@
 import 'package:desafio_loomi_flutter/core/di/injection_container.dart';
 import 'package:desafio_loomi_flutter/core/router/router_config.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart'; // Adicione se necessário
+import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
 import 'package:desafio_loomi_flutter/features/user/presentation/bloc/user_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Usamos MultiBlocProvider para injetar Blocs globais
+    // MultiBlocProvider injects global Blocs
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(create: (_) => sl<AuthBloc>()),

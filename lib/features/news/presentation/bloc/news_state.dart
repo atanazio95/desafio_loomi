@@ -1,5 +1,3 @@
-// Em lib/features/news/presentation/bloc/news_state.dart
-
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:equatable/equatable.dart';
 
@@ -9,7 +7,7 @@ class NewsState extends Equatable {
   final bool isLoading;
   final String? error;
   final int currentPage;
-  final String searchQuery; // [NOVO] Termo de busca
+  final String searchQuery;
 
   const NewsState({
     this.news = const [],
@@ -17,11 +15,9 @@ class NewsState extends Equatable {
     this.isLoading = false,
     this.error,
     this.currentPage = 1,
-    this.searchQuery = '', // [NOVO] Inicia vazio
+    this.searchQuery = '',
   });
 
-  // [LÓGICA DE FILTRO] Getter que a UI usará para exibir as notícias
-  // Ele filtra a lista 'news' baseada na 'searchQuery' localmente.
   List<NewsEntity> get displayNews {
     if (searchQuery.isEmpty) return news;
 
@@ -38,16 +34,15 @@ class NewsState extends Equatable {
     bool? isLoading,
     String? error,
     int? currentPage,
-    String? searchQuery, // [NOVO]
+    String? searchQuery,
   }) {
     return NewsState(
       news: news ?? this.news,
       savedNews: savedNews ?? this.savedNews,
       isLoading: isLoading ?? this.isLoading,
-      error:
-          error, // Aqui costuma-se manter nulo se não passado para limpar erros antigos
+      error: error,
       currentPage: currentPage ?? this.currentPage,
-      searchQuery: searchQuery ?? this.searchQuery, // [NOVO]
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
 
@@ -58,6 +53,6 @@ class NewsState extends Equatable {
     isLoading,
     error,
     currentPage,
-    searchQuery, // [NOVO] Adicionado aos props para o Equatable detectar mudanças
+    searchQuery,
   ];
 }

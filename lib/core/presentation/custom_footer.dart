@@ -11,7 +11,6 @@ class CustomFooter extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
       decoration: const BoxDecoration(
         color: Color(0xFF0F172A),
-        // [CORREÇÃO] Bordas arredondadas apenas embaixo
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(24),

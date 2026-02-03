@@ -13,14 +13,10 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
     on<SearchNewsEvent>(_onSearchNews);
   }
 
-  // --- 1. Lógica de Busca Local ---
   void _onSearchNews(SearchNewsEvent event, Emitter<NewsState> emit) {
-    // Apenas atualiza a string no estado.
-    // O getter 'displayNews' no State faz o filtro automaticamente.
     emit(state.copyWith(searchQuery: event.query));
   }
 
-  // --- 2. Carregamento de Notícias (API + Paginação) ---
   Future<void> _onGetNews(GetNewsEvent event, Emitter<NewsState> emit) async {
     emit(state.copyWith(isLoading: true, error: null));
 
@@ -31,10 +27,7 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
         state.copyWith(isLoading: false, error: "Erro ao carregar notícias."),
       ),
       (fetchedNews) {
-        // Criamos um Set de IDs favoritados para busca rápida O(1)
         final savedIds = state.savedNews.map((e) => e.id).toSet();
-
-        // Mapeamos as notícias vindas da API com o estado de favorito atual da memória
         final newsWithFavorites = fetchedNews.map((n) {
           return n.copyWith(isFavorite: savedIds.contains(n.id));
         }).toList();
@@ -57,7 +50,6 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
     );
   }
 
-  // --- 3. Lógica de Favoritos em Memória RAM ---
   void _onToggleFavorite(ToggleFavoriteHome event, Emitter<NewsState> emit) {
     final isAlreadySaved = state.savedNews.any((n) => n.id == event.id);
     List<NewsEntity> newSavedList = List.from(state.savedNews);
@@ -66,7 +58,6 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
       newSavedList.removeWhere((n) => n.id == event.id);
     } else {
       try {
-        // Tenta achar na lista principal ou nas relacionadas para adicionar aos salvos
         var itemToAdd = state.news.firstWhere(
           (n) => n.id == event.id,
           orElse: () => state.news
@@ -74,18 +65,14 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
               .firstWhere((r) => r.id == event.id),
         );
         newSavedList.add(itemToAdd.copyWith(isFavorite: true));
-      } catch (e) {
-        // Caso não encontre em lugar nenhum (raro), não adiciona nada
-      }
+      } catch (_) {}
     }
 
-    // Atualiza a lista visual (Feed) para refletir a mudança no ícone imediatamente
     final newNewsList = state.news.map((newsItem) {
       if (newsItem.id == event.id) {
         return newsItem.copyWith(isFavorite: !isAlreadySaved);
       }
 
-      // Atualiza também dentro das notícias relacionadas de cada card
       final updatedRelated = newsItem.relatedNews.map((related) {
         if (related.id == event.id) {
           return related.copyWith(isFavorite: !isAlreadySaved);

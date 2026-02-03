@@ -37,11 +37,9 @@ class _LoginPageState extends State<LoginPage> {
 
   bool get _isRegisterMode => _selectedTab == 1;
 
-  // --- VALIDAÇÕES ---
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) return 'Informe seu e-mail';
 
-    // Validação de formato apenas no cadastro
     if (_isRegisterMode) {
       final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
       if (!emailRegex.hasMatch(value)) return 'E-mail em formato inválido';
@@ -70,7 +68,6 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // 1. MARCA D'ÁGUA
           Positioned(
             top: size.height * 0.05,
             right: -size.width * 0.45,
@@ -86,7 +83,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
 
-          // 2. TÍTULO NORTUS
           SafeArea(
             child: Padding(
               padding: EdgeInsets.fromLTRB(20, size.height * 0.05, 24, 0),
@@ -101,7 +97,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
 
-          // 3. CARD DINÂMICO E SELETOR
           Align(
             alignment: Alignment.bottomCenter,
             child: Stack(
@@ -317,7 +312,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // --- WIDGET DE INPUT COM LABEL INTERNO ---
   Widget _buildTextFormField({
     required TextEditingController controller,
     required String label,

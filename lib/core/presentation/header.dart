@@ -35,7 +35,6 @@ class _NewsHeaderState extends State<NewsHeader> {
     );
   }
 
-  // --- LAYOUT PADRÃO (LOGO + LUPA) ---
   Widget _buildDefaultHeader() {
     return Row(
       key: const ValueKey('default'),
@@ -73,12 +72,10 @@ class _NewsHeaderState extends State<NewsHeader> {
     );
   }
 
-  // --- LAYOUT DE BUSCA (ESTILO LINEAR) ---
   Widget _buildSearchField() {
     return Row(
       key: const ValueKey('search'),
       children: [
-        // Mantém sua imagem original do menu lateral à esquerda
         InkWell(
           onTap: () => Scaffold.of(context).openDrawer(),
           child: Image.asset(
@@ -105,7 +102,6 @@ class _NewsHeaderState extends State<NewsHeader> {
                 color: const Color(0xFF94A3B8),
                 fontSize: 16,
               ),
-              // Borda apenas na parte inferior
               enabledBorder: const UnderlineInputBorder(
                 borderSide: BorderSide(color: Color(0xFFE2E8F0), width: 1),
               ),
@@ -122,7 +118,6 @@ class _NewsHeaderState extends State<NewsHeader> {
 
         const SizedBox(width: 16),
 
-        // Botão de fechar circular
         GestureDetector(
           onTap: () {
             setState(() {

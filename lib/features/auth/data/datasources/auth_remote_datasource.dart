@@ -43,15 +43,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDatasource {
     }
   }
 
-  // No arquivo de implementação:
-
   @override
   Future<AuthModel> register(String login, String password) async {
-    // Simulamos o tempo de resposta do servidor
     await Future.delayed(const Duration(seconds: 1));
-
-    // Como não existe endpoint, retornamos um modelo "mockado"
-    // para que o fluxo do Bloc continue funcionando.
     return AuthModel(login: login, password: password);
   }
 

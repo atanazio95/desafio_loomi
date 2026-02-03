@@ -5,5 +5,5 @@ class GetNewsDetails extends NewsDetailsEvent {
   GetNewsDetails(this.id);
 }
 
-// Adicione este evento
+// Add this event
 class ToggleFavoriteNews extends NewsDetailsEvent {}
