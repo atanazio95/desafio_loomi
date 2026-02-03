@@ -1,8 +1,8 @@
-# desafio_loomi_flutter
+# Nortus (Desafio Loomi Flutter)
 
 Flutter app for the Loomi Challenge: news feed with authentication, user profile, and favorites.
 
-## Getting Started
+> **Entrega do desafio:** use o checklist em [ENTREGA_DESAFIO.md](ENTREGA_DESAFIO.md) para conferir relatório de progresso, Git, escopo técnico e prazo. **Backlog:** [Trello - Desafio Loomi](https://trello.com/b/KCoxyq0E/desafio-loomi)
 
 ### Prerequisites
 
@@ -72,7 +72,7 @@ Each feature is split into **data** (datasources, models, repositories), **domai
 - **News** – List with hero/grid/recent layout, search, pagination, details page.
 - **Favorites** – Toggle on news cards and details; list on profile; persisted via `FavoritesManager`.
 - **Profile** – User info, edit profile (language, timezone, date format, address).
-- **Response balloon** – On news details, when toggling favorite, a custom overlay balloon shows feedback at the top (e.g. “Você favoritou esta Notícia”).
+- **Response balloon** – On news details, when toggling favorite, a custom overlay balloon shows feedback at the top (e.g. "Você favoritou esta Notícia").
 
 ---
 
@@ -89,7 +89,7 @@ Each feature is split into **data** (datasources, models, repositories), **domai
 
 ---
 
-## What’s been done (recent)
+## What's been done (recent)
 
 - **Response balloon** – Favorites feedback on news details via custom overlay balloon (and SnackBar where used).
 - **Comments** – All comments in `lib/` translated to English; decorative/section comments removed.
