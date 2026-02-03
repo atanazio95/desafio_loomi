@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:desafio_loomi_flutter/core/errors/failures.dart';
-import 'package:desafio_loomi_flutter/core/mock/news_mock.dart';
 import 'package:desafio_loomi_flutter/features/news/data/datasources/news_remote_datasource_impl.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/repositories/news_repository.dart';
@@ -16,8 +15,7 @@ class NewsRepositoryImpl implements NewsRepository {
       final result = await remoteDataSource.getNews(page);
       return Right(result);
     } catch (_) {
-      await Future.delayed(const Duration(milliseconds: 800));
-      return Right(NewsMock.getNews(page));
+      return Left(ServerFailure());
     }
   }
 
