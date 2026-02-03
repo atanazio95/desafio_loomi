@@ -1,3 +1,4 @@
+import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
 import 'package:flutter/material.dart';
@@ -41,11 +42,11 @@ class NewsCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
                         news.imageUrl,
-                        height: 200,
+                        height: Responsive.imageHeightHeroCard(context),
                         width: double.infinity,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
-                          height: 200,
+                          height: Responsive.imageHeightHeroCard(context),
                           color: Colors.grey[200],
                           child: const Icon(Icons.image, color: Colors.grey),
                         ),

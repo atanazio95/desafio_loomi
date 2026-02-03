@@ -1,5 +1,7 @@
 import 'package:desafio_loomi_flutter/core/presentation/custom_home_app_bar.dart';
 import 'package:desafio_loomi_flutter/core/presentation/profile_header.dart';
+import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
+import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_event.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_state.dart';
@@ -45,15 +47,18 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: CustomHomeAppBar(selectedTab: 1, onTabChanged: (index) {}),
-        body: Column(
-          children: [
-            const ProfileHeader(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+        body: SafeArea(
+          child: Column(
+            children: [
+              const ProfileHeader(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: Responsive.horizontalPadding(context),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                     const SizedBox(height: 40),
 
                     BlocBuilder<UserBloc, UserState>(
@@ -62,7 +67,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           return const Center(
                             child: Padding(
                               padding: EdgeInsets.all(20.0),
-                              child: CircularProgressIndicator(),
+                              child: CircularProgressIndicator(
+                                color: AppColors.loading,
+                              ),
                             ),
                           );
                         }
@@ -245,11 +252,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                     ),
                     const SizedBox(height: 40),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

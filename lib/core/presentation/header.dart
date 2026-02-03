@@ -1,3 +1,4 @@
+import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart';
 import 'package:flutter/material.dart';
@@ -23,10 +24,11 @@ class _NewsHeaderState extends State<NewsHeader> {
 
   @override
   Widget build(BuildContext context) {
+    final padH = Responsive.horizontalPadding(context);
     return SafeArea(
       bottom: false,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+        padding: EdgeInsets.symmetric(horizontal: padH, vertical: 8.0),
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
           child: _isSearching ? _buildSearchField() : _buildDefaultHeader(),
@@ -36,39 +38,43 @@ class _NewsHeaderState extends State<NewsHeader> {
   }
 
   Widget _buildDefaultHeader() {
-    return Row(
-      key: const ValueKey('default'),
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
+    return Builder(
+      builder: (context) {
+        final logoW = Responsive.logoWidth(context);
+        final logoH = Responsive.logoHeight(context);
+        return Row(
+          key: const ValueKey('default'),
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Builder(
-              builder: (context) => InkWell(
-                onTap: () => Scaffold.of(context).openDrawer(),
-                child: Image.asset(
-                  'assets/assets/menu_loomi.png',
-                  width: 24,
-                  height: 24,
+            Row(
+              children: [
+                InkWell(
+                  onTap: () => Scaffold.of(context).openDrawer(),
+                  child: Image.asset(
+                    'assets/assets/menu_loomi.png',
+                    width: 24,
+                    height: 24,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Image.asset(
+                  'assets/assets/nortus.png',
+                  width: logoW,
+                  height: logoH,
                   fit: BoxFit.contain,
                 ),
-              ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Image.asset(
-              'assets/assets/nortus.png',
-              width: 89,
-              height: 20,
-              fit: BoxFit.contain,
+            IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              icon: const Icon(Icons.search, size: 28, color: Color(0xFF0F172A)),
+              onPressed: () => setState(() => _isSearching = true),
             ),
           ],
-        ),
-        IconButton(
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
-          icon: const Icon(Icons.search, size: 28, color: Color(0xFF0F172A)),
-          onPressed: () => setState(() => _isSearching = true),
-        ),
-      ],
+        );
+      },
     );
   }
 

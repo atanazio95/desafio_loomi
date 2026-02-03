@@ -1,7 +1,12 @@
+// Example: persistence of favorites with SharedPreferences.
+// The app currently keeps favorites in memory (NewsBloc.savedNews); this file
+// is kept as reference for when persistence with SharedPreferences is needed.
+
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:desafio_loomi_flutter/features/news/data/models/news_model.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FavoritesManager {
   final SharedPreferences sharedPreferences;
@@ -14,9 +19,8 @@ class FavoritesManager {
   }
 
   void _loadFromDisk() {
-    final List<String>? jsonList = sharedPreferences.getStringList(
-      _kFavoritesKey,
-    );
+    final List<String>? jsonList =
+        sharedPreferences.getStringList(_kFavoritesKey);
     if (jsonList != null) {
       _cachedList.clear();
       for (var jsonStr in jsonList) {

@@ -1,5 +1,7 @@
 import 'package:desafio_loomi_flutter/core/presentation/custom_footer.dart';
 import 'package:desafio_loomi_flutter/core/presentation/custom_home_app_bar.dart';
+import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
+import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart';
@@ -87,252 +89,263 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
           if (index == 1) context.push('/profile');
         },
       ),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              // Back button
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
-                ),
-                child: InkWell(
-                  onTap: () => context.pop(),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.arrow_back, color: textBlack, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Voltar',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                // Back button
+                Builder(
+                  builder: (context) {
+                    final padH = Responsive.horizontalPadding(context);
+                    return Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: padH,
+                        vertical: 16,
                       ),
-                    ],
-                  ),
-                ),
-              ),
-
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      child: InkWell(
+                        onTap: () => context.pop(),
+                        child: Row(
                           children: [
-                            const SizedBox(height: 8),
-                            // Header: category and favorite
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: brandBlue.withOpacity(0.5),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    widget.news.category.toUpperCase(),
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                                BlocBuilder<NewsBloc, NewsState>(
-                                  builder: (context, state) {
-                                    final isFavorited = state.savedNews.any(
-                                      (n) => n.id == widget.news.id,
-                                    );
-                                    return GestureDetector(
-                                      onTap: () => _onFavoriteToggle(
-                                        context,
-                                        widget.news.id,
-                                        isFavorited,
-                                      ),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: const Color(0xFFD0D0D0),
-                                          ),
-                                        ),
-                                        child: Icon(
-                                          isFavorited
-                                              ? Icons.star
-                                              : Icons.star_border,
-                                          color: isFavorited
-                                              ? Colors.yellow
-                                              : Colors.black,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
+                            const Icon(Icons.arrow_back, color: textBlack, size: 20),
+                            const SizedBox(width: 8),
                             Text(
-                              widget.news.title,
-                              style: GoogleFonts.spaceGrotesk(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Publicado: $formattedDate',
-                              style: GoogleFonts.inter(
-                                fontSize: 14,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
-                                widget.news.imageUrl,
-                                height: 250,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(height: 32),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8FAFC),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: const Color(0xFFE2E8F0),
-                                ),
-                              ),
-                              child: Text(
-                                widget.news.summary,
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  height: 1.5,
-                                  color: const Color(0xFF334155),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 32),
-                            Text(
-                              widget.news.description.isNotEmpty
-                                  ? widget.news.description
-                                  : widget.news.summary,
+                              'Voltar',
                               style: GoogleFonts.inter(
                                 fontSize: 16,
-                                height: 1.6,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-
-                            // Categories section
-                            const SizedBox(height: 32),
-                            _buildTagsSection(),
-                            const SizedBox(height: 48),
-
-                            // Related news section
-                            if (widget.news.relatedNews.isNotEmpty) ...[
-                              Text(
-                                "Notícias relacionadas",
-                                style: GoogleFonts.spaceGrotesk(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 24),
-                              _buildRelatedGrid(context),
-                              const SizedBox(height: 32),
-
-                              // See more button
-                              SizedBox(
-                                width: double.infinity,
-                                height: 56,
-                                child: OutlinedButton(
-                                  onPressed: _isLoadingMore
-                                      ? null
-                                      : _onLoadMoreRelated,
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(
-                                      color: Color(0xFF163C43),
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(100),
-                                    ),
-                                  ),
-                                  child: _isLoadingMore
-                                      ? const SizedBox(
-                                          height: 24,
-                                          width: 24,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: Color(0xFF163C43),
-                                          ),
-                                        )
-                                      : Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "Ver mais",
-                                              style: GoogleFonts.inter(
-                                                color: const Color(0xFF163C43),
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            const Icon(
-                                              Icons.keyboard_arrow_down,
-                                              color: Color(0xFF163C43),
-                                            ),
-                                          ],
-                                        ),
-                                ),
-                              ),
-                              const SizedBox(height: 48),
-                            ],
                           ],
                         ),
                       ),
+                    );
+                  },
+                ),
 
-                      const CustomFooter(),
-                    ],
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Builder(
+                          builder: (context) {
+                            final padH = Responsive.horizontalPadding(context);
+                            return Padding(
+                              padding: EdgeInsets.symmetric(horizontal: padH),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 8),
+                                  // Header: category and favorite
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                            Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(16),
+                                          border: Border.all(
+                                            color: brandBlue.withOpacity(0.5),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          widget.news.category.toUpperCase(),
+                                          style: GoogleFonts.inter(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                      BlocBuilder<NewsBloc, NewsState>(
+                                        builder: (context, state) {
+                                          final isFavorited = state.savedNews.any(
+                                            (n) => n.id == widget.news.id,
+                                          );
+                                          return GestureDetector(
+                                            onTap: () => _onFavoriteToggle(
+                                              context,
+                                              widget.news.id,
+                                              isFavorited,
+                                            ),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: const Color(0xFFD0D0D0),
+                                                ),
+                                              ),
+                                              child: Icon(
+                                                isFavorited
+                                                    ? Icons.star
+                                                    : Icons.star_border,
+                                                color: isFavorited
+                                                    ? Colors.yellow
+                                                    : Colors.black,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    widget.news.title,
+                                    style: GoogleFonts.spaceGrotesk(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'Publicado: $formattedDate',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.network(
+                                      widget.news.imageUrl,
+                                      height: Responsive.imageHeightHero(context),
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 32),
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF8FAFC),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: const Color(0xFFE2E8F0),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      widget.news.summary,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14,
+                                        height: 1.5,
+                                        color: const Color(0xFF334155),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 32),
+                                  Text(
+                                    widget.news.description.isNotEmpty
+                                        ? widget.news.description
+                                        : widget.news.summary,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 16,
+                                      height: 1.6,
+                                    ),
+                                  ),
+
+                                  // Categories section
+                                  const SizedBox(height: 32),
+                                  _buildTagsSection(),
+                                  const SizedBox(height: 48),
+
+                                  // Related news section
+                                  if (widget.news.relatedNews.isNotEmpty) ...[
+                                    Text(
+                                      "Notícias relacionadas",
+                                      style: GoogleFonts.spaceGrotesk(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    _buildRelatedGrid(context),
+                                    const SizedBox(height: 32),
+
+                                    // See more button
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height: 56,
+                                      child: OutlinedButton(
+                                        onPressed: _isLoadingMore
+                                            ? null
+                                            : _onLoadMoreRelated,
+                                        style: OutlinedButton.styleFrom(
+                                          side: const BorderSide(
+                                            color: Color(0xFF163C43),
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(100),
+                                          ),
+                                        ),
+                                        child: _isLoadingMore
+                                            ? const SizedBox(
+                                                height: 24,
+                                                width: 24,
+                                                child: CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                  color: AppColors.loading,
+                                                ),
+                                              )
+                                            : Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    "Ver mais",
+                                                    style: GoogleFonts.inter(
+                                                      color: const Color(0xFF163C43),
+                                                      fontWeight: FontWeight.w600,
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  const Icon(
+                                                    Icons.keyboard_arrow_down,
+                                                    color: Color(0xFF163C43),
+                                                  ),
+                                                ],
+                                              ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 48),
+                                  ],
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        const CustomFooter(),
+                      ],
+                    ),
                   ),
+                ),
+              ],
+            ),
+
+            // Overlay balloon
+            if (_showBallon)
+              Positioned(
+                top: 10,
+                left: 16,
+                right: 16,
+                child: _TopBallonWidget(
+                  title: _ballonTitle,
+                  subtitle: _ballonSubtitle,
+                  color: _ballonColor,
+                  icon: _ballonIcon,
+                  onClose: () => setState(() => _showBallon = false),
                 ),
               ),
             ],
           ),
-
-          // Overlay balloon
-          if (_showBallon)
-            Positioned(
-              top: 10,
-              left: 16,
-              right: 16,
-              child: _TopBallonWidget(
-                title: _ballonTitle,
-                subtitle: _ballonSubtitle,
-                color: _ballonColor,
-                icon: _ballonIcon,
-                onClose: () => setState(() => _showBallon = false),
-              ),
-            ),
-        ],
-      ),
+        ),
     );
   }
 
@@ -385,6 +398,7 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
   }
 
   Widget _buildRelatedGrid(BuildContext context) {
+    final imageH = Responsive.imageHeightGrid(context);
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
@@ -411,7 +425,7 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
                       related.imageUrl,
-                      height: 120,
+                      height: imageH,
                       width: double.infinity,
                       fit: BoxFit.cover,
                     ),

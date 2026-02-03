@@ -2,6 +2,8 @@ import 'package:desafio_loomi_flutter/core/presentation/custom_drawer.dart';
 import 'package:desafio_loomi_flutter/core/presentation/custom_footer.dart';
 import 'package:desafio_loomi_flutter/core/presentation/custom_home_app_bar.dart';
 import 'package:desafio_loomi_flutter/core/presentation/header.dart';
+import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
+import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart';
@@ -39,66 +41,84 @@ class _NewsPageState extends State<NewsPage> {
           if (index == 1) context.push('/profile');
         },
       ),
-      body: BlocBuilder<NewsBloc, NewsState>(
-        builder: (context, state) {
-          if (state.isLoading && state.news.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: SafeArea(
+        child: BlocBuilder<NewsBloc, NewsState>(
+          builder: (context, state) {
+            if (state.isLoading && state.news.isEmpty) {
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.loading),
+              );
+            }
 
-          if (state.error != null && state.news.isEmpty) {
-            return Center(child: Text(state.error!));
-          }
+            if (state.error != null && state.news.isEmpty) {
+              return Center(child: Text(state.error!));
+            }
 
-          final isSearching = state.searchQuery.isNotEmpty;
-          final displayList = state.displayNews;
+            final isSearching = state.searchQuery.isNotEmpty;
+            final displayList = state.displayNews;
+            final padH = Responsive.horizontalPadding(context);
 
-          return SingleChildScrollView(
-            padding: EdgeInsets.zero,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const NewsHeader(),
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  padding: EdgeInsets.zero,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const NewsHeader(),
 
-                if (isSearching)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
-                    child: RichText(
-                      text: TextSpan(
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          color: const Color(0xFF64748B),
+                            if (isSearching)
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(padH, 24, padH, 8),
+                                child: RichText(
+                                  text: TextSpan(
+                                    style: GoogleFonts.inter(
+                                      fontSize: 16,
+                                      color: const Color(0xFF64748B),
+                                    ),
+                                    children: [
+                                      const TextSpan(text: 'Resultado da busca por '),
+                                      TextSpan(
+                                        text: '"${state.searchQuery}"',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                            const SizedBox(height: 16),
+
+                            if (isSearching)
+                              _buildSearchResults(context, displayList)
+                            else
+                              _buildComplexLayout(context, state),
+                          ],
                         ),
-                        children: [
-                          const TextSpan(text: 'Resultado da busca por '),
-                          TextSpan(
-                            text: '"${state.searchQuery}"',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
+                        const CustomFooter(),
+                      ],
                     ),
                   ),
-
-                const SizedBox(height: 16),
-
-                if (isSearching)
-                  _buildSearchResults(displayList)
-                else
-                  _buildComplexLayout(context, state),
-
-                const CustomFooter(),
-              ],
-            ),
-          );
-        },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildSearchResults(List<NewsEntity> results) {
+  Widget _buildSearchResults(BuildContext context, List<NewsEntity> results) {
     if (results.isEmpty) {
       return Container(
         height: 300,
@@ -110,17 +130,22 @@ class _NewsPageState extends State<NewsPage> {
       );
     }
 
+    final padH = Responsive.horizontalPadding(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: results.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 24),
-        itemBuilder: (context, index) => _RecentNewsCard(
-          news: results[index],
-          onTap: () => _navigateToDetails(context, results[index]),
-        ),
+      padding: EdgeInsets.symmetric(horizontal: padH),
+      child: Column(
+        children: results
+            .map(
+              (news) => Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: _HeroNewsCard(
+                  news: news,
+                  onTap: () => _navigateToDetails(context, news),
+                  onFavorite: () => _toggleFavorite(context, news.id),
+                ),
+              ),
+            )
+            .toList(),
       ),
     );
   }
@@ -129,11 +154,12 @@ class _NewsPageState extends State<NewsPage> {
     final List<NewsEntity> heroNews = state.news.take(2).toList();
     final List<NewsEntity> gridNews = state.news.skip(2).take(4).toList();
     final List<NewsEntity> recentNews = state.news.skip(6).toList();
+    final padH = Responsive.horizontalPadding(context);
 
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: EdgeInsets.symmetric(horizontal: padH),
           child: Column(
             children: heroNews
                 .map(
@@ -151,7 +177,7 @@ class _NewsPageState extends State<NewsPage> {
         ),
 
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: EdgeInsets.symmetric(horizontal: padH),
           child: GridView.builder(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -174,7 +200,7 @@ class _NewsPageState extends State<NewsPage> {
 
         // Recent news section header
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: EdgeInsets.symmetric(horizontal: padH, vertical: 16),
           decoration: const BoxDecoration(
             border: Border(
               top: BorderSide(color: Color(0xFFEEEEEE)),
@@ -201,7 +227,7 @@ class _NewsPageState extends State<NewsPage> {
 
         // Recent news list
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: EdgeInsets.symmetric(horizontal: padH),
           child: ListView.separated(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -216,7 +242,7 @@ class _NewsPageState extends State<NewsPage> {
 
         // Load more button
         Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(padH),
           child: _buildPaginationButton(context, state),
         ),
       ],
@@ -265,7 +291,7 @@ class _NewsPageState extends State<NewsPage> {
         child: state.isLoading
             ? const CircularProgressIndicator(
                 strokeWidth: 2,
-                color: Color(0xFF163C43),
+                color: AppColors.loading,
               )
             : const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -316,11 +342,13 @@ class _HeroNewsCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
                   news.imageUrl,
-                  height: 200,
+                  height: Responsive.imageHeightHeroCard(context),
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      Container(height: 200, color: Colors.grey[200]),
+                  errorBuilder: (_, __, ___) => Container(
+                    height: Responsive.imageHeightHeroCard(context),
+                    color: Colors.grey[200],
+                  ),
                 ),
               ),
               Positioned(
@@ -417,11 +445,13 @@ class _GridNewsCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
                   news.imageUrl,
-                  height: 120,
+                  height: Responsive.imageHeightGrid(context),
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      Container(height: 120, color: Colors.grey[200]),
+                  errorBuilder: (_, __, ___) => Container(
+                    height: Responsive.imageHeightGrid(context),
+                    color: Colors.grey[200],
+                  ),
                 ),
               ),
               Positioned(
@@ -504,11 +534,14 @@ class _RecentNewsCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             child: Image.network(
               news.imageUrl,
-              height: 80,
-              width: 120,
+              height: Responsive.imageHeightRecentThumb(context),
+              width: Responsive.imageWidthRecentThumb(context),
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
-                  Container(height: 80, width: 120, color: Colors.grey[200]),
+              errorBuilder: (_, __, ___) => Container(
+                height: Responsive.imageHeightRecentThumb(context),
+                width: Responsive.imageWidthRecentThumb(context),
+                color: Colors.grey[200],
+              ),
             ),
           ),
           const SizedBox(width: 16),

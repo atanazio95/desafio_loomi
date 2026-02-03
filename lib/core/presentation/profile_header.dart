@@ -1,3 +1,4 @@
+import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -6,10 +7,13 @@ class ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final padH = Responsive.horizontalPadding(context);
+    final logoW = Responsive.logoWidth(context);
+    final logoH = Responsive.logoHeight(context);
     return SafeArea(
       bottom: false,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        padding: EdgeInsets.symmetric(horizontal: padH, vertical: 12.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -18,8 +22,8 @@ class ProfileHeader extends StatelessWidget {
               padding: const EdgeInsets.only(left: 4.0),
               child: Image.asset(
                 'assets/assets/nortus.png',
-                width: 89,
-                height: 20,
+                width: logoW,
+                height: logoH,
                 fit: BoxFit.contain,
               ),
             ),

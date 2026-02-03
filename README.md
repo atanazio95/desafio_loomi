@@ -1,153 +1,110 @@
 # Nortus (Desafio Loomi Flutter)
 
-Aplicativo Flutter para o desafio Loomi: feed de notícias com autenticação, perfil de usuário e favoritos.
+Flutter app for the Loomi Challenge: news feed with authentication, user profile, and favorites.
 
 > **Entrega do desafio:** use o checklist em [ENTREGA_DESAFIO.md](ENTREGA_DESAFIO.md) para conferir relatório de progresso, Git, escopo técnico e prazo. **Backlog:** [Trello - Desafio Loomi](https://trello.com/b/KCoxyq0E/desafio-loomi)
 
----
+### Prerequisites
 
-## Índice
+- Flutter SDK ^3.8.1
+- Dart ^3.8.1
 
-- [Requisitos](#requisitos)
-- [Setup do projeto](#setup-do-projeto)
-- [Estrutura do projeto](#estrutura-do-projeto)
-- [Principais decisões](#principais-decisões)
-- [Rotas](#rotas)
-- [Testes](#testes)
-- [Commits e Pull Requests](#commits-e-pull-requests)
-
----
-
-## Requisitos
-
-- **Flutter** 3.8.1 ou superior (`sdk: ^3.8.1`)
-- **Dart** 3.x
-
-Verifique a instalação:
+### Setup
 
 ```bash
-flutter doctor
-```
-
----
-
-## Setup do projeto
-
-### 1. Clonar e instalar dependências
-
-```bash
-git clone <url-do-repositorio>
-cd desafio_loomi_flutter
 flutter pub get
-```
-
-### 2. Assets
-
-Certifique-se de que os assets existam em:
-
-- `assets/` e `assets/assets/` (incluindo `logo_shield.png` para a tela de login)
-
-O `pubspec.yaml` já declara:
-
-```yaml
-flutter:
-  assets:
-    - assets/
-    - assets/assets/
-    - assets/assets/logo_shield.png
-```
-
-### 3. Rodar o app
-
-```bash
-# Desenvolvimento
 flutter run
-
-# Build release (exemplo Android)
-flutter build apk
 ```
 
-### 4. Análise e testes
+### Run tests
 
 ```bash
-flutter analyze
 flutter test
 ```
 
 ---
 
-## Estrutura do projeto
+## Project structure
 
-O código segue **Clean Architecture** por features, com camadas **data**, **domain** e **presentation**.
+The app follows **Clean Architecture** organized by **feature**:
 
 ```
 lib/
-├── main.dart                 # Entry point, MultiBlocProvider, MaterialApp.router
-├── core/                     # Recursos compartilhados
-│   ├── config/               # Configurações (ex.: app_config)
-│   ├── di/                   # Injeção de dependências (GetIt)
-│   ├── errors/               # Failures e tratamento de erros
-│   ├── network/              # Dio client
-│   ├── router/               # GoRouter
-│   ├── services/             # Serviços (ex.: FavoritesManager)
-│   └── presentation/         # Componentes UI reutilizáveis
+├── main.dart
+├── core/
+│   ├── di/                 # Dependency injection (GetIt)
+│   ├── errors/             # Failures / error types
+│   ├── mock/               # Mock data (e.g. news for pagination)
+│   ├── network/            # Dio client
+│   ├── presentation/       # Shared UI (drawer, footer, app bar, headers)
+│   ├── router/             # GoRouter config
+│   └── services/           # Favorites manager (SharedPreferences)
 └── features/
-    ├── auth/                 # Login, splash, estado de autenticação
-    │   ├── data/             # Datasources, models, repository impl
-    │   ├── domain/           # Entities, repository interface, use cases
-    │   └── presentation/     # Bloc, pages (Splash, Login)
-    ├── news/                 # Feed e detalhes de notícias
-    ├── profile/              # Perfil e edição
-    └── user/                 # Dados e atualização de usuário
+    ├── auth/               # Login, register, splash
+    ├── news/               # News list, details, favorites
+    ├── profile/            # Profile and edit profile pages
+    └── user/               # User domain + profile loading/update
 ```
 
-Cada feature segue o padrão:
-
-- **data**: implementações concretas (API, cache), models, `*RepositoryImpl`
-- **domain**: entidades, contratos de repositório, use cases (regras de negócio)
-- **presentation**: BLoC/Cubit, páginas e widgets
+Each feature is split into **data** (datasources, models, repositories), **domain** (entities, repositories, use cases), and **presentation** (BLoC, pages, widgets).
 
 ---
 
-## Principais decisões
+## Tech stack
 
-| Decisão | Motivo |
-|--------|--------|
-| **Clean Architecture por feature** | Separação clara de responsabilidades, testabilidade e evolução por módulo. |
-| **BLoC (flutter_bloc)** | Estado previsível, fácil de testar e alinhado com o ecossistema Flutter. |
-| **GetIt para DI** | Injeção de dependências leve, sem contexto de build; registros explícitos em `injection_container.dart`. |
-| **GoRouter** | Rotas declarativas, deep linking e passagem de parâmetros (ex.: `extra` para `NewsEntity`). |
-| **Dio** | Cliente HTTP configurável; instância compartilhada via `DioClient` no core. |
-| **SharedPreferences** | Persistência simples para token/sessão e favoritos (FavoritesManager). |
-| **dartz** | Uso de `Either<Failure, T>` nos use cases para representar falha ou sucesso de forma tipada. |
-| **Equatable** | Igualdade em entities, states e events para evitar rebuilds desnecessários no BLoC. |
-| **Splash em Flutter (sem native splash)** | Controle total do layout (texto "Nortus", delay, redirecionamento) e consistência entre plataformas. |
-| **Cores e tipografia** | Uso de `google_fonts` (Inter) e cores do design (ex.: `#1876D2` na login). |
+| Layer        | Choice |
+|-------------|--------|
+| State       | **flutter_bloc** (BLoC) |
+| DI          | **get_it** |
+| Routing     | **go_router** |
+| HTTP        | **dio** |
+| FP / errors | **dartz** (Either) |
+| Equality    | **equatable** |
+| Fonts       | **google_fonts** (Inter, Space Grotesk) |
+| Storage     | **shared_preferences** (favorites, session) |
 
 ---
 
-## Rotas
+## Features
 
-| Rota | Descrição |
-|------|-----------|
-| `/` | Splash (verifica auth e redireciona) |
-| `/login` | Login (e-mail + fluxo “continuar sem conta”) |
-| `/news` | Feed de notícias |
-| `/news/details` | Detalhes da notícia (passa `NewsEntity` via `extra`) |
-| `/profile` | Perfil do usuário |
-| `/edit-profile` | Edição de perfil |
-
-Configuração centralizada em `lib/core/router/router_config.dart`.
+- **Splash** – Initial screen with redirect by auth status.
+- **Auth** – Login and register (tabs), session handling.
+- **News** – List with hero/grid/recent layout, search, pagination, details page.
+- **Favorites** – Toggle on news cards and details; list on profile; persisted via `FavoritesManager`.
+- **Profile** – User info, edit profile (language, timezone, date format, address).
+- **Response balloon** – On news details, when toggling favorite, a custom overlay balloon shows feedback at the top (e.g. "Você favoritou esta Notícia").
 
 ---
 
-## Testes
+## Routing
 
-Os testes espelham a estrutura de `lib/`:
+| Route            | Screen        |
+|------------------|---------------|
+| `/`              | SplashPage    |
+| `/login`         | LoginPage     |
+| `/news`          | NewsPage      |
+| `/news/details`  | NewsDetailsPage (extra: news + bloc) |
+| `/profile`       | ProfilePage   |
+| `/edit-profile`  | EditProfilePage |
 
-- **data**: repositórios e models
-- **domain**: use cases
-- **presentation**: BLoCs (com `bloc_test` e `mocktail`)
+---
+
+## What's been done (recent)
+
+- **Response balloon** – Favorites feedback on news details via custom overlay balloon (and SnackBar where used).
+- **Comments** – All comments in `lib/` translated to English; decorative/section comments removed.
+- **Cleanup** – Unused files and folders removed:
+  - `lib/core/config/app_config.dart`
+  - `lib/features/profile/presentation/widgets/profile_data_section.dart`
+  - `lib/features/news/presentation/widgets/related_news_list.dart`
+  - `lib/features/user/presentation/bloc/user_event.dart` (logic kept in `user_bloc.dart`)
+- **Branch** – `fix/response-balloon-and-comments-cleanup` with the above changes.
+
+---
+
+## Tests
+
+Tests live under `test/` and mirror `lib/` (e.g. `test/features/auth/`, `test/features/news/`). Run with:
 
 ```bash
 flutter test
@@ -155,30 +112,8 @@ flutter test
 
 ---
 
-## Commits e Pull Requests
+## Resources
 
-Para padronizar histórico e revisões, seguimos as convenções abaixo. Detalhes em [CONTRIBUTING.md](CONTRIBUTING.md).
-
-### Mensagens de commit
-
-- **Formato**: `tipo(escopo): descrição curta`
-- **Tipos**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
-- **Exemplos**:
-  - `feat(auth): add login with email`
-  - `fix(news): correct loading state in feed`
-  - `docs: update README setup`
-
-### Pull Requests
-
-- Título claro e objetivo (pode seguir o mesmo padrão do commit).
-- Descrição com: **o que** mudou, **por quê** e como **testar**.
-- Referência a issue/tarefa quando existir.
-
----
-
-## Referências
-
-- [Flutter](https://docs.flutter.dev/)
-- [flutter_bloc](https://bloclibrary.dev/)
-- [GoRouter](https://pub.dev/documentation/go_router/latest/)
-- [GetIt](https://pub.dev/packages/get_it)
+- [Flutter documentation](https://docs.flutter.dev/)
+- [BLoC library](https://bloclibrary.dev/)
+- [GoRouter](https://pub.dev/packages/go_router)
