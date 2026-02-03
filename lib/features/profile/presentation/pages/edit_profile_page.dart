@@ -436,6 +436,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ),
               ),
+              SizedBox(height: Responsive.footerTopSpacing(context)),
               const CustomFooter(),
             ],
           ),

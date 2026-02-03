@@ -249,9 +249,13 @@ class _LoginPageState extends State<LoginPage> {
                                   listener: (context, state) {
                                     if (state is AuthAuthenticated) {
                                       if (_isRegisterMode) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           const SnackBar(
-                                            content: Text('Usuário cadastrado com sucesso!'),
+                                            content: Text(
+                                              'Usuário cadastrado com sucesso!',
+                                            ),
                                             backgroundColor: Colors.green,
                                             behavior: SnackBarBehavior.floating,
                                           ),
@@ -268,14 +272,21 @@ class _LoginPageState extends State<LoginPage> {
                                       }
                                     }
                                     if (state is AuthError) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(state.message),
+                                          backgroundColor: Colors.red,
+                                        ),
                                       );
                                     }
                                   },
                                   builder: (context, state) {
                                     return AuthPrimaryButton(
-                                      label: _isRegisterMode ? 'Cadastrar' : 'Entrar',
+                                      label: _isRegisterMode
+                                          ? 'Cadastrar'
+                                          : 'Entrar',
                                       isLoading: state is AuthLoading,
                                       onPressed: () {
                                         if (_formKey.currentState!.validate()) {
@@ -283,16 +294,20 @@ class _LoginPageState extends State<LoginPage> {
                                             context.read<AuthBloc>().add(
                                               RegisterSubmitted(
                                                 username: _emailController.text,
-                                                password: _passwordController.text,
+                                                password:
+                                                    _passwordController.text,
                                               ),
                                             );
                                           } else if (!_isPasswordStep) {
-                                            setState(() => _isPasswordStep = true);
+                                            setState(
+                                              () => _isPasswordStep = true,
+                                            );
                                           } else {
                                             context.read<AuthBloc>().add(
                                               LoginSubmitted(
                                                 username: _emailController.text,
-                                                password: _passwordController.text,
+                                                password:
+                                                    _passwordController.text,
                                                 keepLoggedIn: _keepLoggedIn,
                                               ),
                                             );
@@ -313,7 +328,10 @@ class _LoginPageState extends State<LoginPage> {
                         crossAxisAlignment: WrapCrossAlignment.center,
                         spacing: 12,
                         children: [
-                          FooterTextLink(label: 'Esqueci a senha', onTap: () {}),
+                          FooterTextLink(
+                            label: 'Esqueci a senha',
+                            onTap: () {},
+                          ),
                           Container(
                             width: 4,
                             height: 4,
@@ -322,7 +340,10 @@ class _LoginPageState extends State<LoginPage> {
                               shape: BoxShape.circle,
                             ),
                           ),
-                          FooterTextLink(label: 'Continuar sem conta', onTap: () {}),
+                          FooterTextLink(
+                            label: 'Continuar sem conta',
+                            onTap: () {},
+                          ),
                         ],
                       ),
                     ],
@@ -385,5 +406,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
 }

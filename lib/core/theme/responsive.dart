@@ -59,4 +59,10 @@ abstract class Responsive {
     final width = logoWidth(context);
     return (20.0 * width / 89.0).roundToDouble();
   }
+
+  /// Vertical space between last content and footer. Scales with screen height.
+  static double footerTopSpacing(BuildContext context) {
+    final h = MediaQuery.sizeOf(context).height;
+    return min(80.0, max(40.0, h * 0.06));
+  }
 }
