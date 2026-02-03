@@ -25,6 +25,9 @@ abstract class AppColors {
   /// Text / content dark.
   static const Color textPrimary = Color(0xFF0B1125);
 
+  /// Form input text (fields, dropdowns).
+  static const Color formText = Color(0xFF666666);
+
   /// Light gray background.
   static const Color surfaceLight = Color(0xFFF1F5F9);
 

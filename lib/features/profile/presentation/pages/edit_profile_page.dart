@@ -1,4 +1,5 @@
 import 'package:desafio_loomi_flutter/core/presentation/custom_footer.dart';
+import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
 import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:desafio_loomi_flutter/core/widgets/app_dropdown.dart';
 import 'package:desafio_loomi_flutter/core/widgets/app_text_field.dart';
@@ -186,14 +187,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
             padding: const EdgeInsets.only(left: 16.0),
             child: Row(
               children: [
-                const Icon(Icons.arrow_back, color: Colors.black, size: 20),
+                Icon(Icons.arrow_back, color: AppColors.primaryDark, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   'Voltar',
                   style: GoogleFonts.inter(
-                    color: Colors.black,
-                    fontSize: 16,
+                    color: AppColors.primaryDark,
+                    fontSize: 14,
                     fontWeight: FontWeight.w500,
+                    height: 1.0,
                   ),
                 ),
               ],
@@ -381,7 +383,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                     onPressed: () => context.pop(),
                                     style: OutlinedButton.styleFrom(
                                       backgroundColor: Colors.white,
-                                      side: const BorderSide(color: textBlack),
+                                      side: const BorderSide(
+                                        color: Color(0xFF0D478C),
+                                        width: 0.75,
+                                      ),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(48),
                                       ),
