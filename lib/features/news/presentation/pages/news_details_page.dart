@@ -4,6 +4,8 @@ import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
 import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
+import 'package:desafio_loomi_flutter/features/news/presentation/widgets/favorite_feedback_balloon.dart';
+import 'package:desafio_loomi_flutter/features/news/presentation/widgets/tags_section.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_state.dart';
 import 'package:flutter/material.dart';
@@ -252,7 +254,14 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
 
                                   // Categories section
                                   const SizedBox(height: 32),
-                                  _buildTagsSection(),
+                                  TagsSection(
+                                    title: "Categorias",
+                                    tags: [
+                                      widget.news.category.toUpperCase(),
+                                      "NOTÍCIAS",
+                                      "LEITURA",
+                                    ],
+                                  ),
                                   const SizedBox(height: 48),
 
                                   // Related news section
@@ -335,7 +344,7 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                 top: 10,
                 left: 16,
                 right: 16,
-                child: _TopBallonWidget(
+                child: FavoriteFeedbackBalloon(
                   title: _ballonTitle,
                   subtitle: _ballonSubtitle,
                   color: _ballonColor,
@@ -346,54 +355,6 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
             ],
           ),
         ),
-    );
-  }
-
-  Widget _buildTagsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Categorias",
-          style: GoogleFonts.spaceGrotesk(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF0F172A),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Wrap(
-          spacing: 12, // Horizontal spacing between tags
-          runSpacing: 12, // Vertical spacing when wrapping
-          children: [
-            // Main category tag
-            _buildTagChip(widget.news.category.toUpperCase()),
-
-            // Static tags for example (or from API)
-            _buildTagChip("NOTÍCIAS"),
-            _buildTagChip("LEITURA"),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTagChip(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9), // Very light gray
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.inter(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: const Color(0xFF475569),
-        ),
-      ),
     );
   }
 
@@ -479,83 +440,6 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
           ),
         );
       },
-    );
-  }
-}
-
-// Custom balloon widget
-class _TopBallonWidget extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final Color color;
-  final IconData icon;
-  final VoidCallback onClose;
-
-  const _TopBallonWidget({
-    required this.title,
-    required this.subtitle,
-    required this.color,
-    required this.icon,
-    required this.onClose,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-                if (subtitle.isNotEmpty)
-                  Text(
-                    subtitle,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: Colors.white.withOpacity(0.9),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: onClose,
-            child: const Icon(Icons.close, color: Colors.white, size: 20),
-          ),
-        ],
-      ),
     );
   }
 }

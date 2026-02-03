@@ -9,6 +9,7 @@ import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_state.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/widgets/news_card.dart';
+import 'package:desafio_loomi_flutter/features/profile/presentation/widgets/section_title.dart';
 import 'package:desafio_loomi_flutter/features/user/presentation/bloc/user_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -186,27 +187,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     const SizedBox(height: 48),
 
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Noticias favoritadas',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: brandBlue,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Container(
-                          width: 116,
-                          height: 3,
-                          decoration: BoxDecoration(
-                            color: brandBlue,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                      ],
+                    SectionTitle(
+                      title: 'Noticias favoritadas',
+                      accentColor: brandBlue,
                     ),
 
                     const SizedBox(height: 24),

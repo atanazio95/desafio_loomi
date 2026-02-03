@@ -6,6 +6,11 @@ import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
 import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
+import 'package:desafio_loomi_flutter/features/news/presentation/widgets/grid_news_card.dart';
+import 'package:desafio_loomi_flutter/features/news/presentation/widgets/hero_news_card.dart';
+import 'package:desafio_loomi_flutter/features/news/presentation/widgets/load_more_button.dart';
+import 'package:desafio_loomi_flutter/features/news/presentation/widgets/recent_news_card.dart';
+import 'package:desafio_loomi_flutter/features/news/presentation/widgets/ver_mais_button.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_state.dart';
 import 'package:flutter/material.dart';
@@ -138,7 +143,7 @@ class _NewsPageState extends State<NewsPage> {
             .map(
               (news) => Padding(
                 padding: const EdgeInsets.only(bottom: 24),
-                child: _HeroNewsCard(
+                child: HeroNewsCard(
                   news: news,
                   onTap: () => _navigateToDetails(context, news),
                   onFavorite: () => _toggleFavorite(context, news.id),
@@ -165,7 +170,7 @@ class _NewsPageState extends State<NewsPage> {
                 .map(
                   (news) => Padding(
                     padding: const EdgeInsets.only(bottom: 24),
-                    child: _HeroNewsCard(
+                    child: HeroNewsCard(
                       news: news,
                       onTap: () => _navigateToDetails(context, news),
                       onFavorite: () => _toggleFavorite(context, news.id),
@@ -188,7 +193,7 @@ class _NewsPageState extends State<NewsPage> {
               childAspectRatio: 0.65,
             ),
             itemCount: gridNews.length,
-            itemBuilder: (context, index) => _GridNewsCard(
+            itemBuilder: (context, index) => GridNewsCard(
               news: gridNews[index],
               onTap: () => _navigateToDetails(context, gridNews[index]),
               onFavorite: () => _toggleFavorite(context, gridNews[index].id),
@@ -218,7 +223,11 @@ class _NewsPageState extends State<NewsPage> {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              _buildVerMaisHeader(context),
+              VerMaisButton(
+                              onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Funcionalidade em breve.")),
+                              ),
+                            ),
             ],
           ),
         ),
@@ -233,7 +242,7 @@ class _NewsPageState extends State<NewsPage> {
             shrinkWrap: true,
             itemCount: recentNews.length,
             separatorBuilder: (_, __) => const SizedBox(height: 24),
-            itemBuilder: (context, index) => _RecentNewsCard(
+            itemBuilder: (context, index) => RecentNewsCard(
               news: recentNews[index],
               onTap: () => _navigateToDetails(context, recentNews[index]),
             ),
@@ -243,65 +252,14 @@ class _NewsPageState extends State<NewsPage> {
         // Load more button
         Padding(
           padding: EdgeInsets.all(padH),
-          child: _buildPaginationButton(context, state),
+          child: LoadMoreButton(
+                          isLoading: state.isLoading,
+                          onPressed: () => context.read<NewsBloc>().add(
+                            GetNewsEvent(page: state.currentPage + 1),
+                          ),
+                        ),
         ),
       ],
-    );
-  }
-
-  Widget _buildVerMaisHeader(BuildContext context) {
-    return InkWell(
-      onTap: () => ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Funcionalidade em breve."))),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFF0F172A)),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: const Row(
-          children: [
-            Text("Ver mais", style: TextStyle(fontSize: 12)),
-            Icon(Icons.chevron_right, size: 16),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPaginationButton(BuildContext context, NewsState state) {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: OutlinedButton(
-        onPressed: state.isLoading
-            ? null
-            : () {
-                context.read<NewsBloc>().add(
-                  GetNewsEvent(page: state.currentPage + 1),
-                );
-              },
-        style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Color(0xFF163C43)),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100),
-          ),
-        ),
-        child: state.isLoading
-            ? const CircularProgressIndicator(
-                strokeWidth: 2,
-                color: AppColors.loading,
-              )
-            : const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Ver mais"),
-                  SizedBox(width: 10),
-                  Icon(Icons.keyboard_arrow_down),
-                ],
-              ),
-      ),
     );
   }
 
@@ -314,274 +272,5 @@ class _NewsPageState extends State<NewsPage> {
 
   void _toggleFavorite(BuildContext context, String newsId) {
     context.read<NewsBloc>().add(ToggleFavoriteHome(newsId));
-  }
-}
-
-// Hero news card (featured at top)
-class _HeroNewsCard extends StatelessWidget {
-  final NewsEntity news;
-  final VoidCallback onTap;
-  final VoidCallback onFavorite;
-
-  const _HeroNewsCard({
-    required this.news,
-    required this.onTap,
-    required this.onFavorite,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  news.imageUrl,
-                  height: Responsive.imageHeightHeroCard(context),
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    height: Responsive.imageHeightHeroCard(context),
-                    color: Colors.grey[200],
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 12,
-                right: 12,
-                child: GestureDetector(
-                  onTap: onFavorite,
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFFD0D0D0),
-                        width: 1.01,
-                      ),
-                    ),
-                    child: Icon(
-                      news.isFavorite ? Icons.star : Icons.star_border,
-                      color: news.isFavorite ? Colors.yellow : Colors.black,
-                      size: 24,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            news.category.toUpperCase(),
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              color: const Color(0xFF64748B),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            news.title,
-            style: GoogleFonts.spaceGrotesk(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: const Color(0xFF0F172A),
-              height: 1.2,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            news.summary,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: const Color(0xFF64748B),
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            "12 horas atrás",
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              color: const Color(0xFF94A3B8),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Grid news card (2-column layout)
-class _GridNewsCard extends StatelessWidget {
-  final NewsEntity news;
-  final VoidCallback onTap;
-  final VoidCallback onFavorite;
-
-  const _GridNewsCard({
-    required this.news,
-    required this.onTap,
-    required this.onFavorite,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  news.imageUrl,
-                  height: Responsive.imageHeightGrid(context),
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    height: Responsive.imageHeightGrid(context),
-                    color: Colors.grey[200],
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: GestureDetector(
-                  onTap: onFavorite,
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFFD0D0D0),
-                        width: 1.01,
-                      ),
-                    ),
-                    child: Icon(
-                      news.isFavorite ? Icons.star : Icons.star_border,
-                      color: news.isFavorite ? Colors.yellow : Colors.black,
-                      size: 18,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            "BRAND: ${news.category.toUpperCase()}",
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              color: const Color(0xFF94A3B8),
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            news.title,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: const Color(0xFF0F172A),
-              height: 1.2,
-            ),
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            "12 horas atrás",
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              color: const Color(0xFF94A3B8),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Recent news list item card
-class _RecentNewsCard extends StatelessWidget {
-  final NewsEntity news;
-  final VoidCallback onTap;
-
-  const _RecentNewsCard({required this.news, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              news.imageUrl,
-              height: Responsive.imageHeightRecentThumb(context),
-              width: Responsive.imageWidthRecentThumb(context),
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                height: Responsive.imageHeightRecentThumb(context),
-                width: Responsive.imageWidthRecentThumb(context),
-                color: Colors.grey[200],
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  news.category.toUpperCase(),
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF64748B),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  news.title,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF0F172A),
-                    height: 1.2,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "12 horas atrás",
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    color: const Color(0xFF94A3B8),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
