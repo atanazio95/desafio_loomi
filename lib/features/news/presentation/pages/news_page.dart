@@ -1,7 +1,7 @@
 import 'package:desafio_loomi_flutter/core/presentation/custom_drawer.dart';
 import 'package:desafio_loomi_flutter/core/presentation/custom_footer.dart';
 import 'package:desafio_loomi_flutter/core/presentation/custom_home_app_bar.dart';
-import 'package:desafio_loomi_flutter/core/presentation/header.dart'; // Seu Header
+import 'package:desafio_loomi_flutter/core/presentation/header.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart';
@@ -23,8 +23,6 @@ class _NewsPageState extends State<NewsPage> {
   void initState() {
     super.initState();
     final bloc = context.read<NewsBloc>();
-
-    // Só adiciona o evento se a lista estiver vazia (primeiro carregamento)
     if (bloc.state.news.isEmpty) {
       bloc.add(const GetNewsEvent(page: 1));
     }
@@ -34,251 +32,67 @@ class _NewsPageState extends State<NewsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
-      // Drawer para o menu lateral
       drawer: const CustomDrawer(),
-
-      // AppBar com abas
       appBar: CustomHomeAppBar(
         selectedTab: 0,
         onTabChanged: (index) {
           if (index == 1) context.push('/profile');
         },
       ),
-
       body: BlocBuilder<NewsBloc, NewsState>(
         builder: (context, state) {
-          // Loading Inicial (Tela inteira vazia)
           if (state.isLoading && state.news.isEmpty) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // Erro (Tela inteira vazia)
           if (state.error != null && state.news.isEmpty) {
             return Center(child: Text(state.error!));
           }
 
-          // --- FATIAMENTO DA LISTA ---
-          // Hero: Primeiros 2 itens
-          final List<NewsEntity> heroNews = state.news.take(2).toList();
-          // Grid: Do 3º ao 6º item
-          final List<NewsEntity> gridNews = state.news.skip(2).take(4).toList();
-          // Recentes: Do 7º em diante (Cresce com a paginação)
-          final List<NewsEntity> recentNews = state.news.skip(6).toList();
+          final isSearching = state.searchQuery.isNotEmpty;
+          final displayList = state.displayNews;
 
           return SingleChildScrollView(
-            // [CORREÇÃO] Padding zero aqui para o Footer encostar nas bordas
             padding: EdgeInsets.zero,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // HEADER (Importado)
                 const NewsHeader(),
+
+                // --- FEEDBACK DE BUSCA ---
+                if (isSearching)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+                    child: RichText(
+                      text: TextSpan(
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          color: const Color(0xFF64748B),
+                        ),
+                        children: [
+                          const TextSpan(text: 'Resultado da busca por '),
+                          TextSpan(
+                            text: '"${state.searchQuery}"',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
 
                 const SizedBox(height: 16),
 
-                // --- 1. HERO SECTION (Cards Grandes) ---
-                if (heroNews.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      children: heroNews.map((news) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 24),
-                          child: _HeroNewsCard(
-                            news: news,
-                            onTap: () => _navigateToDetails(context, news),
-                            onFavorite: () => _toggleFavorite(context, news.id),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
+                // --- LÓGICA DE EXIBIÇÃO ---
+                if (isSearching)
+                  // MODO BUSCA: Lista Simples
+                  _buildSearchResults(displayList)
+                else
+                  // MODO NORMAL: Layout Complexo
+                  _buildComplexLayout(context, state),
 
-                // --- 2. GRID SECTION (Cards Pequenos) ---
-                if (gridNews.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: GridView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 24,
-                            childAspectRatio: 0.65,
-                          ),
-                      itemCount: gridNews.length,
-                      itemBuilder: (context, index) {
-                        final news = gridNews[index];
-                        return _GridNewsCard(
-                          news: news,
-                          onTap: () => _navigateToDetails(context, news),
-                          onFavorite: () => _toggleFavorite(context, news.id),
-                        );
-                      },
-                    ),
-                  ),
-
-                const SizedBox(height: 32),
-
-                // --- 3. CABEÇALHO "MAIS RECENTES" ---
-                // Este container ocupa a largura total (sem padding no pai)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 16,
-                  ),
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      top: BorderSide(color: Color(0xFFEEEEEE)),
-                      bottom: BorderSide(color: Color(0xFFEEEEEE)),
-                    ),
-                    color: Color(0xFFFAFAFA),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Mais recentes",
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFF0F172A),
-                        ),
-                      ),
-
-                      // [ALTERAÇÃO] Botão agora é clicável com InkWell
-                      InkWell(
-                        onTap: () {
-                          ScaffoldMessenger.of(context).clearSnackBars();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                "Funcionalidade ainda não implementada.",
-                              ),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(
-                          20,
-                        ), // Para o clique respeitar a borda
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFF0F172A)),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: [
-                              Text(
-                                "Ver mais",
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: const Color(0xFF0F172A),
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(
-                                Icons.chevron_right,
-                                size: 16,
-                                color: Color(0xFF0F172A),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // --- 4. LISTA RECENTES ---
-                if (recentNews.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: ListView.separated(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: recentNews.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 24),
-                      itemBuilder: (context, index) {
-                        final news = recentNews[index];
-                        return _RecentNewsCard(
-                          news: news,
-                          onTap: () => _navigateToDetails(context, news),
-                        );
-                      },
-                    ),
-                  ),
-
-                const SizedBox(height: 32),
-
-                // --- 5. BOTÃO "VER MAIS" (Paginação) ---
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 56, // Altura conforme spec
-                    child: OutlinedButton(
-                      // Bloqueia clique durante carregamento
-                      onPressed: state.isLoading
-                          ? null
-                          : () {
-                              final newsBloc = context.read<NewsBloc>();
-                              final nextPage = newsBloc.state.currentPage + 1;
-                              newsBloc.add(GetNewsEvent(page: nextPage));
-                            },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF163C43)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        padding: const EdgeInsets.all(10),
-                      ),
-                      // Troca texto por Loading girando
-                      child: state.isLoading
-                          ? const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Color(0xFF163C43),
-                              ),
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Ver mais",
-                                  style: GoogleFonts.inter(
-                                    color: const Color(0xFF163C43),
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                const Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: Color(0xFF163C43),
-                                ),
-                              ],
-                            ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 48),
-
-                // --- 6. FOOTER ---
-                // Fora de qualquer Padding horizontal para ocupar tudo
                 const CustomFooter(),
               ],
             ),
@@ -288,15 +102,204 @@ class _NewsPageState extends State<NewsPage> {
     );
   }
 
+  // --- WIDGET PARA MODO BUSCA ---
+  Widget _buildSearchResults(List<NewsEntity> results) {
+    if (results.isEmpty) {
+      return Container(
+        height: 300,
+        alignment: Alignment.center,
+        child: Text(
+          "Nenhuma notícia encontrada.",
+          style: GoogleFonts.inter(color: Colors.grey),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: results.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 24),
+        itemBuilder: (context, index) => _RecentNewsCard(
+          news: results[index],
+          onTap: () => _navigateToDetails(context, results[index]),
+        ),
+      ),
+    );
+  }
+
+  // --- WIDGET PARA LAYOUT NORMAL (HERO + GRID + RECENT) ---
+  Widget _buildComplexLayout(BuildContext context, NewsState state) {
+    final List<NewsEntity> heroNews = state.news.take(2).toList();
+    final List<NewsEntity> gridNews = state.news.skip(2).take(4).toList();
+    final List<NewsEntity> recentNews = state.news.skip(6).toList();
+
+    return Column(
+      children: [
+        // HERO
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            children: heroNews
+                .map(
+                  (news) => Padding(
+                    padding: const EdgeInsets.only(bottom: 24),
+                    child: _HeroNewsCard(
+                      news: news,
+                      onTap: () => _navigateToDetails(context, news),
+                      onFavorite: () => _toggleFavorite(context, news.id),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+
+        // GRID
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: GridView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 24,
+              childAspectRatio: 0.65,
+            ),
+            itemCount: gridNews.length,
+            itemBuilder: (context, index) => _GridNewsCard(
+              news: gridNews[index],
+              onTap: () => _navigateToDetails(context, gridNews[index]),
+              onFavorite: () => _toggleFavorite(context, gridNews[index].id),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 32),
+
+        // CABEÇALHO RECENTES
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          decoration: const BoxDecoration(
+            border: Border(
+              top: BorderSide(color: Color(0xFFEEEEEE)),
+              bottom: BorderSide(color: Color(0xFFEEEEEE)),
+            ),
+            color: Color(0xFFFAFAFA),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Mais recentes",
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              _buildVerMaisHeader(context),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // LISTA RECENTES
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: ListView.separated(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: recentNews.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 24),
+            itemBuilder: (context, index) => _RecentNewsCard(
+              news: recentNews[index],
+              onTap: () => _navigateToDetails(context, recentNews[index]),
+            ),
+          ),
+        ),
+
+        // BOTÃO PAGINAÇÃO
+        Padding(
+          padding: const EdgeInsets.all(24),
+          child: _buildPaginationButton(context, state),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVerMaisHeader(BuildContext context) {
+    return InkWell(
+      onTap: () => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Funcionalidade em breve."))),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xFF0F172A)),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: const Row(
+          children: [
+            Text("Ver mais", style: TextStyle(fontSize: 12)),
+            Icon(Icons.chevron_right, size: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaginationButton(BuildContext context, NewsState state) {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: OutlinedButton(
+        onPressed: state.isLoading
+            ? null
+            : () {
+                context.read<NewsBloc>().add(
+                  GetNewsEvent(page: state.currentPage + 1),
+                );
+              },
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Color(0xFF163C43)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(100),
+          ),
+        ),
+        child: state.isLoading
+            ? const CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Color(0xFF163C43),
+              )
+            : const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Ver mais"),
+                  SizedBox(width: 10),
+                  Icon(Icons.keyboard_arrow_down),
+                ],
+              ),
+      ),
+    );
+  }
+
   void _navigateToDetails(BuildContext context, NewsEntity news) {
-    final newsBloc = context.read<NewsBloc>();
-    context.push('/news/details', extra: {'news': news, 'bloc': newsBloc});
+    context.push(
+      '/news/details',
+      extra: {'news': news, 'bloc': context.read<NewsBloc>()},
+    );
   }
 
   void _toggleFavorite(BuildContext context, String newsId) {
     context.read<NewsBloc>().add(ToggleFavoriteHome(newsId));
   }
 }
+
+// Os componentes _HeroNewsCard, _GridNewsCard e _RecentNewsCard permanecem iguais ao que você já tem.
 
 // ==========================================================
 // COMPONENTES VISUAIS (Cards)
