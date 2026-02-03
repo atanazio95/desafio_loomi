@@ -1,3 +1,5 @@
+import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
+import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_event.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_state.dart';
@@ -66,10 +68,10 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    const primaryBlue = Color(0xFF1876D2);
+    final padH = Responsive.horizontalPadding(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceWhite,
       body: Stack(
         children: [
           Positioned(
@@ -81,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
                 'assets/assets/logo_shield.png',
                 width: size.width * 1.6,
                 fit: BoxFit.contain,
-                color: Colors.grey,
+                color: AppColors.labelHint,
                 colorBlendMode: BlendMode.srcIn,
               ),
             ),
@@ -93,7 +95,6 @@ class _LoginPageState extends State<LoginPage> {
               child: Text(
                 'Nortus',
                 style: GoogleFonts.inter(
-                  color: primaryBlue,
                   fontSize: size.width * 0.11,
                   fontWeight: FontWeight.w700,
                 ),
@@ -109,9 +110,9 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(24, 60, 24, 40),
+                  padding: EdgeInsets.fromLTRB(padH, 60, padH, 40),
                   decoration: const BoxDecoration(
-                    color: Color(0xFF0D478C),
+                    color: AppColors.primaryDark,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(32),
                       topRight: Radius.circular(32),
@@ -123,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                       AnimatedSize(
                         duration: const Duration(milliseconds: 300),
                         child: Container(
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(24),
@@ -134,23 +135,12 @@ class _LoginPageState extends State<LoginPage> {
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  _isRegisterMode
-                                      ? 'Crie sua conta'
-                                      : 'Acesse sua conta',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-
                                 AuthTextFormField(
                                   controller: _emailController,
                                   label: 'Digite seu E-mail',
                                   validator: _validateEmail,
                                   keyboardType: TextInputType.emailAddress,
+                                  maxLength: 64,
                                   onChanged: () => setState(() {}),
                                 ),
 
@@ -159,6 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                                   AuthTextFormField(
                                     controller: _passwordController,
                                     label: 'Digite a Senha',
+                                    showLabel: false,
                                     validator: _validatePassword,
                                     obscureText: _obscurePassword,
                                     suffixIcon: IconButton(
@@ -183,6 +174,7 @@ class _LoginPageState extends State<LoginPage> {
                                   AuthTextFormField(
                                     controller: _confirmPasswordController,
                                     label: 'Confirme Senha',
+                                    showLabel: false,
                                     obscureText: _obscurePasswordConfirmed,
                                     validator: (value) {
                                       if (value != _passwordController.text)
@@ -215,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
                                         width: 24,
                                         child: Checkbox(
                                           value: _keepLoggedIn,
-                                          activeColor: const Color(0xFF0D478C),
+                                          activeColor: AppColors.primaryDark,
                                           onChanged: (value) => setState(
                                             () =>
                                                 _keepLoggedIn = value ?? false,
@@ -277,7 +269,7 @@ class _LoginPageState extends State<LoginPage> {
                                       ).showSnackBar(
                                         SnackBar(
                                           content: Text(state.message),
-                                          backgroundColor: Colors.red,
+                                          backgroundColor: AppColors.error,
                                         ),
                                       );
                                     }
@@ -330,11 +322,17 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           FooterTextLink(
                             label: 'Esqueci a senha',
-                            onTap: () {},
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Função não disponível'),
+                                ),
+                              );
+                            },
                           ),
                           Container(
-                            width: 4,
-                            height: 4,
+                            width: 8,
+                            height: 8,
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
@@ -342,7 +340,13 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           FooterTextLink(
                             label: 'Continuar sem conta',
-                            onTap: () {},
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Função não disponível'),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -361,7 +365,7 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
+                          color: AppColors.textPrimary.withOpacity(0.15),
                           blurRadius: 15,
                           offset: const Offset(0, 4),
                         ),

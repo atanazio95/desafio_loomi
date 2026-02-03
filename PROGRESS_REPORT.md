@@ -50,4 +50,19 @@ Priority was always to meet the PDF required scope before optional items.
 
 ---
 
+## 6. Recent progress (code review and corrections)
+
+After the main delivery, the following adjustments were made:
+
+- **API:** Base URL set to `https://le43j.wiremockapi.cloud/`. Removed mock fallback for the news list; on API failure the app returns `ServerFailure`. News details: `GET /news/{id}/details` is always called when opening a news item; the screen is built entirely from the response body (loading and error states; supports mocked API that returns the same object for any id). `NewsModel.fromJson` maps `newsResume` for the details endpoint. Categories: `GET /categories` returns `{ "data": ["Ciência", "Educação", "Esportes", ...] }`; the drawer is filled with this list.
+- **Edit profile:** Added footer at the end of the scroll (full-width); responsive spacing between last content and footer (`Responsive.footerTopSpacing`); form fields and cancel button with border 0.75px #0D478C; form input text color #666666 (`AppColors.formText`); back button and arrow with Inter Medium 14px, color #0D478C.
+- **Login:** Email field with white background and 1px gray border (#B4B4B4); label in gray; email maxLength 64; character counter hidden. Password fields use the label only as placeholder (hintText), so the label does not float above the field when typing.
+- **News:** Increased spacing between the last “Ver mais” (LoadMoreButton) and the footer (responsive); recent-news list cards with bottom border 1px #B4B4B4.
+- **Categories feature:** New feature for the drawer: `CategoriesRemoteDataSource` (GET /categories), repository, `GetCategoriesUseCase`, `CategoriesCubit`. Drawer loads categories on open; shows loading indicator, error message, or list of category names.
+- **News details page:** Always fetches details by id; content (title, image, summary, description, related news, tags) comes only from the API response. "Resumo NortusAI" block with icon `icon_details_nortus.png`, title and summary text. State includes `isLoadingDetails`, `detailsError` and optional `lastRequestedDetailsId`; error state shows "Tentar novamente" to retry.
+- **Code:** In-code comments reviewed and kept in English (e.g. news details init, Resumo NortusAI block, `lastRequestedDetailsId` in state).
+- **Docs:** README and progress report updated; project structure includes `categories` feature; documentation table and `docs/` index for architecture and responsiveness analyses.
+
+---
+
 *This report complements [DELIVERY_CHECKLIST.md](DELIVERY_CHECKLIST.md) and the project [README.md](README.md).*

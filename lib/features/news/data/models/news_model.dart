@@ -37,7 +37,7 @@ class NewsModel extends NewsEntity {
       title: json['title'] ?? '',
       category: categoryName,
       author: authorName,
-      summary: json['summary'] ?? json['description'] ?? '',
+      summary: json['summary'] ?? json['newsResume'] ?? json['description'] ?? '',
       datePublished: json['publishedAt'] ?? json['date_published'] ?? '',
       imageUrl: imgUrl,
       relatedNews: json['relatedNews'] != null
@@ -46,8 +46,11 @@ class NewsModel extends NewsEntity {
                 .toList()
           : [],
       isFavorite: json['isFavorite'] ?? false,
-      description:
-          json['content'] ?? json['description'] ?? json['summary'] ?? '',
+      description: json['content'] ??
+          json['description'] ??
+          json['newsResume'] ??
+          json['summary'] ??
+          '',
     );
   }
 

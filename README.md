@@ -12,6 +12,7 @@ Flutter app for the Loomi Challenge: news feed with authentication, user profile
 - [Main decisions](#main-decisions)
 - [Routes](#routes)
 - [Tests](#tests)
+- [Documentation](#documentation)
 - [Commits and Pull Requests](#commits-and-pull-requests)
 
 ---
@@ -84,17 +85,20 @@ lib/
 ├── core/                      # Shared resources
 │   ├── di/                    # Dependency injection (GetIt)
 │   ├── errors/                # Failures and error handling
-│   ├── mock/                  # Mock data (e.g. news for pagination)
 │   ├── network/               # Dio client
 │   ├── presentation/          # Reusable UI (drawer, footer, app bar, headers)
 │   ├── router/                # GoRouter
-│   ├── theme/                 # Colors (app_colors) and responsiveness (responsive)
+│   ├── theme/                 # Colors (app_colors) and responsiveness (responsive, footerTopSpacing)
 │   └── widgets/              # Shared form/UI widgets (FormLabel, AppDropdown, AppTextField, FormSectionHeader)
 └── features/
     ├── auth/                  # Login, splash, auth state
     │   ├── data/              # Datasources, models, repository impl
     │   ├── domain/            # Entities, repository interface, use cases
     │   └── presentation/      # Bloc, pages (Splash, Login), widgets (AuthTextFormField, AuthPrimaryButton, TabButton, FooterTextLink)
+    ├── categories/            # Drawer categories from API
+    │   ├── data/              # Datasource, repository impl
+    │   ├── domain/            # Repository interface, use case
+    │   └── presentation/      # Cubit, state (used by CustomDrawer)
     ├── news/                  # News feed and details
     │   └── presentation/      # Bloc, pages, widgets (NewsCard, HeroNewsCard, GridNewsCard, RecentNewsCard, FavoriteFeedbackBalloon, TagsSection, VerMaisButton, LoadMoreButton)
     ├── profile/               # Profile and edit
@@ -155,9 +159,27 @@ flutter test
 
 ---
 
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Commit and PR conventions. |
+| [DELIVERY_CHECKLIST.md](DELIVERY_CHECKLIST.md) | Challenge delivery checklist (deadline, scope, APIs). |
+| [PROGRESS_REPORT.md](PROGRESS_REPORT.md) | Progress report (backlog, prioritization, difficulties). |
+| [docs/](docs/) | Additional analyses: [Architecture](docs/ARCHITECTURE_ANALYSIS.md), [Responsiveness](docs/RESPONSIVENESS_ANALYSIS.md). |
+
+---
+
 ## What's been done (recent)
 
-- **Widget refactor** – UI extracted into reusable widgets: **core** (FormLabel, AppDropdown, AppTextField, FormSectionHeader); **auth** (AuthTextFormField, AuthPrimaryButton, TabButton, FooterTextLink); **news** (HeroNewsCard, GridNewsCard, RecentNewsCard, FavoriteFeedbackBalloon, TagsSection, VerMaisButton, LoadMoreButton); **profile** (SectionTitle). Pages now use these components instead of inline or private builders. Branch: `refactor/extract-widgets`.
+- **Widget refactor** – UI extracted into reusable widgets: **core** (FormLabel, AppDropdown, AppTextField, FormSectionHeader); **auth** (AuthTextFormField, AuthPrimaryButton, TabButton, FooterTextLink); **news** (HeroNewsCard, GridNewsCard, RecentNewsCard, FavoriteFeedbackBalloon, TagsSection, VerMaisButton, LoadMoreButton); **profile** (SectionTitle). Pages use these components instead of inline or private builders.
+- **API** – Base URL: `https://le43j.wiremockapi.cloud/`. News list and details from API; no mock fallback. Errors return `ServerFailure`. News details: `GET /news/{id}/details`; the response body is used to build the full details screen (loading and error states; works with mocked API that returns the same object for any id). Categories: `GET /categories` returns `{ "data": ["Ciência", "Educação", ...] }` and fills the drawer.
+- **Edit profile** – Footer at end of scroll (full-width); responsive spacing above footer (`Responsive.footerTopSpacing`); borders and form text color (#0D478C, #666666 in `AppColors`); back button/arrow Inter Medium 14px #0D478C.
+- **Login** – Email field: white background, 1px gray border (#B4B4B4), label in gray; maxLength 64 for email; character counter hidden. Password fields: label as placeholder only (hintText), no floating label.
+- **News** – Responsive spacing between “Ver mais” / LoadMoreButton and footer; recent-news cards with bottom border 1px #B4B4B4.
+- **Categories (drawer)** – New feature: datasource, repository, use case, `CategoriesCubit`. Drawer loads categories from API on open; shows loading/error or list of category names.
+- **News details** – Always fetches `GET /news/{id}/details` when opening a news item; screen is built only from the API response. "Resumo NortusAI" block with icon `icon_details_nortus.png`, title and summary. Related news and tags from response.
+- **Code** – In-code comments kept in English.
 
 ---
 

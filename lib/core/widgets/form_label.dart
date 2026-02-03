@@ -1,3 +1,4 @@
+import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -17,7 +18,7 @@ class FormLabel extends StatelessWidget {
           fontSize: 10,
           fontWeight: FontWeight.w500,
           height: 1.0,
-          color: const Color(0xFF0B1125),
+          color: AppColors.textPrimary,
         ),
       ),
     );

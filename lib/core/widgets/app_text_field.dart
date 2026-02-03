@@ -31,16 +31,16 @@ class AppTextField extends StatelessWidget {
           decoration: InputDecoration(
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF0D478C), width: 0.75),
+              borderSide: const BorderSide(color: AppColors.primaryDark, width: 0.75),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF0D478C), width: 0.75),
+              borderSide: const BorderSide(color: AppColors.primaryDark, width: 0.75),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
-                color: Color(0xFF0D478C),
+                color: AppColors.primaryDark,
                 width: 0.75,
               ),
             ),

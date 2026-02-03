@@ -20,7 +20,7 @@ class LoadMoreButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Color(0xFF163C43)),
+          side: const BorderSide(color: AppColors.outline),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100),
           ),

@@ -1,3 +1,4 @@
+import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -28,7 +29,7 @@ class TabButton extends StatelessWidget {
           child: Text(
             label,
             style: GoogleFonts.inter(
-              color: isSelected ? Colors.white : Colors.black,
+              color: isSelected ? AppColors.surfaceWhite : AppColors.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),

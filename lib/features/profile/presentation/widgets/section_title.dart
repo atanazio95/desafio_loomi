@@ -1,7 +1,8 @@
+import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Section title with accent underline (e.g. "Noticias favoritadas" on profile).
+/// Section title with accent underline (e.g. favorited news section on profile).
 class SectionTitle extends StatelessWidget {
   final String title;
   final Color accentColor;
@@ -9,7 +10,7 @@ class SectionTitle extends StatelessWidget {
   const SectionTitle({
     super.key,
     required this.title,
-    this.accentColor = const Color(0xFF1876D2),
+    this.accentColor = AppColors.primary,
   });
 
   @override

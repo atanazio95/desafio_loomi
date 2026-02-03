@@ -171,13 +171,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    const brandBlue = Color(0xFF1876D2);
-    const textBlack = Color(0xFF0B1125);
-
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceWhite,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surfaceWhite,
         elevation: 0,
         leadingWidth: 100,
         leading: InkWell(
@@ -213,7 +210,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Dados atualizados com sucesso!'),
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.success,
               ),
             );
             Future.delayed(const Duration(milliseconds: 500), () {
@@ -225,7 +222,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.error,
               ),
             );
           }
@@ -250,7 +247,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           height: 1.0,
-                          color: textBlack,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -293,7 +290,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ),
 
                       const SizedBox(height: 24),
-                      const Divider(color: Color(0xFFE0E0E0)),
+                      const Divider(color: AppColors.borderLight),
                       const SizedBox(height: 24),
 
                       // User info section
@@ -309,7 +306,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ),
 
                       const SizedBox(height: 24),
-                      const Divider(color: Color(0xFFE0E0E0)),
+                      const Divider(color: AppColors.borderLight),
                       const SizedBox(height: 24),
 
                       // Address section
@@ -382,9 +379,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   child: OutlinedButton(
                                     onPressed: () => context.pop(),
                                     style: OutlinedButton.styleFrom(
-                                      backgroundColor: Colors.white,
+                                      backgroundColor: AppColors.surfaceWhite,
                                       side: const BorderSide(
-                                        color: Color(0xFF0D478C),
+                                        color: AppColors.primaryDark,
                                         width: 0.75,
                                       ),
                                       shape: RoundedRectangleBorder(
@@ -396,7 +393,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                       style: GoogleFonts.inter(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
-                                        color: textBlack,
+                                        color: AppColors.textPrimary,
                                       ),
                                     ),
                                   ),
@@ -408,8 +405,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   height: 48,
                                   child: ElevatedButton(
                                     onPressed: isLoading ? null : _onSubmit,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: brandBlue,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(48),
                                       ),
@@ -426,11 +423,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                           )
                                         : Text(
                                             'Salvar',
-                                            style: GoogleFonts.inter(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.white,
-                                            ),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.surfaceWhite,
+                                      ),
                                           ),
                                   ),
                                 ),
