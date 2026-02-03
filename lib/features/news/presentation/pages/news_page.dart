@@ -22,8 +22,12 @@ class _NewsPageState extends State<NewsPage> {
   @override
   void initState() {
     super.initState();
-    // Carrega a primeira página ao iniciar
-    context.read<NewsBloc>().add(const GetNewsEvent(page: 1));
+    final bloc = context.read<NewsBloc>();
+
+    // Só adiciona o evento se a lista estiver vazia (primeiro carregamento)
+    if (bloc.state.news.isEmpty) {
+      bloc.add(const GetNewsEvent(page: 1));
+    }
   }
 
   @override

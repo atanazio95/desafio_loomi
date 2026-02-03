@@ -15,35 +15,55 @@ class NewsDetailsPage extends StatelessWidget {
 
   const NewsDetailsPage({super.key, required this.news});
 
-  // --- LÓGICA DE TOGGLE ---
   void _onFavoriteToggle(
     BuildContext context,
     String newsId,
     bool isCurrentlyFavorited,
   ) {
     context.read<NewsBloc>().add(ToggleFavoriteHome(newsId));
-
     if (isCurrentlyFavorited) {
-      _showRemoveSnackBar(context);
+      _showTopSnackBar(
+        context,
+        title: "Você removeu esta Notícia dos favoritos",
+        subtitle: "",
+        color: const Color(0xFFF5222D),
+        icon: Icons.close,
+      );
     } else {
-      _showSuccessSnackBar(context);
+      _showTopSnackBar(
+        context,
+        title: "Você favoritou esta Notícia",
+        subtitle: "Você pode encontrá-la no perfil",
+        color: const Color(0xFF6FCF97),
+        icon: Icons.check,
+      );
     }
   }
 
-  // --- SNACKBAR DE SUCESSO (VERDE) ---
-  void _showSuccessSnackBar(BuildContext context) {
+  void _showTopSnackBar(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required Color color,
+    required IconData icon,
+  }) {
     ScaffoldMessenger.of(context).clearSnackBars();
+    final topPadding = MediaQuery.of(context).padding.top + 80;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
         duration: const Duration(seconds: 3),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - topPadding,
+          left: 16,
+          right: 16,
+        ),
         content: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           decoration: BoxDecoration(
-            color: const Color(0xFF6FCF97),
+            color: color,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
@@ -62,11 +82,7 @@ class NewsDetailsPage extends StatelessWidget {
                   color: Colors.white,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.check,
-                  color: Color(0xFF6FCF97),
-                  size: 20,
-                ),
+                child: Icon(icon, color: color, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -75,22 +91,21 @@ class NewsDetailsPage extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      "Você favoritou esta Notícia",
+                      title,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "Você pode encontrá-la no perfil",
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white.withOpacity(0.9),
+                    if (subtitle.isNotEmpty)
+                      Text(
+                        subtitle,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -106,49 +121,13 @@ class NewsDetailsPage extends StatelessWidget {
     );
   }
 
-  // --- SNACKBAR DE REMOÇÃO ---
-  void _showRemoveSnackBar(BuildContext context) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Removido dos favoritos'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
-  // --- SNACKBAR DE AVISO (SEM MAIS ITENS) ---
-  void _showNoMoreItemsSnackBar(BuildContext context) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Não há mais itens para serem exibidos',
-          style: GoogleFonts.inter(color: Colors.white),
-        ),
-        backgroundColor: const Color(0xFF334155),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     const brandBlue = Color(0xFF1876D2);
     const textBlack = Color(0xFF0B1125);
-    const textGrey = Color(0xFF6D7A9C);
-
-    DateTime parsedDate;
-    try {
-      parsedDate = DateTime.parse(news.datePublished);
-    } catch (e) {
-      parsedDate = DateTime.now();
-    }
     final formattedDate = DateFormat(
       "dd/MM/yyyy 'ás' HH:mm",
-    ).format(parsedDate);
-    final categories = [news.category.toUpperCase(), "INOVAÇÃO", "MERCADO"];
+    ).format(DateTime.tryParse(news.datePublished) ?? DateTime.now());
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -160,23 +139,18 @@ class NewsDetailsPage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // HEADER "VOLTAR"
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            color: Colors.white,
             child: InkWell(
               onTap: () => context.pop(),
-              borderRadius: BorderRadius.circular(8),
               child: Row(
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(Icons.arrow_back, color: textBlack, size: 20),
                   const SizedBox(width: 8),
                   Text(
                     'Voltar',
                     style: GoogleFonts.inter(
-                      color: textBlack,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -185,22 +159,17 @@ class NewsDetailsPage extends StatelessWidget {
               ),
             ),
           ),
-
           Expanded(
             child: SingleChildScrollView(
-              // [CORREÇÃO 1] Removemos o padding daqui para o footer não ser afetado
               padding: EdgeInsets.zero,
               child: Column(
                 children: [
-                  // [CORREÇÃO 2] Adicionamos um Padding que envolve APENAS o conteúdo da notícia
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 8),
-
-                        // --- 1. LINHA TOPO: CATEGORIA E FAVORITO ---
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -210,7 +179,6 @@ class NewsDetailsPage extends StatelessWidget {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
                                   color: brandBlue.withOpacity(0.5),
@@ -221,22 +189,14 @@ class NewsDetailsPage extends StatelessWidget {
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
-                                  color: textBlack,
                                 ),
                               ),
                             ),
-
-                            // Botão Favorito Principal
                             BlocBuilder<NewsBloc, NewsState>(
                               builder: (context, state) {
-                                final isFavorited =
-                                    state.savedNews.any(
-                                      (n) => n.id == news.id,
-                                    ) ||
-                                    state.news.any(
-                                      (n) => n.id == news.id && n.isFavorite,
-                                    );
-
+                                final isFavorited = state.savedNews.any(
+                                  (n) => n.id == news.id,
+                                );
                                 return GestureDetector(
                                   onTap: () => _onFavoriteToggle(
                                     context,
@@ -246,11 +206,9 @@ class NewsDetailsPage extends StatelessWidget {
                                   child: Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
                                       shape: BoxShape.circle,
                                       border: Border.all(
                                         color: const Color(0xFFD0D0D0),
-                                        width: 1.01,
                                       ),
                                     ),
                                     child: Icon(
@@ -260,7 +218,6 @@ class NewsDetailsPage extends StatelessWidget {
                                       color: isFavorited
                                           ? Colors.yellow
                                           : Colors.black,
-                                      size: 24,
                                     ),
                                   ),
                                 );
@@ -268,35 +225,23 @@ class NewsDetailsPage extends StatelessWidget {
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 16),
-
-                        // --- 2. TÍTULO ---
                         Text(
                           news.title,
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
-                            height: 1.2,
-                            color: textBlack,
                           ),
                         ),
-
                         const SizedBox(height: 16),
-
-                        // --- 3. DATA ---
                         Text(
                           'Publicado: $formattedDate',
                           style: GoogleFonts.inter(
                             fontSize: 14,
-                            color: textBlack.withOpacity(0.7),
-                            fontWeight: FontWeight.w400,
+                            color: Colors.grey,
                           ),
                         ),
-
                         const SizedBox(height: 24),
-
-                        // --- 4. IMAGEM ---
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: Image.network(
@@ -304,34 +249,9 @@ class NewsDetailsPage extends StatelessWidget {
                             height: 250,
                             width: double.infinity,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
-                                  height: 250,
-                                  color: Colors.grey[200],
-                                  child: const Icon(
-                                    Icons.broken_image,
-                                    color: Colors.grey,
-                                  ),
-                                ),
                           ),
                         ),
-
-                        const SizedBox(height: 8),
-
-                        Center(
-                          child: Text(
-                            "Imagem ilustrativa da notícia",
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              color: textGrey,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ),
-
                         const SizedBox(height: 32),
-
-                        // --- 5. RESUMO ---
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(16),
@@ -340,127 +260,34 @@ class NewsDetailsPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: const Color(0xFFE2E8F0)),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.auto_awesome,
-                                    size: 18,
-                                    color: Color(0xFF0F172A),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    "Resumo",
-                                    style: GoogleFonts.inter(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: const Color(0xFF0F172A),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                news.summary,
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  height: 1.5,
-                                  color: const Color(0xFF334155),
-                                ),
-                              ),
-                            ],
+                          child: Text(
+                            news.summary,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              height: 1.5,
+                              color: const Color(0xFF334155),
+                            ),
                           ),
                         ),
-
                         const SizedBox(height: 32),
-
-                        // --- 6. DESCRIÇÃO ---
                         Text(
                           news.description.isNotEmpty
                               ? news.description
                               : news.summary,
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            height: 1.6,
-                            color: textBlack,
-                            fontWeight: FontWeight.w400,
-                          ),
+                          style: GoogleFonts.inter(fontSize: 16, height: 1.6),
                         ),
-
-                        const SizedBox(height: 32),
-
-                        // --- 7. CATEGORIAS (TAGS) ---
-                        Text(
-                          "Categorias",
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: textBlack,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: categories.map((category) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                  color: brandBlue.withOpacity(0.3),
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Text(
-                                category,
-                                style: GoogleFonts.inter(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  color: textBlack,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-
                         const SizedBox(height: 48),
 
-                        // --- 8. NOTÍCIAS RELACIONADAS ---
+                        // --- REINTRODUÇÃO DAS NOTÍCIAS RELACIONADAS ---
                         if (news.relatedNews.isNotEmpty) ...[
-                          // Título
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                              horizontal: 8,
-                            ),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFF9FAFB),
-                              border: Border(
-                                top: BorderSide(
-                                  color: Color(0xFFE2E8F0),
-                                  width: 1,
-                                ),
-                              ),
-                            ),
-                            child: Text(
-                              "Notícias relacionadas",
-                              style: GoogleFonts.spaceGrotesk(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                color: const Color(0xFF1E293B),
-                              ),
+                          Text(
+                            "Notícias relacionadas",
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                           const SizedBox(height: 24),
-
-                          // Grid
                           GridView.builder(
                             physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
@@ -476,10 +303,12 @@ class NewsDetailsPage extends StatelessWidget {
                               final related = news.relatedNews[index];
                               return InkWell(
                                 onTap: () {
-                                  final newsBloc = context.read<NewsBloc>();
                                   context.push(
                                     '/news/details',
-                                    extra: {'news': related, 'bloc': newsBloc},
+                                    extra: {
+                                      'news': related,
+                                      'bloc': context.read<NewsBloc>(),
+                                    },
                                   );
                                 },
                                 child: Column(
@@ -502,7 +331,6 @@ class NewsDetailsPage extends StatelessWidget {
                                                   color: Colors.grey[200],
                                                   child: const Icon(
                                                     Icons.broken_image,
-                                                    color: Colors.grey,
                                                   ),
                                                 ),
                                           ),
@@ -513,18 +341,12 @@ class NewsDetailsPage extends StatelessWidget {
                                           child:
                                               BlocBuilder<NewsBloc, NewsState>(
                                                 builder: (context, state) {
-                                                  final isRelFav =
-                                                      state.savedNews.any(
+                                                  final isRelFav = state
+                                                      .savedNews
+                                                      .any(
                                                         (n) =>
                                                             n.id == related.id,
-                                                      ) ||
-                                                      state.news.any(
-                                                        (n) =>
-                                                            n.id ==
-                                                                related.id &&
-                                                            n.isFavorite,
                                                       );
-
                                                   return GestureDetector(
                                                     onTap: () =>
                                                         _onFavoriteToggle(
@@ -567,8 +389,6 @@ class NewsDetailsPage extends StatelessWidget {
                                         fontWeight: FontWeight.w700,
                                         color: Colors.grey,
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
@@ -576,74 +396,22 @@ class NewsDetailsPage extends StatelessWidget {
                                       style: GoogleFonts.inter(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,
-                                        color: textBlack,
                                         height: 1.2,
                                       ),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      "12 horas atrás",
-                                      style: GoogleFonts.inter(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.grey,
-                                      ),
                                     ),
                                   ],
                                 ),
                               );
                             },
                           ),
-
-                          const SizedBox(height: 16),
-
-                          // --- BOTÃO VER MAIS ---
-                          SizedBox(
-                            width: double.infinity,
-                            height: 48,
-                            child: OutlinedButton(
-                              onPressed: () {
-                                _showNoMoreItemsSnackBar(context);
-                              },
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(
-                                  color: Color(0xFFE2E8F0),
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Ver mais",
-                                    style: GoogleFonts.inter(
-                                      color: textBlack,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Icon(
-                                    Icons.keyboard_arrow_down,
-                                    color: textBlack,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                          const SizedBox(height: 48),
                         ],
-
-                        // [IMPORTANTE] Espaço extra dentro do padding antes do footer
-                        const SizedBox(height: 40),
                       ],
                     ),
                   ),
-
-                  // [CORREÇÃO 3] O CustomFooter fica FORA do Padding, ocupando a largura total
-                  const CustomFooter(),
+                  const CustomFooter(), // Agora o Footer ocupa 100% da largura
                 ],
               ),
             ),
