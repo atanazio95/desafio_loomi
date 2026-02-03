@@ -1,55 +1,71 @@
-// import 'package:dartz/dartz.dart';
-// import 'package:desafio_loomi_flutter/core/errors/failures.dart';
-// import 'package:desafio_loomi_flutter/features/auth/domain/entities/user_entity.dart';
-// import 'package:desafio_loomi_flutter/features/auth/domain/repositories/auth_repository.dart';
-// import 'package:desafio_loomi_flutter/features/auth/domain/usecases/login_usecase.dart';
-// import 'package:flutter_test/flutter_test.dart';
-// import 'package:mocktail/mocktail.dart';
+import 'package:dartz/dartz.dart';
+import 'package:desafio_loomi_flutter/core/errors/failures.dart';
+import 'package:desafio_loomi_flutter/features/auth/domain/entities/auth_entity.dart';
+import 'package:desafio_loomi_flutter/features/auth/domain/repositories/auth_repository.dart';
+import 'package:desafio_loomi_flutter/features/auth/domain/usecases/login_usecase.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 
-// class MockAuthRepository extends Mock implements AuthRepository {}
+class MockAuthRepository extends Mock implements AuthRepository {}
 
-// void main() {
-//   late LoginUseCase usecase;
-//   late MockAuthRepository mockAuthRepository;
+void main() {
+  late LoginUseCase usecase;
+  late MockAuthRepository mockAuthRepository;
 
-//   setUp(() {
-//     mockAuthRepository = MockAuthRepository();
-//     usecase = LoginUseCase(mockAuthRepository);
-//   });
+  const tAuthEntity = AuthEntity(login: 'jeorge@loomi.com', password: '123');
 
-//   const tUserEntity = UserEntity(login: 'jeorge@loomi.com', password: '123');
+  setUpAll(() {
+    registerFallbackValue(tAuthEntity);
+  });
 
-//   test(
-//     'deve retornar Right(true) quando o login for realizado com sucesso',
-//     () async {
-//       // ARRANGE
-//       // Configura o mock para retornar true (sucesso)
-//       when(
-//         () => mockAuthRepository.login(tUserEntity),
-//       ).thenAnswer((_) async => const Right(true));
+  setUp(() {
+    mockAuthRepository = MockAuthRepository();
+    usecase = LoginUseCase(mockAuthRepository);
+  });
 
-//       // ACT
-//       final result = await usecase(tUserEntity);
+  group('LoginUseCase', () {
+    test(
+      'deve retornar Right(AuthEntity) quando o login for realizado com sucesso',
+      () async {
+        when(
+          () => mockAuthRepository.login(any(), keepLoggedIn: any(named: 'keepLoggedIn')),
+        ).thenAnswer((_) async => const Right(tAuthEntity));
 
-//       // ASSERT
-//       // Esperamos um booleano true dentro do Right
-//       expect(result, const Right(true));
+        final result = await usecase(tAuthEntity);
 
-//       verify(() => mockAuthRepository.login(tUserEntity)).called(1);
-//     },
-//   );
+        expect(result, const Right(tAuthEntity));
+        verify(
+          () => mockAuthRepository.login(tAuthEntity, keepLoggedIn: false),
+        ).called(1);
+      },
+    );
 
-//   test('deve retornar Left(ServerFailure) quando o login falhar', () async {
-//     // ARRANGE
-//     when(
-//       () => mockAuthRepository.login(tUserEntity),
-//     ).thenAnswer((_) async => Left(ServerFailure()));
+    test(
+      'deve repassar keepLoggedIn true quando informado',
+      () async {
+        when(
+          () => mockAuthRepository.login(any(), keepLoggedIn: any(named: 'keepLoggedIn')),
+        ).thenAnswer((_) async => const Right(tAuthEntity));
 
-//     // ACT
-//     final result = await usecase(tUserEntity);
+        await usecase(tAuthEntity, keepLoggedIn: true);
 
-//     // ASSERT
-//     expect(result, Left(ServerFailure()));
-//     verify(() => mockAuthRepository.login(tUserEntity)).called(1);
-//   });
-// }
+        verify(
+          () => mockAuthRepository.login(tAuthEntity, keepLoggedIn: true),
+        ).called(1);
+      },
+    );
+
+    test('deve retornar Left(ServerFailure) quando o login falhar', () async {
+      when(
+        () => mockAuthRepository.login(any(), keepLoggedIn: any(named: 'keepLoggedIn')),
+      ).thenAnswer((_) async => Left(ServerFailure()));
+
+      final result = await usecase(tAuthEntity);
+
+      expect(result, Left(ServerFailure()));
+      verify(
+        () => mockAuthRepository.login(tAuthEntity, keepLoggedIn: false),
+      ).called(1);
+    });
+  });
+}

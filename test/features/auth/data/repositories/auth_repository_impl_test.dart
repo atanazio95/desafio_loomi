@@ -2,20 +2,28 @@ import 'package:dartz/dartz.dart';
 import 'package:desafio_loomi_flutter/core/errors/failures.dart';
 import 'package:desafio_loomi_flutter/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:desafio_loomi_flutter/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:desafio_loomi_flutter/features/auth/data/models/auth_model.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/entities/auth_entity.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-// 1. Mock do DataSource
 class MockAuthRemoteDatasource extends Mock implements AuthRemoteDatasource {}
+
+class MockSharedPreferences extends Mock implements SharedPreferences {}
 
 void main() {
   late AuthRepositoryImpl repository;
   late MockAuthRemoteDatasource mockDataSource;
+  late MockSharedPreferences mockSharedPreferences;
 
   setUp(() {
     mockDataSource = MockAuthRemoteDatasource();
-    repository = AuthRepositoryImpl(dataSource: mockDataSource);
+    mockSharedPreferences = MockSharedPreferences();
+    repository = AuthRepositoryImpl(
+      dataSource: mockDataSource,
+      sharedPreferences: mockSharedPreferences,
+    );
   });
 
   const tLogin = 'jeorge@loomi.com';
@@ -26,23 +34,33 @@ void main() {
     // --- TESTES DE LOGIN ---
     group('login', () {
       test(
-        'deve chamar o dataSource.login com strings e retornar Right(true) no sucesso',
+        'deve chamar o dataSource.login com strings e retornar Right(AuthEntity) no sucesso',
         () async {
-          // ARRANGE
-          // Simulamos que o DataSource aceita as strings e retorna true
           when(
             () => mockDataSource.login(any(), any()),
           ).thenAnswer((_) async => true);
 
-          // ACT
           final result = await repository.login(tUserEntity);
 
-          // ASSERT
-          expect(result, const Right(true));
-
-          // VERIFICAÇÃO CRUCIAL:
-          // Verificamos se ele "desmontou" a entidade e passou as strings certas
+          expect(result, const Right(tUserEntity));
           verify(() => mockDataSource.login(tLogin, tPassword)).called(1);
+        },
+      );
+
+      test(
+        'deve chamar sharedPreferences.setBool quando keepLoggedIn for true',
+        () async {
+          when(
+            () => mockDataSource.login(any(), any()),
+          ).thenAnswer((_) async => true);
+          when(
+            () => mockSharedPreferences.setBool(any(), any()),
+          ).thenAnswer((_) async => true);
+
+          await repository.login(tUserEntity, keepLoggedIn: true);
+
+          verify(() => mockSharedPreferences.setBool('is_logged_in', true))
+              .called(1);
         },
       );
 
@@ -65,17 +83,18 @@ void main() {
 
     // --- TESTES DE LOGOUT ---
     group('logout', () {
-      test('deve chamar dataSource.logout e retornar Right(null)', () async {
-        // ARRANGE
+      test('deve chamar sharedPreferences e dataSource.logout e retornar Right(null)', () async {
+        when(
+          () => mockSharedPreferences.setBool(any(), any()),
+        ).thenAnswer((_) async => true);
         when(
           () => mockDataSource.logout(),
-        ).thenAnswer((_) async {}); // Future<void>
+        ).thenAnswer((_) async {});
 
-        // ACT
         final result = await repository.logout();
 
-        // ASSERT
         expect(result, const Right(null));
+        verify(() => mockSharedPreferences.setBool('is_logged_in', false)).called(1);
         verify(() => mockDataSource.logout()).called(1);
       });
 
@@ -94,30 +113,73 @@ void main() {
     // --- TESTES DE CHECK AUTH STATUS ---
     group('checkAuthStatus', () {
       test(
-        'deve retornar Right(true) se o dataSource disser que está logado',
+        'deve retornar Right(true) quando sharedPreferences.getBool retorna true',
         () async {
           when(
-            () => mockDataSource.checkAuthStatus(),
-          ).thenAnswer((_) async => true);
+            () => mockSharedPreferences.getBool(any()),
+          ).thenReturn(true);
 
           final result = await repository.checkAuthStatus();
 
           expect(result, const Right(true));
+          verify(() => mockSharedPreferences.getBool('is_logged_in')).called(1);
         },
       );
 
       test(
-        'deve retornar Right(false) se ocorrer uma exceção (conforme sua lógica)',
+        'deve retornar Right(false) quando getBool retorna null ou false',
         () async {
-          // Na sua implementação, o catch retorna Right(false) em vez de Left(Failure)
-          // Isso é útil para não travar a Splash Screen com tela de erro
           when(
-            () => mockDataSource.checkAuthStatus(),
-          ).thenThrow(Exception()); // Qualquer erro
+            () => mockSharedPreferences.getBool(any()),
+          ).thenReturn(null);
 
           final result = await repository.checkAuthStatus();
 
           expect(result, const Right(false));
+        },
+      );
+
+      test(
+        'deve retornar Right(false) em exceção (não travar Splash)',
+        () async {
+          when(
+            () => mockSharedPreferences.getBool(any()),
+          ).thenThrow(Exception());
+
+          final result = await repository.checkAuthStatus();
+
+          expect(result, const Right(false));
+        },
+      );
+    });
+
+    // --- TESTES DE REGISTER ---
+    group('register', () {
+      test(
+        'deve chamar dataSource.register e retornar Right(AuthEntity) no sucesso',
+        () async {
+          const authModel = AuthModel(login: tLogin, password: tPassword);
+          when(
+            () => mockDataSource.register(any(), any()),
+          ).thenAnswer((_) async => authModel);
+
+          final result = await repository.register(tUserEntity);
+
+          expect(result.getOrElse(() => throw Exception()), authModel);
+          verify(() => mockDataSource.register(tLogin, tPassword)).called(1);
+        },
+      );
+
+      test(
+        'deve retornar Left(ServerFailure) quando register falhar',
+        () async {
+          when(
+            () => mockDataSource.register(any(), any()),
+          ).thenThrow(ServerFailure());
+
+          final result = await repository.register(tUserEntity);
+
+          expect(result, Left(ServerFailure()));
         },
       );
     });
