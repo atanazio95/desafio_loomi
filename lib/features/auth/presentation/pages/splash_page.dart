@@ -1,5 +1,3 @@
-// lib/features/auth/presentation/pages/splash_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -26,15 +24,11 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Future<void> _startSplash() async {
-    // 1. Dispara a verificação no SharedPreferences
     context.read<AuthBloc>().add(AuthCheckRequested());
-
-    // 2. Aguarda o tempo visual da marca (1.5 segundos)
     await Future.delayed(const Duration(milliseconds: 1500));
 
     if (!mounted) return;
 
-    // 3. Verifica se o Bloc já deu uma resposta enquanto o delay acontecia
     final currentState = context.read<AuthBloc>().state;
 
     if (currentState is AuthAuthenticated ||
@@ -42,7 +36,6 @@ class _SplashPageState extends State<SplashPage> {
         currentState is AuthError) {
       _navigate(currentState);
     } else {
-      // Se ainda estiver em AuthInitial ou AuthLoading, libera para o Listener navegar depois
       setState(() {
         _canNavigate = true;
       });
@@ -51,7 +44,7 @@ class _SplashPageState extends State<SplashPage> {
 
   void _navigate(AuthState state) {
     if (state is AuthAuthenticated) {
-      context.go('/news'); // Altere para sua rota principal
+      context.go('/news');
     } else {
       context.go('/login');
     }
@@ -68,7 +61,6 @@ class _SplashPageState extends State<SplashPage> {
         if (_canNavigate) {
           _navigate(state);
         } else {
-          // Se o check for mais rápido que 1.5s, guardamos o resultado aqui
           _pendingState = state;
         }
       },

@@ -4,8 +4,6 @@ Flutter app for the Loomi Challenge: news feed with authentication, user profile
 
 > **Challenge delivery:** use the checklist in [DELIVERY_CHECKLIST.md](DELIVERY_CHECKLIST.md) to verify progress report, Git, technical scope, and deadline. **Backlog:** [Trello - Desafio Loomi](https://trello.com/b/KCoxyq0E/desafio-loomi)
 
----
-
 ## Table of contents
 
 - [Requirements](#requirements)
@@ -146,11 +144,7 @@ Configuration is centralized in `lib/core/router/router_config.dart`.
 
 ## Tests
 
-Tests mirror the structure of `lib/`:
-
-- **data**: repositories and models
-- **domain**: use cases
-- **presentation**: BLoCs (with `bloc_test` and `mocktail`)
+Tests live under `test/` and mirror `lib/` (e.g. `test/features/auth/`, `test/features/news/`). Run with:
 
 ```bash
 flutter test

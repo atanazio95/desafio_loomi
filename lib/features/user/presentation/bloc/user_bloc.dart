@@ -4,7 +4,6 @@ import '../../domain/entities/user_entity.dart';
 import '../../domain/usecases/get_user_profile_usecase.dart';
 import '../../domain/usecases/update_user_profile_usecase.dart';
 
-// --- EVENTS ---
 abstract class UserEvent extends Equatable {
   const UserEvent();
   @override
@@ -21,7 +20,6 @@ class UpdateUserProfile extends UserEvent {
   List<Object> get props => [user];
 }
 
-// --- STATES ---
 abstract class UserState extends Equatable {
   const UserState();
   @override
@@ -39,8 +37,6 @@ class UserLoaded extends UserState {
   List<Object> get props => [user];
 }
 
-// [NOVO] Estado específico para quando o update finaliza com sucesso
-// Ele estende UserLoaded para que a UI de perfil continue mostrando os dados
 class UserUpdated extends UserLoaded {
   const UserUpdated(super.user);
 }
@@ -52,7 +48,6 @@ class UserError extends UserState {
   List<Object> get props => [message];
 }
 
-// --- BLOC ---
 class UserBloc extends Bloc<UserEvent, UserState> {
   final GetUserProfileUseCase getUserProfileUseCase;
   final UpdateUserProfileUseCase updateUserProfileUseCase;
@@ -89,7 +84,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     result.fold((failure) => emit(const UserError("Erro ao atualizar perfil")), (
       _,
     ) {
-      // [ALTERADO] Emitimos UserUpdated para o Listener diferenciar do carregamento inicial
       emit(UserUpdated(event.user));
     });
   }

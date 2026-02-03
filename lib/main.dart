@@ -1,7 +1,8 @@
 import 'package:desafio_loomi_flutter/core/di/injection_container.dart';
 import 'package:desafio_loomi_flutter/core/router/router_config.dart';
+import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart'; // Adicione se necessário
+import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
 import 'package:desafio_loomi_flutter/features/user/presentation/bloc/user_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Usamos MultiBlocProvider para injetar Blocs globais
+    // MultiBlocProvider injects global Blocs
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(create: (_) => sl<AuthBloc>()),
@@ -31,8 +32,12 @@ class MyApp extends StatelessWidget {
         title: 'Loomi Challenge',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFE90064)),
+          colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
           useMaterial3: true,
+          progressIndicatorTheme: const ProgressIndicatorThemeData(
+            color: AppColors.loading,
+            circularTrackColor: Colors.white24,
+          ),
         ),
       ),
     );

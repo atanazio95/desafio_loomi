@@ -1,4 +1,5 @@
 import 'package:desafio_loomi_flutter/core/presentation/custom_footer.dart';
+import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:desafio_loomi_flutter/features/user/domain/entities/user_entity.dart';
 import 'package:desafio_loomi_flutter/features/user/presentation/bloc/user_bloc.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,6 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
 
-  // --- MOCKS (Opções visuais) ---
   final List<String> _languages = [
     'Português - BR',
     'English - US',
@@ -31,18 +31,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
     'London - UK ( GMT+0 )',
   ];
 
-  // --- ESTADO ---
   String? _selectedLanguage;
   String? _selectedDateFormat;
   String? _selectedTimezone;
 
-  // --- CONTROLLERS ---
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _zipCodeController;
   late TextEditingController _streetController;
   late TextEditingController _numberController;
-  late TextEditingController _neighborhoodController; // Logradouro/Bairro
+  late TextEditingController _neighborhoodController;
   late TextEditingController _complementController;
   late TextEditingController _cityController;
   late TextEditingController _stateController;
@@ -52,12 +50,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.initState();
     _initControllers();
 
-    // Valores padrão iniciais
     _selectedLanguage = _languages[0];
     _selectedDateFormat = _dateFormats[0];
     _selectedTimezone = _timezones[0];
 
-    // Tenta carregar se já estiver disponível
     final state = context.read<UserBloc>().state;
     if (state is UserLoaded) {
       _populateFields(state.user);
@@ -76,13 +72,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _stateController = TextEditingController();
   }
 
-  // --- LÓGICA DE POPULAR CAMPOS (MAPEAMENTO) ---
   void _populateFields(UserEntity user) {
     _nameController.text = user.name;
     _emailController.text = user.email;
 
-    // Mapeamento: API -> Dropdown Visual
-    // Idioma
     if (user.language == 'pt-BR')
       _selectedLanguage = 'Português - BR';
     else if (user.language == 'en-US')
@@ -92,12 +85,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
     else if (_languages.contains(user.language))
       _selectedLanguage = user.language;
 
-    // Data (Geralmente vem igual, mas garantimos)
     if (_dateFormats.contains(user.dateFormat)) {
       _selectedDateFormat = user.dateFormat;
     }
 
-    // Fuso Horário
     if (user.timezone == 'America/Sao_Paulo')
       _selectedTimezone = 'Brasília - DF ( GMT-3 )';
     else if (user.timezone == 'America/New_York')
@@ -107,7 +98,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     else if (_timezones.contains(user.timezone))
       _selectedTimezone = user.timezone;
 
-    // Endereço
     if (user.address != null) {
       _zipCodeController.text = user.address!.zipCode;
       _streetController.text = user.address!.street;
@@ -118,17 +108,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
       _stateController.text = user.address!.state;
     }
 
-    // Atualiza a UI para refletir os novos valores nos Dropdowns
     if (mounted) setState(() {});
   }
 
-  // --- LÓGICA DE SALVAR (MAPEAMENTO INVERSO) ---
   void _onSubmit() {
     if (_formKey.currentState!.validate()) {
       final state = context.read<UserBloc>().state;
-      if (state is! UserLoaded) return; // Garante que temos a base
+      if (state is! UserLoaded) return;
 
-      // Mapeamento Inverso: Visual -> API
       String apiLanguage = 'pt-BR';
       if (_selectedLanguage == 'English - US') apiLanguage = 'en-US';
       if (_selectedLanguage == 'Español - ES') apiLanguage = 'es-ES';
@@ -213,12 +200,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
       body: BlocListener<UserBloc, UserState>(
         listener: (context, state) {
-          // 1. Preenche os campos se os dados chegarem depois da tela abrir
           if (state is UserLoaded && state is! UserUpdated) {
             _populateFields(state.user);
           }
 
-          // 2. Feedback de Sucesso ao Salvar
           if (state is UserUpdated) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -231,7 +216,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
             });
           }
 
-          // 3. Feedback de Erro
           if (state is UserError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -242,7 +226,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
           }
         },
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: Responsive.horizontalPadding(context),
+            vertical: 16,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
@@ -259,6 +246,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 const SizedBox(height: 32),
 
+                // Language, timezone and date section
                 _sectionTitle('Ajustes de idioma, fuso horário e data'),
                 const SizedBox(height: 16),
                 _buildDropdown(
@@ -296,6 +284,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 const Divider(color: Color(0xFFE0E0E0)),
                 const SizedBox(height: 24),
 
+                // User info section
                 _buildTextField(
                   label: 'Nome Completo',
                   controller: _nameController,
@@ -311,6 +300,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 const Divider(color: Color(0xFFE0E0E0)),
                 const SizedBox(height: 24),
 
+                // Address section
                 _buildTextField(
                   label: 'CEP',
                   controller: _zipCodeController,
@@ -443,7 +433,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  // --- HELPERS VISUAIS (Inter 10px Medium) ---
   Widget _sectionTitle(String title) {
     return Text(
       title,

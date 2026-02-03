@@ -1,13 +1,10 @@
 import '../../features/news/data/models/news_model.dart';
 
 class NewsMock {
-  /// Gera uma lista de notícias simuladas baseada na página solicitada.
-  /// Isso permite testar a paginação infinita ("Ver mais").
+  /// Generates a list of mock news for the requested page (for infinite pagination testing).
   static List<NewsModel> getNews(int page) {
-    // Prefixo para garantir IDs únicos (ex: "p1_")
     final String p = "p$page";
 
-    // --- MOCK DE NOTÍCIAS RELACIONADAS (Para aparecer na tela de Detalhes) ---
     final List<NewsModel> relatedMock = [
       const NewsModel(
         id: 'rel_1',
@@ -33,7 +30,7 @@ class NewsMock {
         imageUrl:
             'https://images.unsplash.com/photo-1593642632823-8f78536788c6',
         relatedNews: [],
-        isFavorite: true, // Testando estrela amarela
+        isFavorite: true,
       ),
       const NewsModel(
         id: 'rel_3',
@@ -50,10 +47,7 @@ class NewsMock {
       ),
     ];
 
-    // --- LISTA PRINCIPAL (Dinâmica por Página) ---
-    // Retornamos 8 itens por página para preencher bem a tela
     return [
-      // ITEM 1
       NewsModel(
         id: '${p}_1',
         title: page == 1
@@ -66,7 +60,6 @@ class NewsMock {
         description:
             'O 5G não é apenas internet rápida para celulares. Na indústria automotiva, ele representa a espinha dorsal da comunicação V2X (Vehicle-to-Everything)...',
         datePublished: '2025-10-21T08:00:00Z',
-        // Alterna imagem baseada na página para dar sensação de novidade
         imageUrl: page % 2 != 0
             ? 'https://images.unsplash.com/photo-1519389950473-47ba0277781c'
             : 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b',
@@ -74,7 +67,6 @@ class NewsMock {
         isFavorite: false,
       ),
 
-      // ITEM 2
       NewsModel(
         id: '${p}_2',
         title: page == 1
@@ -91,10 +83,9 @@ class NewsMock {
             ? 'https://images.unsplash.com/photo-1561070791-2526d30994b5'
             : 'https://images.unsplash.com/photo-1586717791821-3f44a5638d0f',
         relatedNews: relatedMock,
-        isFavorite: false, // Vamos deixar false para testar o clique
+        isFavorite: false,
       ),
 
-      // ITEM 3
       NewsModel(
         id: '${p}_3',
         title: 'Transformação Digital no Varejo (Pág $page)',
@@ -110,7 +101,6 @@ class NewsMock {
         isFavorite: false,
       ),
 
-      // ITEM 4
       NewsModel(
         id: '${p}_4',
         title: 'Cibersegurança: Protegendo dados na nuvem (Pág $page)',
@@ -125,7 +115,6 @@ class NewsMock {
         isFavorite: false,
       ),
 
-      // ITEM 5
       NewsModel(
         id: '${p}_5',
         title: 'O crescimento das Fintechs no Brasil (Pág $page)',
@@ -140,7 +129,6 @@ class NewsMock {
         isFavorite: false,
       ),
 
-      // ITEM 6
       NewsModel(
         id: '${p}_6',
         title: 'Energia Limpa: O futuro é renovável (Pág $page)',
@@ -170,7 +158,6 @@ class NewsMock {
         isFavorite: false,
       ),
 
-      // ITEM 8
       NewsModel(
         id: '${p}_8',
         title: 'Logística Inteligente e Drones (Pág $page)',
