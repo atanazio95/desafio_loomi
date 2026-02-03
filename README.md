@@ -1,29 +1,29 @@
-# Nortus (Desafio Loomi Flutter)
+# Nortus (Loomi Flutter Challenge)
 
-Aplicativo Flutter para o desafio Loomi: feed de notícias com autenticação, perfil de usuário e favoritos.
+Flutter app for the Loomi Challenge: news feed with authentication, user profile, and favorites.
 
-> **Entrega do desafio:** use o checklist em [ENTREGA_DESAFIO.md](ENTREGA_DESAFIO.md) para conferir relatório de progresso, Git, escopo técnico e prazo. **Backlog:** [Trello - Desafio Loomi](https://trello.com/b/KCoxyq0E/desafio-loomi)
-
----
-
-## Índice
-
-- [Requisitos](#requisitos)
-- [Setup do projeto](#setup-do-projeto)
-- [Estrutura do projeto](#estrutura-do-projeto)
-- [Principais decisões](#principais-decisões)
-- [Rotas](#rotas)
-- [Testes](#testes)
-- [Commits e Pull Requests](#commits-e-pull-requests)
+> **Challenge delivery:** use the checklist in [DELIVERY_CHECKLIST.md](DELIVERY_CHECKLIST.md) to verify progress report, Git, technical scope, and deadline. **Backlog:** [Trello - Desafio Loomi](https://trello.com/b/KCoxyq0E/desafio-loomi)
 
 ---
 
-## Requisitos
+## Table of contents
 
-- **Flutter** 3.8.1 ou superior (`sdk: ^3.8.1`)
+- [Requirements](#requirements)
+- [Project setup](#project-setup)
+- [Project structure](#project-structure)
+- [Main decisions](#main-decisions)
+- [Routes](#routes)
+- [Tests](#tests)
+- [Commits and Pull Requests](#commits-and-pull-requests)
+
+---
+
+## Requirements
+
+- **Flutter** 3.8.1 or higher (`sdk: ^3.8.1`)
 - **Dart** 3.x
 
-Verifique a instalação:
+Check your setup:
 
 ```bash
 flutter doctor
@@ -31,23 +31,23 @@ flutter doctor
 
 ---
 
-## Setup do projeto
+## Project setup
 
-### 1. Clonar e instalar dependências
+### 1. Clone and install dependencies
 
 ```bash
-git clone <url-do-repositorio>
+git clone <repository-url>
 cd desafio_loomi_flutter
 flutter pub get
 ```
 
 ### 2. Assets
 
-Certifique-se de que os assets existam em:
+Ensure assets exist under:
 
-- `assets/` e `assets/assets/` (incluindo `logo_shield.png` para a tela de login)
+- `assets/` and `assets/assets/` (including `logo_shield.png` for the login screen)
 
-O `pubspec.yaml` já declara:
+The `pubspec.yaml` already declares:
 
 ```yaml
 flutter:
@@ -57,17 +57,17 @@ flutter:
     - assets/assets/logo_shield.png
 ```
 
-### 3. Rodar o app
+### 3. Run the app
 
 ```bash
-# Desenvolvimento
+# Development
 flutter run
 
-# Build release (exemplo Android)
+# Release build (e.g. Android)
 flutter build apk
 ```
 
-### 4. Análise e testes
+### 4. Analyze and test
 
 ```bash
 flutter analyze
@@ -76,78 +76,81 @@ flutter test
 
 ---
 
-## Estrutura do projeto
+## Project structure
 
-O código segue **Clean Architecture** por features, com camadas **data**, **domain** e **presentation**.
+The codebase follows **Clean Architecture** by feature, with **data**, **domain**, and **presentation** layers.
 
 ```
 lib/
 ├── main.dart                 # Entry point, MultiBlocProvider, MaterialApp.router
-├── core/                     # Recursos compartilhados
-│   ├── config/               # Configurações (ex.: app_config)
-│   ├── di/                   # Injeção de dependências (GetIt)
-│   ├── errors/               # Failures e tratamento de erros
-│   ├── network/              # Dio client
-│   ├── router/               # GoRouter
-│   ├── services/             # Serviços (ex.: FavoritesManager)
-│   └── presentation/         # Componentes UI reutilizáveis
+├── core/                      # Shared resources
+│   ├── di/                    # Dependency injection (GetIt)
+│   ├── errors/                # Failures and error handling
+│   ├── mock/                  # Mock data (e.g. news for pagination)
+│   ├── network/               # Dio client
+│   ├── presentation/          # Reusable UI (drawer, footer, app bar, headers)
+│   ├── router/                # GoRouter
+│   └── theme/                 # Colors (app_colors) and responsiveness (responsive)
 └── features/
-    ├── auth/                 # Login, splash, estado de autenticação
-    │   ├── data/             # Datasources, models, repository impl
-    │   ├── domain/           # Entities, repository interface, use cases
-    │   └── presentation/     # Bloc, pages (Splash, Login)
-    ├── news/                 # Feed e detalhes de notícias
-    ├── profile/              # Perfil e edição
-    └── user/                 # Dados e atualização de usuário
+    ├── auth/                  # Login, splash, auth state
+    │   ├── data/              # Datasources, models, repository impl
+    │   ├── domain/            # Entities, repository interface, use cases
+    │   └── presentation/      # Bloc, pages (Splash, Login)
+    ├── news/                  # News feed and details
+    ├── profile/               # Profile and edit
+    └── user/                  # User data and update
 ```
 
-Cada feature segue o padrão:
+Each feature follows:
 
-- **data**: implementações concretas (API, cache), models, `*RepositoryImpl`
-- **domain**: entidades, contratos de repositório, use cases (regras de negócio)
-- **presentation**: BLoC/Cubit, páginas e widgets
-
----
-
-## Principais decisões
-
-| Decisão | Motivo |
-|--------|--------|
-| **Clean Architecture por feature** | Separação clara de responsabilidades, testabilidade e evolução por módulo. |
-| **BLoC (flutter_bloc)** | Estado previsível, fácil de testar e alinhado com o ecossistema Flutter. |
-| **GetIt para DI** | Injeção de dependências leve, sem contexto de build; registros explícitos em `injection_container.dart`. |
-| **GoRouter** | Rotas declarativas, deep linking e passagem de parâmetros (ex.: `extra` para `NewsEntity`). |
-| **Dio** | Cliente HTTP configurável; instância compartilhada via `DioClient` no core. |
-| **SharedPreferences** | Persistência simples para token/sessão e favoritos (FavoritesManager). |
-| **dartz** | Uso de `Either<Failure, T>` nos use cases para representar falha ou sucesso de forma tipada. |
-| **Equatable** | Igualdade em entities, states e events para evitar rebuilds desnecessários no BLoC. |
-| **Splash em Flutter (sem native splash)** | Controle total do layout (texto "Nortus", delay, redirecionamento) e consistência entre plataformas. |
-| **Cores e tipografia** | Uso de `google_fonts` (Inter) e cores do design (ex.: `#1876D2` na login). |
+- **data**: concrete implementations (API, cache), models, `*RepositoryImpl`
+- **domain**: entities, repository contracts, use cases (business rules)
+- **presentation**: BLoC/Cubit, pages and widgets
 
 ---
 
-## Rotas
+## Main decisions
 
-| Rota | Descrição |
-|------|-----------|
-| `/` | Splash (verifica auth e redireciona) |
-| `/login` | Login (e-mail + fluxo “continuar sem conta”) |
-| `/news` | Feed de notícias |
-| `/news/details` | Detalhes da notícia (passa `NewsEntity` via `extra`) |
-| `/profile` | Perfil do usuário |
-| `/edit-profile` | Edição de perfil |
+| Layer   | Library | Why |
+|---------|---------|-----|
+| **State** | **flutter_bloc** (BLoC) | Predictable state, easy to test, clear separation of events and states; aligned with Clean Architecture. |
+| **DI** | **get_it** | Lightweight service locator; no build context; explicit registration in `injection_container.dart`; easy to mock in tests. |
+| **Routing** | **go_router** | Declarative routes, deep linking, type-safe `extra` (e.g. pass `NewsEntity` to details). |
+| **HTTP** | **dio** | Configurable client (timeouts, interceptors); used for auth, news, and user. |
+| **FP / errors** | **dartz** (Either) | Typed success/failure in use cases (`Either<Failure, T>`); avoids try/catch in business logic. |
+| **Equality** | **equatable** | `==` and `hashCode` on entities, events, and states; fewer rebuilds and simpler test assertions. |
+| **Fonts** | **google_fonts** (Inter, Space Grotesk) | Matches Figma (Nortus); consistent typography without bundling fonts manually. |
+| **Storage** | **shared_preferences** | Persist “keep me logged in” and favorites; simple key-value API. News and other data could also be persisted the same way (e.g. cache or offline access) if desired. |
 
-Configuração centralizada em `lib/core/router/router_config.dart`.
+### Core theme: colors and responsiveness
+
+- **`lib/core/theme/app_colors.dart`** – Central app color palette (primary, outline, error, success, text, surface, border) for buttons, AppBar, SnackBars, and screens; keeps the UI aligned with Figma and avoids hardcoded colors.
+- **`lib/core/theme/responsive.dart`** – Responsive layout helpers based on `MediaQuery`: horizontal padding, image heights (hero, grid, card, thumbnail), and logo size in headers. Used in news list, details, profile, and shared headers to adapt to different screen sizes.
 
 ---
 
-## Testes
+## Routes
 
-Os testes espelham a estrutura de `lib/`:
+| Route | Description |
+|-------|-------------|
+| `/` | Splash (checks auth and redirects) |
+| `/login` | Login (email + “continue without account” flow) |
+| `/news` | News feed |
+| `/news/details` | News details (passes `NewsEntity` via `extra`) |
+| `/profile` | User profile |
+| `/edit-profile` | Edit profile |
 
-- **data**: repositórios e models
+Configuration is centralized in `lib/core/router/router_config.dart`.
+
+---
+
+## Tests
+
+Tests mirror the structure of `lib/`:
+
+- **data**: repositories and models
 - **domain**: use cases
-- **presentation**: BLoCs (com `bloc_test` e `mocktail`)
+- **presentation**: BLoCs (with `bloc_test` and `mocktail`)
 
 ```bash
 flutter test
@@ -155,28 +158,37 @@ flutter test
 
 ---
 
-## Commits e Pull Requests
+## Addenda
 
-Para padronizar histórico e revisões, seguimos as convenções abaixo. Detalhes em [CONTRIBUTING.md](CONTRIBUTING.md).
+- **Persistence (SharedPreferences):** Besides “keep me logged in” and favorites, news and other data could also be stored in `shared_preferences` (e.g. list cache or offline access), using the same approach already used in the project.
+- **Colors file (`app_colors.dart`):** Centralizes the app palette (primary, outline, error, success, text, surface, border) for buttons, AppBar, SnackBars, and screens, keeping the look aligned with Figma and avoiding scattered color values in the code.
+- **Responsiveness file (`responsive.dart`):** Provides functions that compute horizontal padding, image heights (hero, grid, card, thumbnail), and logo size from screen size (`MediaQuery`), so lists, details, and headers adapt to different devices.
+- **Scope and deadline:** Other features (e.g. favorites-only screen, category filters, full local cache for offline access) were not implemented because the challenge deadline was reached; what was delivered covers the required scope and part of the optional items.
 
-### Mensagens de commit
+---
 
-- **Formato**: `tipo(escopo): descrição curta`
-- **Tipos**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
-- **Exemplos**:
+## Commits and Pull Requests
+
+To keep history and reviews consistent, we follow the conventions below. Details in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### Commit messages
+
+- **Format**: `type(scope): short description`
+- **Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+- **Examples**:
   - `feat(auth): add login with email`
   - `fix(news): correct loading state in feed`
   - `docs: update README setup`
 
 ### Pull Requests
 
-- Título claro e objetivo (pode seguir o mesmo padrão do commit).
-- Descrição com: **o que** mudou, **por quê** e como **testar**.
-- Referência a issue/tarefa quando existir.
+- Clear, objective title (can follow the same pattern as the commit).
+- Description with: **what** changed, **why**, and **how to test**.
+- Reference to issue/task when applicable.
 
 ---
 
-## Referências
+## References
 
 - [Flutter](https://docs.flutter.dev/)
 - [flutter_bloc](https://bloclibrary.dev/)

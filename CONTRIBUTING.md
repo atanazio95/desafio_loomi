@@ -1,47 +1,47 @@
-# Guia de contribuição
+# Contribution guide
 
-Este documento define boas práticas para **mensagens de commit** e **Pull Requests**, garantindo clareza e consistência no histórico do projeto.
+This document defines good practices for **commit messages** and **Pull Requests**, ensuring clarity and consistency in the project history.
 
 ---
 
-## Mensagens de commit
+## Commit messages
 
-### Formato
+### Format
 
 ```
-tipo(escopo): descrição curta em imperativo
+type(scope): short description in imperative mood
 
-Corpo opcional com mais detalhes, quebra de linha em 72 caracteres.
+Optional body with more details, wrap at 72 characters.
 ```
 
-- **tipo**: o que mudou (feat, fix, docs, etc.)
-- **escopo**: módulo/área afetada (auth, news, profile, core)
-- **descrição**: frase curta, no imperativo (“add” e não “added”)
+- **type**: what changed (feat, fix, docs, etc.)
+- **scope**: module/area affected (auth, news, profile, core)
+- **description**: short phrase, imperative (“add” not “added”)
 
-### Tipos permitidos
+### Allowed types
 
-| Tipo       | Uso |
+| Type       | Use |
 |-----------|-----|
-| `feat`    | Nova funcionalidade |
-| `fix`     | Correção de bug |
-| `docs`    | Apenas documentação (README, CONTRIBUTING, comentários) |
-| `style`   | Formatação, espaços, ponto e vírgula (sem mudança de lógica) |
-| `refactor`| Refatoração (sem nova feature nem correção de bug) |
-| `test`    | Inclusão ou ajuste de testes |
-| `chore`   | Tarefas de build, CI, dependências, config (ex.: pubspec, analysis_options) |
+| `feat`    | New feature |
+| `fix`     | Bug fix |
+| `docs`    | Documentation only (README, CONTRIBUTING, comments) |
+| `style`   | Formatting, spaces, semicolons (no logic change) |
+| `refactor`| Refactor (no new feature or bug fix) |
+| `test`    | Adding or updating tests |
+| `chore`   | Build, CI, dependencies, config (e.g. pubspec, analysis_options) |
 
-### Escopos sugeridos
+### Suggested scopes
 
-- `auth` – login, splash, autenticação
-- `news` – feed, detalhes, favoritos
-- `profile` / `user` – perfil e dados do usuário
+- `auth` – login, splash, authentication
+- `news` – feed, details, favorites
+- `profile` / `user` – profile and user data
 - `core` – router, DI, network, errors, services
-- *(omitir escopo quando a mudança for geral, ex.: `docs: update README`)*
+- *(omit scope when the change is general, e.g. `docs: update README`)*
 
-### Exemplos
+### Examples
 
 ```text
-feat(auth): add login screen with email and "continuar sem conta"
+feat(auth): add login screen with email and "continue without account"
 fix(news): avoid duplicate requests when opening details
 docs: add project setup and architecture to README
 style(login): apply Figma spacing to tab container
@@ -50,67 +50,67 @@ test(auth): add AuthBloc login success and failure cases
 chore: upgrade flutter_lints to 5.0.0
 ```
 
-### O que evitar
+### What to avoid
 
-- Mensagens genéricas: `fix bug`, `update`, `changes`
-- Passado: preferir “add” em vez de “added”
-- Misturar vários tipos em um único commit: fazer commits atômicos
+- Generic messages: `fix bug`, `update`, `changes`
+- Past tense: prefer “add” over “added”
+- Mixing several types in one commit: keep commits atomic
 
 ---
 
 ## Pull Requests
 
-### Título
+### Title
 
-- Objetivo e curto.
-- Pode seguir o padrão de commit: `tipo(escopo): descrição`.
+- Clear and short.
+- Can follow the commit pattern: `type(scope): description`.
 
-Exemplos:
+Examples:
 
-- `feat(auth): tela de login conforme Figma`
-- `fix(news): estado de loading no feed`
+- `feat(auth): login screen per Figma`
+- `fix(news): loading state in feed`
 
-### Descrição
+### Description
 
-Inclua de forma clara:
+Clearly include:
 
-1. **O que** foi alterado (resumo das mudanças).
-2. **Por que** (motivo/contexto, link para issue se houver).
-3. **Como testar** (passos para um revisor validar).
+1. **What** was changed (summary of changes).
+2. **Why** (reason/context, link to issue if any).
+3. **How to test** (steps for a reviewer to validate).
 
-Exemplo:
+Example:
 
 ```markdown
-## O que
-- Nova tela de login com abas "Acessar conta" e "Não tenho conta"
-- Campo de e-mail e botão "Entrar" com cor #1876D2
-- Links "Esqueci a senha" e "Continuar sem conta"
+## What
+- New login screen with "Sign in" and "Create account" tabs
+- Email field and "Sign in" button with color #1876D2
+- "Forgot password" and "Continue without account" links
 
-## Por que
-Alinhar a tela de login ao design do Figma (issue #XX).
+## Why
+Align login screen with Figma design (issue #XX).
 
-## Como testar
-1. Rodar `flutter run`
-2. Na splash, aguardar redirecionamento para /login
-3. Verificar layout (Nortus, logo, tabs, card azul)
-4. Testar "Entrar" com e-mail válido e "Continuar sem conta"
+## How to test
+1. Run `flutter run`
+2. On splash, wait for redirect to /login
+3. Check layout (Nortus, logo, tabs, blue card)
+4. Test "Sign in" with valid email and "Continue without account"
 ```
 
-### Boas práticas
+### Good practices
 
-- Commits no PR com mensagens no padrão acima.
-- Um PR por objetivo (uma feature ou um fix).
-- Atualizar documentação (README, CONTRIBUTING) se a mudança impactar setup ou fluxo.
-- Rodar `flutter analyze` e `flutter test` antes de abrir o PR.
+- Commits in the PR with messages following the format above.
+- One PR per goal (one feature or one fix).
+- Update documentation (README, CONTRIBUTING) if the change affects setup or flow.
+- Run `flutter analyze` and `flutter test` before opening the PR.
 
 ---
 
-## Resumo rápido
+## Quick summary
 
-| Item | Regra |
-|------|--------|
-| Commit | `tipo(escopo): descrição no imperativo` |
-| PR título | Claro e objetivo (pode usar o mesmo padrão do commit) |
-| PR descrição | O que, por que e como testar |
+| Item | Rule |
+|------|------|
+| Commit | `type(scope): description in imperative` |
+| PR title | Clear and objective (can use same pattern as commit) |
+| PR description | What, why, and how to test |
 
-Seguir esse guia mantém o histórico legível e as revisões mais rápidas.
+Following this guide keeps history readable and reviews faster.
