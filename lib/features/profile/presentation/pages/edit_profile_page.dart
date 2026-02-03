@@ -1,3 +1,4 @@
+import 'package:desafio_loomi_flutter/core/presentation/custom_footer.dart';
 import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:desafio_loomi_flutter/core/widgets/app_dropdown.dart';
 import 'package:desafio_loomi_flutter/core/widgets/app_text_field.dart';
@@ -228,16 +229,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
           }
         },
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: Responsive.horizontalPadding(context),
-            vertical: 16,
-          ),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: Responsive.horizontalPadding(context),
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
                   'Configurações de usuário',
                   style: GoogleFonts.inter(
                     fontSize: 16,
@@ -427,8 +432,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   },
                 ),
                 const SizedBox(height: 24),
-              ],
-            ),
+                    ],
+                  ),
+                ),
+              ),
+              const CustomFooter(),
+            ],
           ),
         ),
       ),
