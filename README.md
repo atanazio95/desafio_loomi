@@ -1,24 +1,74 @@
-# Nortus (Desafio Loomi Flutter)
+# Nortus (Loomi Flutter Challenge)
 
 Flutter app for the Loomi Challenge: news feed with authentication, user profile, and favorites.
 
-> **Entrega do desafio:** use o checklist em [ENTREGA_DESAFIO.md](ENTREGA_DESAFIO.md) para conferir relatório de progresso, Git, escopo técnico e prazo. **Backlog:** [Trello - Desafio Loomi](https://trello.com/b/KCoxyq0E/desafio-loomi)
+> **Challenge delivery:** use the checklist in [DELIVERY_CHECKLIST.md](DELIVERY_CHECKLIST.md) to verify progress report, Git, technical scope, and deadline. **Backlog:** [Trello - Desafio Loomi](https://trello.com/b/KCoxyq0E/desafio-loomi)
 
-### Prerequisites
+## Table of contents
 
-- Flutter SDK ^3.8.1
-- Dart ^3.8.1
+- [Requirements](#requirements)
+- [Project setup](#project-setup)
+- [Project structure](#project-structure)
+- [Main decisions](#main-decisions)
+- [Routes](#routes)
+- [Tests](#tests)
+- [Commits and Pull Requests](#commits-and-pull-requests)
 
-### Setup
+---
+
+## Requirements
+
+- **Flutter** 3.8.1 or higher (`sdk: ^3.8.1`)
+- **Dart** 3.x
+
+Check your setup:
 
 ```bash
-flutter pub get
-flutter run
+flutter doctor
 ```
 
-### Run tests
+---
+
+## Project setup
+
+### 1. Clone and install dependencies
 
 ```bash
+git clone <repository-url>
+cd desafio_loomi_flutter
+flutter pub get
+```
+
+### 2. Assets
+
+Ensure assets exist under:
+
+- `assets/` and `assets/assets/` (including `logo_shield.png` for the login screen)
+
+The `pubspec.yaml` already declares:
+
+```yaml
+flutter:
+  assets:
+    - assets/
+    - assets/assets/
+    - assets/assets/logo_shield.png
+```
+
+### 3. Run the app
+
+```bash
+# Development
+flutter run
+
+# Release build (e.g. Android)
+flutter build apk
+```
+
+### 4. Analyze and test
+
+```bash
+flutter analyze
 flutter test
 ```
 
@@ -26,79 +76,69 @@ flutter test
 
 ## Project structure
 
-The app follows **Clean Architecture** organized by **feature**:
+The codebase follows **Clean Architecture** by feature, with **data**, **domain**, and **presentation** layers.
 
 ```
 lib/
-├── main.dart
-├── core/
-│   ├── di/                 # Dependency injection (GetIt)
-│   ├── errors/             # Failures / error types
-│   ├── mock/               # Mock data (e.g. news for pagination)
-│   ├── network/            # Dio client
-│   ├── presentation/       # Shared UI (drawer, footer, app bar, headers)
-│   ├── router/             # GoRouter config
-│   └── services/           # Favorites manager (SharedPreferences)
+├── main.dart                 # Entry point, MultiBlocProvider, MaterialApp.router
+├── core/                      # Shared resources
+│   ├── di/                    # Dependency injection (GetIt)
+│   ├── errors/                # Failures and error handling
+│   ├── mock/                  # Mock data (e.g. news for pagination)
+│   ├── network/               # Dio client
+│   ├── presentation/          # Reusable UI (drawer, footer, app bar, headers)
+│   ├── router/                # GoRouter
+│   └── theme/                 # Colors (app_colors) and responsiveness (responsive)
 └── features/
-    ├── auth/               # Login, register, splash
-    ├── news/               # News list, details, favorites
-    ├── profile/            # Profile and edit profile pages
-    └── user/               # User domain + profile loading/update
+    ├── auth/                  # Login, splash, auth state
+    │   ├── data/              # Datasources, models, repository impl
+    │   ├── domain/            # Entities, repository interface, use cases
+    │   └── presentation/      # Bloc, pages (Splash, Login)
+    ├── news/                  # News feed and details
+    ├── profile/               # Profile and edit
+    └── user/                  # User data and update
 ```
 
-Each feature is split into **data** (datasources, models, repositories), **domain** (entities, repositories, use cases), and **presentation** (BLoC, pages, widgets).
+Each feature follows:
+
+- **data**: concrete implementations (API, cache), models, `*RepositoryImpl`
+- **domain**: entities, repository contracts, use cases (business rules)
+- **presentation**: BLoC/Cubit, pages and widgets
 
 ---
 
-## Tech stack
+## Main decisions
 
-| Layer        | Choice |
-|-------------|--------|
-| State       | **flutter_bloc** (BLoC) |
-| DI          | **get_it** |
-| Routing     | **go_router** |
-| HTTP        | **dio** |
-| FP / errors | **dartz** (Either) |
-| Equality    | **equatable** |
-| Fonts       | **google_fonts** (Inter, Space Grotesk) |
-| Storage     | **shared_preferences** (favorites, session) |
+| Layer   | Library | Why |
+|---------|---------|-----|
+| **State** | **flutter_bloc** (BLoC) | Predictable state, easy to test, clear separation of events and states; aligned with Clean Architecture. |
+| **DI** | **get_it** | Lightweight service locator; no build context; explicit registration in `injection_container.dart`; easy to mock in tests. |
+| **Routing** | **go_router** | Declarative routes, deep linking, type-safe `extra` (e.g. pass `NewsEntity` to details). |
+| **HTTP** | **dio** | Configurable client (timeouts, interceptors); used for auth, news, and user. |
+| **FP / errors** | **dartz** (Either) | Typed success/failure in use cases (`Either<Failure, T>`); avoids try/catch in business logic. |
+| **Equality** | **equatable** | `==` and `hashCode` on entities, events, and states; fewer rebuilds and simpler test assertions. |
+| **Fonts** | **google_fonts** (Inter, Space Grotesk) | Matches Figma (Nortus); consistent typography without bundling fonts manually. |
+| **Storage** | **shared_preferences** | Persist “keep me logged in” and favorites; simple key-value API. News and other data could also be persisted the same way (e.g. cache or offline access) if desired. |
 
----
+### Core theme: colors and responsiveness
 
-## Features
-
-- **Splash** – Initial screen with redirect by auth status.
-- **Auth** – Login and register (tabs), session handling.
-- **News** – List with hero/grid/recent layout, search, pagination, details page.
-- **Favorites** – Toggle on news cards and details; list on profile; persisted via `FavoritesManager`.
-- **Profile** – User info, edit profile (language, timezone, date format, address).
-- **Response balloon** – On news details, when toggling favorite, a custom overlay balloon shows feedback at the top (e.g. "Você favoritou esta Notícia").
+- **`lib/core/theme/app_colors.dart`** – Central app color palette (primary, outline, error, success, text, surface, border) for buttons, AppBar, SnackBars, and screens; keeps the UI aligned with Figma and avoids hardcoded colors.
+- **`lib/core/theme/responsive.dart`** – Responsive layout helpers based on `MediaQuery`: horizontal padding, image heights (hero, grid, card, thumbnail), and logo size in headers. Used in news list, details, profile, and shared headers to adapt to different screen sizes.
 
 ---
 
-## Routing
+## Routes
 
-| Route            | Screen        |
-|------------------|---------------|
-| `/`              | SplashPage    |
-| `/login`         | LoginPage     |
-| `/news`          | NewsPage      |
-| `/news/details`  | NewsDetailsPage (extra: news + bloc) |
-| `/profile`       | ProfilePage   |
-| `/edit-profile`  | EditProfilePage |
+| Route | Description |
+|-------|-------------|
+| `/` | Splash (checks auth and redirects) |
+| `/login` | Login (email + “continue without account” flow) |
+| `/news` | News feed |
+| `/news/details` | News details (passes `NewsEntity` via `extra`) |
+| `/profile` | User profile |
+| `/edit-profile` | Edit profile |
 
----
-
-## What's been done (recent)
-
-- **Response balloon** – Favorites feedback on news details via custom overlay balloon (and SnackBar where used).
-- **Comments** – All comments in `lib/` translated to English; decorative/section comments removed.
-- **Cleanup** – Unused files and folders removed:
-  - `lib/core/config/app_config.dart`
-  - `lib/features/profile/presentation/widgets/profile_data_section.dart`
-  - `lib/features/news/presentation/widgets/related_news_list.dart`
-  - `lib/features/user/presentation/bloc/user_event.dart` (logic kept in `user_bloc.dart`)
-- **Branch** – `fix/response-balloon-and-comments-cleanup` with the above changes.
+Configuration is centralized in `lib/core/router/router_config.dart`.
 
 ---
 
@@ -112,8 +152,39 @@ flutter test
 
 ---
 
-## Resources
+## Addenda
 
-- [Flutter documentation](https://docs.flutter.dev/)
-- [BLoC library](https://bloclibrary.dev/)
-- [GoRouter](https://pub.dev/packages/go_router)
+- **Persistence (SharedPreferences):** Besides “keep me logged in” and favorites, news and other data could also be stored in `shared_preferences` (e.g. list cache or offline access), using the same approach already used in the project.
+- **Colors file (`app_colors.dart`):** Centralizes the app palette (primary, outline, error, success, text, surface, border) for buttons, AppBar, SnackBars, and screens, keeping the look aligned with Figma and avoiding scattered color values in the code.
+- **Responsiveness file (`responsive.dart`):** Provides functions that compute horizontal padding, image heights (hero, grid, card, thumbnail), and logo size from screen size (`MediaQuery`), so lists, details, and headers adapt to different devices.
+- **Scope and deadline:** Other features (e.g. favorites-only screen, category filters, full local cache for offline access) were not implemented because the challenge deadline was reached; what was delivered covers the required scope and part of the optional items.
+
+---
+
+## Commits and Pull Requests
+
+To keep history and reviews consistent, we follow the conventions below. Details in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### Commit messages
+
+- **Format**: `type(scope): short description`
+- **Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+- **Examples**:
+  - `feat(auth): add login with email`
+  - `fix(news): correct loading state in feed`
+  - `docs: update README setup`
+
+### Pull Requests
+
+- Clear, objective title (can follow the same pattern as the commit).
+- Description with: **what** changed, **why**, and **how to test**.
+- Reference to issue/task when applicable.
+
+---
+
+## References
+
+- [Flutter](https://docs.flutter.dev/)
+- [flutter_bloc](https://bloclibrary.dev/)
+- [GoRouter](https://pub.dev/documentation/go_router/latest/)
+- [GetIt](https://pub.dev/packages/get_it)
