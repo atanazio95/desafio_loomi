@@ -88,14 +88,17 @@ lib/
 │   ├── network/               # Dio client
 │   ├── presentation/          # Reusable UI (drawer, footer, app bar, headers)
 │   ├── router/                # GoRouter
-│   └── theme/                 # Colors (app_colors) and responsiveness (responsive)
+│   ├── theme/                 # Colors (app_colors) and responsiveness (responsive)
+│   └── widgets/              # Shared form/UI widgets (FormLabel, AppDropdown, AppTextField, FormSectionHeader)
 └── features/
     ├── auth/                  # Login, splash, auth state
     │   ├── data/              # Datasources, models, repository impl
     │   ├── domain/            # Entities, repository interface, use cases
-    │   └── presentation/      # Bloc, pages (Splash, Login)
+    │   └── presentation/      # Bloc, pages (Splash, Login), widgets (AuthTextFormField, AuthPrimaryButton, TabButton, FooterTextLink)
     ├── news/                  # News feed and details
+    │   └── presentation/      # Bloc, pages, widgets (NewsCard, HeroNewsCard, GridNewsCard, RecentNewsCard, FavoriteFeedbackBalloon, TagsSection, VerMaisButton, LoadMoreButton)
     ├── profile/               # Profile and edit
+    │   └── presentation/      # Pages, widgets (SectionTitle)
     └── user/                  # User data and update
 ```
 
@@ -103,7 +106,7 @@ Each feature follows:
 
 - **data**: concrete implementations (API, cache), models, `*RepositoryImpl`
 - **domain**: entities, repository contracts, use cases (business rules)
-- **presentation**: BLoC/Cubit, pages and widgets
+- **presentation**: BLoC/Cubit, pages, and **widgets** (reusable UI components extracted from pages)
 
 ---
 
@@ -149,6 +152,12 @@ Tests live under `test/` and mirror `lib/` (e.g. `test/features/auth/`, `test/fe
 ```bash
 flutter test
 ```
+
+---
+
+## What's been done (recent)
+
+- **Widget refactor** – UI extracted into reusable widgets: **core** (FormLabel, AppDropdown, AppTextField, FormSectionHeader); **auth** (AuthTextFormField, AuthPrimaryButton, TabButton, FooterTextLink); **news** (HeroNewsCard, GridNewsCard, RecentNewsCard, FavoriteFeedbackBalloon, TagsSection, VerMaisButton, LoadMoreButton); **profile** (SectionTitle). Pages now use these components instead of inline or private builders. Branch: `refactor/extract-widgets`.
 
 ---
 
