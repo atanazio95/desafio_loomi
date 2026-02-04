@@ -34,7 +34,7 @@ void main() {
 
   group('GetNewsUseCase', () {
     test(
-      'deve obter lista de notícias do repositório quando for sucesso',
+      'gets news list from repository on success',
       () async {
         when(
           () => mockNewsRepository.getNews(1),
@@ -47,7 +47,7 @@ void main() {
       },
     );
 
-    test('deve retornar Left(ServerFailure) quando o repositório falhar', () async {
+    test('returns Left(ServerFailure) when repository fails', () async {
       when(
         () => mockNewsRepository.getNews(1),
       ).thenAnswer((_) async => Left(ServerFailure()));

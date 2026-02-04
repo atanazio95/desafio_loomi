@@ -3,35 +3,24 @@ import 'package:desafio_loomi_flutter/features/auth/domain/entities/auth_entity.
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  const tLogin = "jeorge@loomi.com";
-  const tPassword = "123";
+  const tLogin = 'jeorge@loomi.com';
+  const tPassword = '123';
+  const tAuthEntity = AuthEntity(login: tLogin, password: tPassword);
+  const tAuthModel = AuthModel(login: tLogin, password: tPassword);
 
-  // Dados de teste
-  const tUserEntity = AuthEntity(login: tLogin, password: tPassword);
-  const tUserModel = AuthModel(login: tLogin, password: tPassword);
-
-  group('UserModel', () {
-    test('deve ser uma subclasse de UserEntity', () {
-      expect(tUserModel, isA<AuthEntity>());
+  group('AuthModel', () {
+    test('is a subclass of AuthEntity', () {
+      expect(tAuthModel, isA<AuthEntity>());
     });
 
-    test(
-      'fromEntity deve criar um UserModel válido a partir de uma UserEntity',
-      () {
-        // Act
-        final result = AuthModel.fromEntity(tUserEntity);
+    test('fromEntity creates AuthModel from AuthEntity', () {
+      final result = AuthModel.fromEntity(tAuthEntity);
+      expect(result, tAuthModel);
+    });
 
-        // Assert
-        expect(result, tUserModel);
-      },
-    );
-
-    test('toJson deve retornar um Map contendo login e password corretos', () {
-      // Act
-      final result = tUserModel.toJson();
-
-      // Assert
-      final expectedMap = {"login": tLogin, "password": tPassword};
+    test('toJson returns Map with login and password', () {
+      final result = tAuthModel.toJson();
+      final expectedMap = {'login': tLogin, 'password': tPassword};
       expect(result, expectedMap);
     });
   });

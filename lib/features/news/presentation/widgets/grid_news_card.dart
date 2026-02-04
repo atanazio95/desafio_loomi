@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:flutter/material.dart';
@@ -27,12 +28,12 @@ class GridNewsCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  news.imageUrl,
+                child: CachedNetworkImage(
+                  imageUrl: news.imageUrl,
                   height: Responsive.imageHeightGrid(context),
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
+                  errorWidget: (_, __, ___) => Container(
                     height: Responsive.imageHeightGrid(context),
                     color: Colors.grey[200],
                   ),

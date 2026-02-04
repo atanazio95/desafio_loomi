@@ -31,10 +31,9 @@ void main() {
   const tUserEntity = AuthEntity(login: tLogin, password: tPassword);
 
   group('AuthRepositoryImpl', () {
-    // --- TESTES DE LOGIN ---
     group('login', () {
       test(
-        'deve chamar o dataSource.login com strings e retornar Right(AuthEntity) no sucesso',
+        'calls dataSource.login and returns Right(AuthEntity) on success',
         () async {
           when(
             () => mockDataSource.login(any(), any()),
@@ -48,7 +47,7 @@ void main() {
       );
 
       test(
-        'deve chamar sharedPreferences.setBool quando keepLoggedIn for true',
+        'calls sharedPreferences.setBool when keepLoggedIn is true',
         () async {
           when(
             () => mockDataSource.login(any(), any()),
@@ -67,23 +66,19 @@ void main() {
       test(
         'deve retornar Left(ServerFailure) quando o dataSource falhar',
         () async {
-          // ARRANGE
           when(
             () => mockDataSource.login(any(), any()),
           ).thenThrow(ServerFailure());
 
-          // ACT
           final result = await repository.login(tUserEntity);
 
-          // ASSERT
           expect(result, Left(ServerFailure()));
         },
       );
     });
 
-    // --- TESTES DE LOGOUT ---
     group('logout', () {
-      test('deve chamar sharedPreferences e dataSource.logout e retornar Right(null)', () async {
+      test('calls sharedPreferences and dataSource.logout and returns Right(null)', () async {
         when(
           () => mockSharedPreferences.setBool(any(), any()),
         ).thenAnswer((_) async => true);
@@ -98,22 +93,18 @@ void main() {
         verify(() => mockDataSource.logout()).called(1);
       });
 
-      test('deve retornar Left(ServerFailure) se o logout falhar', () async {
-        // ARRANGE
+      test('returns Left(ServerFailure) when logout fails', () async {
         when(() => mockDataSource.logout()).thenThrow(ServerFailure());
 
-        // ACT
         final result = await repository.logout();
 
-        // ASSERT
         expect(result, Left(ServerFailure()));
       });
     });
 
-    // --- TESTES DE CHECK AUTH STATUS ---
     group('checkAuthStatus', () {
       test(
-        'deve retornar Right(true) quando sharedPreferences.getBool retorna true',
+        'returns Right(true) when sharedPreferences.getBool returns true',
         () async {
           when(
             () => mockSharedPreferences.getBool(any()),
@@ -127,7 +118,7 @@ void main() {
       );
 
       test(
-        'deve retornar Right(false) quando getBool retorna null ou false',
+        'returns Right(false) when getBool returns null or false',
         () async {
           when(
             () => mockSharedPreferences.getBool(any()),
@@ -140,7 +131,7 @@ void main() {
       );
 
       test(
-        'deve retornar Right(false) em exceção (não travar Splash)',
+        'returns Right(false) on exception (does not block Splash)',
         () async {
           when(
             () => mockSharedPreferences.getBool(any()),
@@ -171,7 +162,7 @@ void main() {
       );
 
       test(
-        'deve retornar Left(ServerFailure) quando register falhar',
+        'returns Left(ServerFailure) when register fails',
         () async {
           when(
             () => mockDataSource.register(any(), any()),

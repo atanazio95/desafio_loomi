@@ -33,7 +33,7 @@ void main() {
 
   group('UpdateUserProfileUseCase', () {
     test(
-      'deve retornar Right(null) quando updateUserProfile tem sucesso',
+      'returns Right(null) when updateUserProfile succeeds',
       () async {
         when(
           () => mockUserRepository.updateUserProfile(any()),
@@ -47,7 +47,7 @@ void main() {
     );
 
     test(
-      'deve retornar Left(ServerFailure) quando updateUserProfile falha',
+      'returns Left(ServerFailure) when updateUserProfile fails',
       () async {
         when(
           () => mockUserRepository.updateUserProfile(any()),

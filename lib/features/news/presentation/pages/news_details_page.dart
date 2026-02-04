@@ -8,6 +8,7 @@ import 'package:desafio_loomi_flutter/features/news/presentation/widgets/favorit
 import 'package:desafio_loomi_flutter/features/news/presentation/widgets/tags_section.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_state.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -566,8 +567,8 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      related.imageUrl,
+                    child: CachedNetworkImage(
+                      imageUrl: related.imageUrl,
                       height: imageH,
                       width: double.infinity,
                       fit: BoxFit.cover,

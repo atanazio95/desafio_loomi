@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
 import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
@@ -28,12 +29,12 @@ class RecentNewsCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  news.imageUrl,
+                child: CachedNetworkImage(
+                  imageUrl: news.imageUrl,
                   height: Responsive.imageHeightRecentThumb(context),
                   width: Responsive.imageWidthRecentThumb(context),
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
+                  errorWidget: (_, __, ___) => Container(
                     height: Responsive.imageHeightRecentThumb(context),
                     width: Responsive.imageWidthRecentThumb(context),
                     color: AppColors.surfaceLight,

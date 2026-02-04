@@ -52,13 +52,13 @@ void main() {
   });
 
   group('AuthBloc', () {
-    test('estado inicial é AuthInitial', () {
+    test('initial state is AuthInitial', () {
       expect(bloc.state, equals(AuthInitial()));
     });
 
     group('Login', () {
       blocTest<AuthBloc, AuthState>(
-        'emite [AuthLoading, AuthAuthenticated] no login com sucesso',
+        'emits [AuthLoading, AuthAuthenticated] on successful login',
         build: () {
           when(
             () => mockLoginUseCase(any(), keepLoggedIn: any(named: 'keepLoggedIn')),
@@ -73,7 +73,7 @@ void main() {
       );
 
       blocTest<AuthBloc, AuthState>(
-        'emite [AuthLoading, AuthError] no login com falha',
+        'emits [AuthLoading, AuthError] on login failure',
         build: () {
           when(
             () => mockLoginUseCase(any(), keepLoggedIn: any(named: 'keepLoggedIn')),
@@ -110,7 +110,7 @@ void main() {
       );
 
       blocTest<AuthBloc, AuthState>(
-        'emite [AuthLoading, AuthError] no cadastro com falha',
+        'emits [AuthLoading, AuthError] on register failure',
         build: () {
           when(
             () => mockRegisterUseCase(any()),
@@ -130,7 +130,7 @@ void main() {
 
     group('CheckAuthStatus (Splash)', () {
       blocTest<AuthBloc, AuthState>(
-        'emite [AuthLoading, AuthAuthenticated] quando já logado',
+        'emits [AuthLoading, AuthAuthenticated] when already logged in',
         build: () {
           when(() => mockCheckAuthStatusUseCase()).thenAnswer((_) async => true);
           return bloc;
@@ -140,7 +140,7 @@ void main() {
       );
 
       blocTest<AuthBloc, AuthState>(
-        'emite [AuthLoading, AuthUnauthenticated] quando não logado',
+        'emits [AuthLoading, AuthUnauthenticated] when not logged in',
         build: () {
           when(() => mockCheckAuthStatusUseCase()).thenAnswer((_) async => false);
           return bloc;
@@ -152,7 +152,7 @@ void main() {
 
     group('Logout', () {
       blocTest<AuthBloc, AuthState>(
-        'chama authRepository.logout e emite AuthUnauthenticated',
+        'calls authRepository.logout and emits AuthUnauthenticated',
         build: () {
           when(
             () => mockAuthRepository.logout(),

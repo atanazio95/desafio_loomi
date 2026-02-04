@@ -44,7 +44,7 @@ flutter pub get
 
 Ensure assets exist under:
 
-- `assets/` and `assets/assets/` (including `logo_shield.png` for the login screen)
+- `assets/` and `assets/assets/` (e.g. `logo_shield.png` for login, `icon_details_nortus.png` for news details, `menu_loomi.png`, `nortus.png`)
 
 The `pubspec.yaml` already declares:
 
@@ -125,7 +125,8 @@ Each feature follows:
 | **FP / errors** | **dartz** (Either) | Typed success/failure in use cases (`Either<Failure, T>`); avoids try/catch in business logic. |
 | **Equality** | **equatable** | `==` and `hashCode` on entities, events, and states; fewer rebuilds and simpler test assertions. |
 | **Fonts** | **google_fonts** (Inter, Space Grotesk) | Matches Figma (Nortus); consistent typography without bundling fonts manually. |
-| **Storage** | **shared_preferences** | Persist “keep me logged in” and favorites; simple key-value API. News and other data could also be persisted the same way (e.g. cache or offline access) if desired. |
+| **Storage** | **shared_preferences** | Persist “keep me logged in”, favorites, and **news cache** (list and details). Simple key-value API; cache avoids redundant requests and improves perceived performance. |
+| **Images** | **cached_network_image** | Load and cache network images for news (list, details, related). Reduces bandwidth and speeds up repeat visits. |
 
 ### Core theme: colors and responsiveness
 
@@ -151,10 +152,22 @@ Configuration is centralized in `lib/core/router/router_config.dart`.
 
 ## Tests
 
-Tests live under `test/` and mirror `lib/` (e.g. `test/features/auth/`, `test/features/news/`). Run with:
+Tests live under `test/` and mirror `lib/` (e.g. `test/features/auth/`, `test/features/news/`, `test/features/user/`, `test/core/`). **Test descriptions and group names are in English.** Structure includes:
+
+- **Bloc/Cubit:** subgroups by event (e.g. GetNewsEvent, LoadNewsDetailsEvent, Login, Register).
+- **Use cases and repositories:** one group per class; descriptions state expected outcome (e.g. “returns Right when … succeeds”).
+- **Models:** fromJson/toJson and entity subclass behavior.
+
+Run all tests:
 
 ```bash
 flutter test
+```
+
+Run a single file (e.g. news bloc):
+
+```bash
+flutter test test/features/news/presentation/bloc/news_bloc_test.dart
 ```
 
 ---
@@ -174,18 +187,20 @@ flutter test
 
 - **Widget refactor** – UI extracted into reusable widgets: **core** (FormLabel, AppDropdown, AppTextField, FormSectionHeader); **auth** (AuthTextFormField, AuthPrimaryButton, TabButton, FooterTextLink); **news** (HeroNewsCard, GridNewsCard, RecentNewsCard, FavoriteFeedbackBalloon, TagsSection, VerMaisButton, LoadMoreButton); **profile** (SectionTitle). Pages use these components instead of inline or private builders.
 - **API** – Base URL: `https://le43j.wiremockapi.cloud/`. News list and details from API; no mock fallback. Errors return `ServerFailure`. News details: `GET /news/{id}/details`; the response body is used to build the full details screen (loading and error states; works with mocked API that returns the same object for any id). Categories: `GET /categories` returns `{ "data": ["Ciência", "Educação", ...] }` and fills the drawer.
+- **Cache** – **SharedPreferences** for news list and news details (reduces repeated API calls). **cached_network_image** for all news images (list, details, related). No Hive or other local DB; only SharedPreferences + image cache.
 - **Edit profile** – Footer at end of scroll (full-width); responsive spacing above footer (`Responsive.footerTopSpacing`); borders and form text color (#0D478C, #666666 in `AppColors`); back button/arrow Inter Medium 14px #0D478C.
 - **Login** – Email field: white background, 1px gray border (#B4B4B4), label in gray; maxLength 64 for email; character counter hidden. Password fields: label as placeholder only (hintText), no floating label.
 - **News** – Responsive spacing between “Ver mais” / LoadMoreButton and footer; recent-news cards with bottom border 1px #B4B4B4.
-- **Categories (drawer)** – New feature: datasource, repository, use case, `CategoriesCubit`. Drawer loads categories from API on open; shows loading/error or list of category names.
+- **Categories (drawer)** – Feature: datasource, repository, use case, `CategoriesCubit`. Drawer loads categories from API on open; shows loading/error or list of category names.
 - **News details** – Always fetches `GET /news/{id}/details` when opening a news item; screen is built only from the API response. "Resumo NortusAI" block with icon `icon_details_nortus.png`, title and summary. Related news and tags from response.
+- **Tests** – Unit tests for auth, news, user (repositories, use cases, BLoCs), plus core (e.g. Responsive). Descriptions and group names in **English**; BLoC tests grouped by event (GetNewsEvent, LoadNewsDetailsEvent, etc.). NewsBloc tests include `GetNewsDetailsUseCase` mock and LoadNewsDetails success/failure cases.
 - **Code** – In-code comments kept in English.
 
 ---
 
 ## Addenda
 
-- **Persistence (SharedPreferences):** Besides “keep me logged in” and favorites, news and other data could also be stored in `shared_preferences` (e.g. list cache or offline access), using the same approach already used in the project.
+- **Persistence and cache:** “Keep me logged in” and favorites use **SharedPreferences**. News list and news details are also cached in SharedPreferences to reduce API calls. Network images are cached with **cached_network_image** (no Hive or other local DB).
 - **Colors file (`app_colors.dart`):** Centralizes the app palette (primary, outline, error, success, text, surface, border) for buttons, AppBar, SnackBars, and screens, keeping the look aligned with Figma and avoiding scattered color values in the code.
 - **Responsiveness file (`responsive.dart`):** Provides functions that compute horizontal padding, image heights (hero, grid, card, thumbnail), and logo size from screen size (`MediaQuery`), so lists, details, and headers adapt to different devices.
 - **Scope and deadline:** Other features (e.g. favorites-only screen, category filters, full local cache for offline access) were not implemented because the challenge deadline was reached; what was delivered covers the required scope and part of the optional items.

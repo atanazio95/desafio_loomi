@@ -25,7 +25,7 @@ void main() {
 
   group('LoginUseCase', () {
     test(
-      'deve retornar Right(AuthEntity) quando o login for realizado com sucesso',
+      'returns Right(AuthEntity) when login succeeds',
       () async {
         when(
           () => mockAuthRepository.login(any(), keepLoggedIn: any(named: 'keepLoggedIn')),
@@ -41,7 +41,7 @@ void main() {
     );
 
     test(
-      'deve repassar keepLoggedIn true quando informado',
+      'forwards keepLoggedIn true when provided',
       () async {
         when(
           () => mockAuthRepository.login(any(), keepLoggedIn: any(named: 'keepLoggedIn')),
@@ -55,7 +55,7 @@ void main() {
       },
     );
 
-    test('deve retornar Left(ServerFailure) quando o login falhar', () async {
+    test('returns Left(ServerFailure) when login fails', () async {
       when(
         () => mockAuthRepository.login(any(), keepLoggedIn: any(named: 'keepLoggedIn')),
       ).thenAnswer((_) async => Left(ServerFailure()));
