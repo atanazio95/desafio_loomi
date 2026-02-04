@@ -17,7 +17,7 @@ void main() {
   });
 
   group('CheckAuthStatusUseCase', () {
-    test('deve retornar true quando checkAuthStatus retorna Right(true)', () async {
+    test('returns true when checkAuthStatus returns Right(true)', () async {
       when(
         () => mockAuthRepository.checkAuthStatus(),
       ).thenAnswer((_) async => const Right(true));
@@ -38,7 +38,7 @@ void main() {
       expect(result, false);
     });
 
-    test('deve retornar false quando checkAuthStatus retorna Left(Failure)', () async {
+    test('returns false when checkAuthStatus returns Left(Failure)', () async {
       when(
         () => mockAuthRepository.checkAuthStatus(),
       ).thenAnswer((_) async => Left(ServerFailure()));

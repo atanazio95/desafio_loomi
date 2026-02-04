@@ -38,7 +38,7 @@ class _NewsPageState extends State<NewsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceWhite,
       drawer: const CustomDrawer(),
       appBar: CustomHomeAppBar(
         selectedTab: 0,
@@ -86,7 +86,7 @@ class _NewsPageState extends State<NewsPage> {
                                   text: TextSpan(
                                     style: GoogleFonts.inter(
                                       fontSize: 16,
-                                      color: const Color(0xFF64748B),
+                                      color: AppColors.categoryGray,
                                     ),
                                     children: [
                                       const TextSpan(text: 'Resultado da busca por '),
@@ -94,7 +94,7 @@ class _NewsPageState extends State<NewsPage> {
                                         text: '"${state.searchQuery}"',
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.black,
+                                          color: AppColors.textPrimary,
                                         ),
                                       ),
                                     ],
@@ -110,7 +110,13 @@ class _NewsPageState extends State<NewsPage> {
                               _buildComplexLayout(context, state),
                           ],
                         ),
-                        const CustomFooter(),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(height: Responsive.footerTopSpacing(context)),
+                            const CustomFooter(),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -130,7 +136,7 @@ class _NewsPageState extends State<NewsPage> {
         alignment: Alignment.center,
         child: Text(
           "Nenhuma notícia encontrada.",
-          style: GoogleFonts.inter(color: Colors.grey),
+          style: GoogleFonts.inter(color: AppColors.labelHint),
         ),
       );
     }
@@ -208,10 +214,10 @@ class _NewsPageState extends State<NewsPage> {
           padding: EdgeInsets.symmetric(horizontal: padH, vertical: 16),
           decoration: const BoxDecoration(
             border: Border(
-              top: BorderSide(color: Color(0xFFEEEEEE)),
-              bottom: BorderSide(color: Color(0xFFEEEEEE)),
+              top: BorderSide(color: AppColors.divider),
+              bottom: BorderSide(color: AppColors.divider),
             ),
-            color: Color(0xFFFAFAFA),
+            color: AppColors.sectionBg,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

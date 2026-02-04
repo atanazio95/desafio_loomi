@@ -29,7 +29,7 @@ void main() {
 
   group('GetUserProfileUseCase', () {
     test(
-      'deve retornar Right(UserEntity) quando getUserProfile tem sucesso',
+      'returns Right(UserEntity) when getUserProfile succeeds',
       () async {
         when(
           () => mockUserRepository.getUserProfile(),
@@ -43,7 +43,7 @@ void main() {
     );
 
     test(
-      'deve retornar Left(ServerFailure) quando getUserProfile falha',
+      'returns Left(ServerFailure) when getUserProfile fails',
       () async {
         when(
           () => mockUserRepository.getUserProfile(),

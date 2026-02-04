@@ -26,22 +26,22 @@ class AppDropdown extends StatelessWidget {
         FormLabel(text: label),
         DropdownButtonFormField<String>(
           value: value,
-          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
+          icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.labelHint),
           style: GoogleFonts.inter(fontSize: 14, color: AppColors.formText),
           isExpanded: true,
           decoration: InputDecoration(
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF0D478C), width: 0.75),
+              borderSide: const BorderSide(color: AppColors.primaryDark, width: 0.75),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF0D478C), width: 0.75),
+              borderSide: const BorderSide(color: AppColors.primaryDark, width: 0.75),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
-                color: Color(0xFF0D478C),
+                color: AppColors.primaryDark,
                 width: 0.75,
               ),
             ),

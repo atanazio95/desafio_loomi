@@ -46,13 +46,13 @@ void main() {
   });
 
   group('UserBloc', () {
-    test('estado inicial é UserInitial', () {
+    test('initial state is UserInitial', () {
       expect(bloc.state, equals(UserInitial()));
     });
 
     group('GetUserProfile', () {
       blocTest<UserBloc, UserState>(
-        'emite [UserLoading, UserLoaded] quando getProfile tem sucesso',
+        'emits [UserLoading, UserLoaded] when getProfile succeeds',
         build: () {
           when(
             () => mockGetUserProfileUseCase(),
@@ -67,7 +67,7 @@ void main() {
       );
 
       blocTest<UserBloc, UserState>(
-        'emite [UserLoading, UserError] quando getProfile falha',
+        'emits [UserLoading, UserError] when getProfile fails',
         build: () {
           when(
             () => mockGetUserProfileUseCase(),
@@ -99,7 +99,7 @@ void main() {
       );
 
       blocTest<UserBloc, UserState>(
-        'emite [UserLoading, UserError] quando update falha',
+        'emits [UserLoading, UserError] when update fails',
         build: () {
           when(
             () => mockUpdateUserProfileUseCase(any()),

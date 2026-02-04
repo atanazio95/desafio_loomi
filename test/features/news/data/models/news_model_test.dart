@@ -30,12 +30,12 @@ void main() {
   );
 
   group('NewsModel', () {
-    test('deve ser uma subclasse de NewsEntity', () {
+    test('is a subclass of NewsEntity', () {
       expect(tNewsModel, isA<NewsEntity>());
     });
 
     test(
-      'fromJson deve retornar NewsModel válido com estrutura aninhada',
+      'fromJson returns valid NewsModel with nested structure',
       () {
         final result = NewsModel.fromJson(tJson);
 
@@ -63,7 +63,7 @@ void main() {
       },
     );
 
-    test('toJson deve retornar Map com id e title', () {
+    test('toJson returns Map with id and title', () {
       final result = tNewsModel.toJson();
 
       expect(result['id'], '123');

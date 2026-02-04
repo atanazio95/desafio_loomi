@@ -1,16 +1,56 @@
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../domain/usecases/get_news_details_usecase.dart';
 import '../../domain/usecases/get_news_usecase.dart';
 import 'news_event.dart';
 import 'news_state.dart';
 
 class NewsBloc extends Bloc<NewsEvent, NewsState> {
   final GetNewsUseCase getNewsUseCase;
+  final GetNewsDetailsUseCase getNewsDetailsUseCase;
 
-  NewsBloc({required this.getNewsUseCase}) : super(const NewsState()) {
+  NewsBloc({
+    required this.getNewsUseCase,
+    required this.getNewsDetailsUseCase,
+  }) : super(const NewsState()) {
     on<GetNewsEvent>(_onGetNews);
     on<ToggleFavoriteHome>(_onToggleFavorite);
     on<SearchNewsEvent>(_onSearchNews);
+    on<LoadNewsDetailsEvent>(_onLoadNewsDetails);
+  }
+
+  Future<void> _onLoadNewsDetails(
+    LoadNewsDetailsEvent event,
+    Emitter<NewsState> emit,
+  ) async {
+    emit(state.copyWith(
+      clearCurrentDetails: true,
+      lastRequestedDetailsId: event.id,
+      isLoadingDetails: true,
+      detailsError: null,
+    ));
+    final result = await getNewsDetailsUseCase(event.id);
+    result.fold(
+      (_) => emit(state.copyWith(
+        clearCurrentDetails: true,
+        isLoadingDetails: false,
+        detailsError: 'Não foi possível carregar os detalhes.',
+      )),
+      (details) {
+        final savedIds = state.savedNews.map((e) => e.id).toSet();
+        final withFav = details.copyWith(
+          isFavorite: savedIds.contains(details.id),
+          relatedNews: details.relatedNews.map((r) {
+            return r.copyWith(isFavorite: savedIds.contains(r.id));
+          }).toList(),
+        );
+        emit(state.copyWith(
+          currentDetails: withFav,
+          isLoadingDetails: false,
+          detailsError: null,
+        ));
+      },
+    );
   }
 
   void _onSearchNews(SearchNewsEvent event, Emitter<NewsState> emit) {

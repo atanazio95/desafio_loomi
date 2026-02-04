@@ -8,6 +8,7 @@ import 'package:desafio_loomi_flutter/features/news/presentation/widgets/favorit
 import 'package:desafio_loomi_flutter/features/news/presentation/widgets/tags_section.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_state.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -33,6 +34,13 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
 
   // Load more loading state control
   bool _isLoadingMore = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Always fetch details from API: GET /news/{id}/details; the response body is used to build the screen.
+    context.read<NewsBloc>().add(LoadNewsDetailsEvent(widget.news.id));
+  }
 
   void _onFavoriteToggle(
     BuildContext context,
@@ -77,11 +85,9 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    const brandBlue = Color(0xFF1876D2);
-    const textBlack = Color(0xFF0B1125);
-    final formattedDate = DateFormat(
-      "dd/MM/yyyy 'ás' HH:mm",
-    ).format(DateTime.tryParse(widget.news.datePublished) ?? DateTime.now());
+    final state = context.watch<NewsBloc>().state;
+    final displayNews = state.currentDetails;
+    final showError = state.detailsError != null && !state.isLoadingDetails;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -94,10 +100,144 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
       body: SafeArea(
         child: Stack(
           children: [
-            Column(
-              children: [
-                // Back button
-                Builder(
+            if (state.isLoadingDetails || displayNews == null) ...[
+              showError
+                  ? _buildErrorState(context)
+                  : _buildLoadingState(context),
+            ] else ...[
+              _buildDetailsContent(context, displayNews),
+            ],
+            // Overlay balloon
+            if (_showBallon)
+              Positioned(
+                top: 10,
+                left: 16,
+                right: 16,
+                child: FavoriteFeedbackBalloon(
+                  title: _ballonTitle,
+                  subtitle: _ballonSubtitle,
+                  color: _ballonColor,
+                  icon: _ballonIcon,
+                  onClose: () => setState(() => _showBallon = false),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState(BuildContext context) {
+    return Column(
+      children: [
+        Builder(
+          builder: (context) {
+            final padH = Responsive.horizontalPadding(context);
+            return Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: padH, vertical: 16),
+              child: InkWell(
+                onTap: () => context.pop(),
+                child: Row(
+                  children: [
+                    Icon(Icons.arrow_back, color: AppColors.primaryDark, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Voltar',
+                      style: GoogleFonts.inter(
+                        color: AppColors.primaryDark,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        const Expanded(
+          child: Center(
+            child: CircularProgressIndicator(color: AppColors.loading),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context) {
+    final state = context.watch<NewsBloc>().state;
+    return Column(
+      children: [
+        Builder(
+          builder: (context) {
+            final padH = Responsive.horizontalPadding(context);
+            return Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: padH, vertical: 16),
+              child: InkWell(
+                onTap: () => context.pop(),
+                child: Row(
+                  children: [
+                    Icon(Icons.arrow_back, color: AppColors.primaryDark, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Voltar',
+                      style: GoogleFonts.inter(
+                        color: AppColors.primaryDark,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        Expanded(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    state.detailsError ?? 'Erro ao carregar.',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  TextButton(
+                    onPressed: () => context.read<NewsBloc>().add(
+                          LoadNewsDetailsEvent(widget.news.id),
+                        ),
+                    child: const Text('Tentar novamente'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailsContent(
+    BuildContext context,
+    NewsEntity displayNews,
+  ) {
+    final formattedDate = DateFormat(
+      "dd/MM/yyyy 'ás' HH:mm",
+    ).format(DateTime.tryParse(displayNews.datePublished) ?? DateTime.now());
+
+    return Column(
+      children: [
+        // Back button
+        Builder(
                   builder: (context) {
                     final padH = Responsive.horizontalPadding(context);
                     return Container(
@@ -110,12 +250,13 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                         onTap: () => context.pop(),
                         child: Row(
                           children: [
-                            const Icon(Icons.arrow_back, color: textBlack, size: 20),
+                            Icon(Icons.arrow_back, color: AppColors.primaryDark, size: 20),
                             const SizedBox(width: 8),
                             Text(
                               'Voltar',
                               style: GoogleFonts.inter(
-                                fontSize: 16,
+                                color: AppColors.primaryDark,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -149,28 +290,30 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                                           vertical: 6,
                                         ),
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(16),
+                                          color: AppColors.sectionBg,
+                                          borderRadius: BorderRadius.circular(20),
                                           border: Border.all(
-                                            color: brandBlue.withOpacity(0.5),
+                                            color: const Color(0xFFB3D4E5),
                                           ),
                                         ),
                                         child: Text(
-                                          widget.news.category.toUpperCase(),
+                                          displayNews.category.toUpperCase(),
                                           style: GoogleFonts.inter(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w700,
+                                            color: AppColors.textSlate,
                                           ),
                                         ),
                                       ),
                                       BlocBuilder<NewsBloc, NewsState>(
                                         builder: (context, state) {
                                           final isFavorited = state.savedNews.any(
-                                            (n) => n.id == widget.news.id,
+                                            (n) => n.id == displayNews.id,
                                           );
                                           return GestureDetector(
                                             onTap: () => _onFavoriteToggle(
                                               context,
-                                              widget.news.id,
+                                              displayNews.id,
                                               isFavorited,
                                             ),
                                             child: Container(
@@ -197,7 +340,7 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
-                                    widget.news.title,
+                                    displayNews.title,
                                     style: GoogleFonts.spaceGrotesk(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w700,
@@ -215,69 +358,128 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
                                     child: Image.network(
-                                      widget.news.imageUrl,
+                                      displayNews.imageUrl,
                                       height: Responsive.imageHeightHero(context),
                                       width: double.infinity,
                                       fit: BoxFit.cover,
                                     ),
                                   ),
                                   const SizedBox(height: 32),
+                                  // Resumo NortusAI block (icon + title + summary)
                                   Container(
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFF8FAFC),
+                                      color: const Color(0xFFF0F2F5),
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
                                         color: const Color(0xFFE2E8F0),
                                       ),
                                     ),
-                                    child: Text(
-                                      widget.news.summary,
-                                      style: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        height: 1.5,
-                                        color: const Color(0xFF334155),
-                                      ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Image.asset(
+                                              'assets/assets/icon_details_nortus.png',
+                                              height: 20,
+                                              width: 20,
+                                              fit: BoxFit.contain,
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              'Resumo ',
+                                              style: GoogleFonts.inter(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w700,
+                                                color: const Color(0xFF334155),
+                                              ),
+                                            ),
+                                            Text(
+                                              'NortusAI',
+                                              style: GoogleFonts.inter(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w700,
+                                                color: const Color(0xFF334155),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          displayNews.summary,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            height: 1.5,
+                                            color: const Color(0xFF334155),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   const SizedBox(height: 32),
                                   Text(
-                                    widget.news.description.isNotEmpty
-                                        ? widget.news.description
-                                        : widget.news.summary,
+                                    displayNews.description.isNotEmpty
+                                        ? displayNews.description
+                                        : displayNews.summary,
                                     style: GoogleFonts.inter(
                                       fontSize: 16,
                                       height: 1.6,
                                     ),
                                   ),
 
-                                  // Categories section
+                                  // Tags (categories) section – no title
                                   const SizedBox(height: 32),
                                   TagsSection(
-                                    title: "Categorias",
                                     tags: [
-                                      widget.news.category.toUpperCase(),
+                                      displayNews.category.toUpperCase(),
                                       "NOTÍCIAS",
                                       "LEITURA",
                                     ],
                                   ),
                                   const SizedBox(height: 48),
 
-                                  // Related news section
-                                  if (widget.news.relatedNews.isNotEmpty) ...[
-                                    Text(
+                                  // Related news section – same style as "Mais recentes" on news page
+                                  Container(
+                                    width: double.infinity,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: padH,
+                                      vertical: 16,
+                                    ),
+                                    decoration: const BoxDecoration(
+                                      border: Border(
+                                        top: BorderSide(color: AppColors.divider),
+                                        bottom: BorderSide(color: AppColors.divider),
+                                      ),
+                                      color: AppColors.sectionBg,
+                                    ),
+                                    child: Text(
                                       "Notícias relacionadas",
                                       style: GoogleFonts.spaceGrotesk(
-                                        fontSize: 18,
+                                        fontSize: 20,
                                         fontWeight: FontWeight.w700,
+                                        color: Color(0xFF1F343A),
                                       ),
                                     ),
-                                    const SizedBox(height: 24),
-                                    _buildRelatedGrid(context),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  if (displayNews.relatedNews.isEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 24),
+                                      child: Center(
+                                        child: Text(
+                                          "Nenhuma notícia relacionada no momento.",
+                                          style: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  else ...[
+                                    _buildRelatedGrid(context, displayNews),
                                     const SizedBox(height: 32),
-
-                                    // See more button
                                     SizedBox(
                                       width: double.infinity,
                                       height: 56,
@@ -336,29 +538,10 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                   ),
                 ),
               ],
-            ),
-
-            // Overlay balloon
-            if (_showBallon)
-              Positioned(
-                top: 10,
-                left: 16,
-                right: 16,
-                child: FavoriteFeedbackBalloon(
-                  title: _ballonTitle,
-                  subtitle: _ballonSubtitle,
-                  color: _ballonColor,
-                  icon: _ballonIcon,
-                  onClose: () => setState(() => _showBallon = false),
-                ),
-              ),
-            ],
-          ),
-        ),
-    );
+            );
   }
 
-  Widget _buildRelatedGrid(BuildContext context) {
+  Widget _buildRelatedGrid(BuildContext context, NewsEntity news) {
     final imageH = Responsive.imageHeightGrid(context);
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),
@@ -369,9 +552,9 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
         mainAxisSpacing: 24,
         childAspectRatio: 0.65,
       ),
-      itemCount: widget.news.relatedNews.length,
+      itemCount: news.relatedNews.length,
       itemBuilder: (context, index) {
-        final related = widget.news.relatedNews[index];
+        final related = news.relatedNews[index];
         return InkWell(
           onTap: () => context.push(
             '/news/details',
@@ -384,8 +567,8 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      related.imageUrl,
+                    child: CachedNetworkImage(
+                      imageUrl: related.imageUrl,
                       height: imageH,
                       width: double.infinity,
                       fit: BoxFit.cover,

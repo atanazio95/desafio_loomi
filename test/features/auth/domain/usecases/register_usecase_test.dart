@@ -25,7 +25,7 @@ void main() {
 
   group('RegisterUseCase', () {
     test(
-      'deve retornar Right(AuthEntity) quando o cadastro for realizado com sucesso',
+      'returns Right(AuthEntity) when register succeeds',
       () async {
         when(
           () => mockAuthRepository.register(any()),
@@ -38,7 +38,7 @@ void main() {
       },
     );
 
-    test('deve retornar Left(ServerFailure) quando o cadastro falhar', () async {
+    test('returns Left(ServerFailure) when register fails', () async {
       when(
         () => mockAuthRepository.register(any()),
       ).thenAnswer((_) async => Left(ServerFailure()));

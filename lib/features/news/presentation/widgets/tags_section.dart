@@ -1,31 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Section title with a list of tag chips.
+/// Section with optional title and a list of tag chips.
 class TagsSection extends StatelessWidget {
-  final String title;
+  final String? title;
   final List<String> tags;
 
   const TagsSection({
     super.key,
-    required this.title,
+    this.title,
     required this.tags,
   });
 
   @override
   Widget build(BuildContext context) {
+    final hasTitle = title != null && title!.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: GoogleFonts.spaceGrotesk(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF0F172A),
+        if (hasTitle) ...[
+          Text(
+            title!,
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF0F172A),
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
+          const SizedBox(height: 16),
+        ],
         Wrap(
           spacing: 12,
           runSpacing: 12,
@@ -55,7 +58,7 @@ class TagChip extends StatelessWidget {
         label,
         style: GoogleFonts.inter(
           fontSize: 12,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: const Color(0xFF475569),
         ),
       ),

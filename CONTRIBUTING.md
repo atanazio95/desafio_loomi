@@ -34,6 +34,7 @@ Optional body with more details, wrap at 72 characters.
 
 - `auth` – login, splash, authentication
 - `news` – feed, details, favorites
+- `categories` – drawer categories from API
 - `profile` / `user` – profile and user data
 - `core` – router, DI, network, errors, services
 - *(omit scope when the change is general, e.g. `docs: update README`)*

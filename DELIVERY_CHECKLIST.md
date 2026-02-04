@@ -50,18 +50,18 @@ Before sending the ZIP, verify:
 
 | Feature | What it must have | Status |
 |---------|-------------------|--------|
-| **Splash Screen** | Simple initial screen for app loading. | |
-| **Register and Login** | Create account and authenticate; **"Keep me logged in"** option. | |
-| **Home screen** | News list with **infinite pagination**; **text search** (local, in-memory data); each item with **title, image and short description**. | |
-| **Details screen** | **Title, image and full content**; **"Related news"** section at the bottom. | |
-| **Favorites** | Mark/unmark favorite **in memory** (no persistence across runs). | |
-| **Profile screen** | Display user data and **edit** (name, email, etc. — **no photo**). | |
+| **Splash Screen** | Simple initial screen for app loading. | Done |
+| **Register and Login** | Create account and authenticate; **"Keep me logged in"** option. | Done |
+| **Home screen** | News list with **infinite pagination**; **text search** (local, in-memory data); each item with **title, image and short description**. | Done |
+| **Details screen** | **Title, image and full content**; **"Related news"** section at the bottom. | Done |
+| **Favorites** | Mark/unmark favorite **in memory** (no persistence across runs). | Done (in-memory + optional persistence via SharedPreferences) |
+| **Profile screen** | Display user data and **edit** (name, email, etc. — **no photo**). | Done |
 
 ### Rules and important details
 
 | Rule | Requirement |
 |------|-------------|
-| **API** | Requests to `https://flutter-challenge.wiremockapi.cloud/` (mocked). |
+| **API** | Requests to a WireMock API (mocked). **This project uses** `https://le43j.wiremockapi.cloud/` (see README). |
 | **Design** | Follow the provided **Figma** (Nortus). |
 | **"Forgot password" / "Continue without account"** | **Do not implement** the flows; only **have the option on screen**. |
 | **Language / date / timezone** | **Mocked** list with a few options for illustration. |
@@ -74,11 +74,9 @@ Before sending the ZIP, verify:
 
 ### Optional features (differentiators)
 
-The features below were not implemented because the challenge deadline was reached; the required scope was prioritized.
-
-- [ ] **Favorites-only screen** (list of favorited news only).
-- [ ] **Category filters** (e.g. Technology, Sports, World).
-- [ ] **Local cache** (optional): store news/images for partial offline access.
+- [ ] **Favorites-only screen** (list of favorited news only) — not implemented.
+- [x] **Category list** — Drawer loads categories from `GET /categories` (list only; no filter applied to news list).
+- [x] **Local cache** — **News list and details** cached with SharedPreferences; **images** cached with `cached_network_image`. Improves perceived performance and reduces redundant requests.
 
 ---
 
@@ -93,7 +91,8 @@ The features below were not implemented because the challenge deadline was reach
 | GET | `/user` | User data. |
 | PATCH | `/user` | Profile update (simulate with 3s delay). |
 
-Base URL: `https://flutter-challenge.wiremockapi.cloud`
+**Challenge reference base URL:** `https://flutter-challenge.wiremockapi.cloud`  
+**This project uses:** `https://le43j.wiremockapi.cloud` (configured in `lib/core/network/` or DI).
 
 ---
 

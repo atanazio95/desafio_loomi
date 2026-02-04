@@ -1,3 +1,4 @@
+import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 /// Primary action button with optional loading state (login/register).
@@ -21,7 +22,7 @@ class AuthPrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF1876D2),
+          backgroundColor: AppColors.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -31,14 +32,14 @@ class AuthPrimaryButton extends StatelessWidget {
                 height: 20,
                 width: 20,
                 child: CircularProgressIndicator(
-                  color: Colors.white,
+                  color: AppColors.surfaceWhite,
                   strokeWidth: 2,
                 ),
               )
             : Text(
                 label,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.surfaceWhite,
                   fontWeight: FontWeight.bold,
                 ),
               ),

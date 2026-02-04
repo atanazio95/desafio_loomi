@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:desafio_loomi_flutter/core/network/dio_client.dart';
@@ -9,10 +10,19 @@ import 'package:desafio_loomi_flutter/features/auth/domain/usecases/check_auth_s
 import 'package:desafio_loomi_flutter/features/auth/domain/usecases/login_usecase.dart';
 import 'package:desafio_loomi_flutter/features/auth/domain/usecases/register_usecase.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:desafio_loomi_flutter/features/news/data/datasources/news_local_datasource.dart';
+import 'package:desafio_loomi_flutter/features/news/data/datasources/news_local_datasource_impl.dart';
 import 'package:desafio_loomi_flutter/features/news/data/datasources/news_remote_datasource_impl.dart';
 import 'package:desafio_loomi_flutter/features/news/data/repositories/news_repository_impl.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/repositories/news_repository.dart';
+import 'package:desafio_loomi_flutter/features/news/domain/usecases/get_news_details_usecase.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/usecases/get_news_usecase.dart';
+import 'package:desafio_loomi_flutter/features/categories/data/datasources/categories_remote_datasource.dart';
+import 'package:desafio_loomi_flutter/features/categories/data/datasources/categories_remote_datasource_impl.dart';
+import 'package:desafio_loomi_flutter/features/categories/data/repositories/categories_repository_impl.dart';
+import 'package:desafio_loomi_flutter/features/categories/domain/repositories/categories_repository.dart';
+import 'package:desafio_loomi_flutter/features/categories/domain/usecases/get_categories_usecase.dart';
+import 'package:desafio_loomi_flutter/features/categories/presentation/cubit/categories_cubit.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
 import 'package:desafio_loomi_flutter/features/user/data/datasources/user_datasources.dart';
 import 'package:desafio_loomi_flutter/features/user/data/repositories/user_repository_impl.dart';
@@ -58,13 +68,34 @@ Future<void> init() async {
 
   // Features - News
   sl.registerLazySingleton(() => GetNewsUseCase(sl()));
+  sl.registerLazySingleton(() => GetNewsDetailsUseCase(sl()));
+  sl.registerLazySingleton<NewsLocalDataSource>(
+    () => NewsLocalDataSourceImpl(sharedPreferences: sl()),
+  );
   sl.registerLazySingleton<NewsRepository>(
-    () => NewsRepositoryImpl(remoteDataSource: sl()),
+    () => NewsRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+    ),
   );
   sl.registerLazySingleton<NewsRemoteDataSource>(
     () => NewsRemoteDataSourceImpl(dioClient: sl()),
   );
-  sl.registerLazySingleton(() => NewsBloc(getNewsUseCase: sl()));
+
+  // Features - Categories (drawer)
+  sl.registerLazySingleton<CategoriesRemoteDataSource>(
+    () => CategoriesRemoteDataSourceImpl(dioClient: sl()),
+  );
+  sl.registerLazySingleton<CategoriesRepository>(
+    () => CategoriesRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton(() => GetCategoriesUseCase(sl()));
+  sl.registerLazySingleton(() => CategoriesCubit(sl()));
+
+  sl.registerLazySingleton(() => NewsBloc(
+        getNewsUseCase: sl(),
+        getNewsDetailsUseCase: sl(),
+      ));
 
   // Features - User
   sl.registerLazySingleton(

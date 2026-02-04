@@ -1,8 +1,24 @@
+import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
+import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
+import 'package:desafio_loomi_flutter/features/categories/presentation/cubit/categories_cubit.dart';
+import 'package:desafio_loomi_flutter/features/categories/presentation/cubit/categories_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class CustomDrawer extends StatelessWidget {
+class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
+
+  @override
+  State<CustomDrawer> createState() => _CustomDrawerState();
+}
+
+class _CustomDrawerState extends State<CustomDrawer> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<CategoriesCubit>().loadCategories();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +31,7 @@ class CustomDrawer extends StatelessWidget {
 
           // Drawer header with back and title
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: Responsive.horizontalPadding(context)),
             child: Row(
               children: [
                 GestureDetector(
@@ -23,7 +39,7 @@ class CustomDrawer extends StatelessWidget {
                   child: const Icon(
                     Icons.arrow_back_ios_new,
                     size: 20,
-                    color: Colors.black,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -31,10 +47,10 @@ class CustomDrawer extends StatelessWidget {
                   'Notícias',
                   style: GoogleFonts.spaceGrotesk(
                     fontSize: 22,
-                    fontWeight: FontWeight.w700, // Bold
-                    height: 1.0, // line-height: 100%
+                    fontWeight: FontWeight.w700,
+                    height: 1.0,
                     letterSpacing: 0,
-                    color: Colors.black,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -42,22 +58,42 @@ class CustomDrawer extends StatelessWidget {
           ),
 
           const SizedBox(height: 16),
-          const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+          const Divider(height: 1, thickness: 1, color: AppColors.divider),
 
-          // Category list
+          // Category list from API
           Expanded(
             flex: 6,
-            child: ListView(
-              padding: const EdgeInsets.only(top: 10),
-              children: [
-                _buildDrawerItem('Tecnologia'),
-                _buildDrawerItem('Inovação'),
-                _buildDrawerItem('Política'),
-              ],
+            child: BlocBuilder<CategoriesCubit, CategoriesState>(
+              builder: (context, state) {
+                if (state.isLoading && state.categories.isEmpty) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: AppColors.loading),
+                  );
+                }
+                if (state.error != null && state.categories.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        state.error!,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return ListView.builder(
+                  padding: const EdgeInsets.only(top: 10),
+                  itemCount: state.categories.length,
+                  itemBuilder: (context, index) => _buildDrawerItem(state.categories[index]),
+                );
+              },
             ),
           ),
 
-          // 20% space below
           const Spacer(flex: 2),
         ],
       ),
@@ -71,13 +107,13 @@ class CustomDrawer extends StatelessWidget {
         label,
         style: GoogleFonts.spaceGrotesk(
           fontSize: 18,
-          fontWeight: FontWeight.w700, // Bold
-          height: 1.0, // line-height: 100%
+          fontWeight: FontWeight.w700,
+          height: 1.0,
           letterSpacing: 0,
-          color: Colors.black,
+          color: AppColors.textPrimary,
         ),
       ),
-      onTap: () {},
+      onTap: () => Navigator.pop(context),
     );
   }
 }

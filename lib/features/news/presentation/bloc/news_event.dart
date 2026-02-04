@@ -32,3 +32,12 @@ class SearchNewsEvent extends NewsEvent {
   @override
   List<Object> get props => [query];
 }
+
+class LoadNewsDetailsEvent extends NewsEvent {
+  final String id;
+
+  const LoadNewsDetailsEvent(this.id);
+
+  @override
+  List<Object> get props => [id];
+}

@@ -43,11 +43,11 @@ void main() {
   };
 
   group('UserModel', () {
-    test('deve ser uma subclasse de UserEntity', () {
+    test('is a subclass of UserEntity', () {
       expect(tUserModel, isA<UserEntity>());
     });
 
-    test('fromJson deve criar UserModel a partir de JSON', () {
+    test('fromJson creates UserModel from JSON', () {
       final result = UserModel.fromJson(tJson);
 
       expect(result.id, 1);
@@ -71,7 +71,7 @@ void main() {
       expect(result.address!.state, 'SP');
     });
 
-    test('toJson deve retornar Map com campos corretos', () {
+    test('toJson returns Map with correct fields', () {
       final result = tUserModel.toJson();
 
       expect(result['name'], 'Test User');

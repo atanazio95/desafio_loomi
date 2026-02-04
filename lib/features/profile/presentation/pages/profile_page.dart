@@ -35,10 +35,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    const borderColorDefault = Color(0xFF0B1125);
-    const borderColorDanger = Color(0xFFF5222D);
-    const brandBlue = Color(0xFF1876D2);
-
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthUnauthenticated) {
@@ -46,7 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surfaceWhite,
         appBar: CustomHomeAppBar(selectedTab: 1, onTabChanged: (index) {}),
         body: SafeArea(
           child: Column(
@@ -79,7 +75,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           return Center(
                             child: Text(
                               'Erro ao carregar perfil',
-                              style: GoogleFonts.inter(color: Colors.red),
+                              style: GoogleFonts.inter(color: AppColors.error),
                             ),
                           );
                         }
@@ -98,7 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 style: GoogleFonts.spaceGrotesk(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w700,
-                                  color: Colors.black,
+                                  color: AppColors.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 6),
@@ -106,7 +102,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 user.email,
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
-                                  color: Colors.black,
+                                  color: AppColors.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 20),
@@ -122,7 +118,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     style: GoogleFonts.inter(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
-                                      color: Colors.black,
+                                      color: AppColors.textPrimary,
                                     ),
                                   ),
                                 ],
@@ -143,7 +139,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         onPressed: () => context.push('/edit-profile'),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(
-                            color: borderColorDefault,
+                            color: AppColors.textPrimary,
                             width: 0.5,
                           ),
                           shape: RoundedRectangleBorder(
@@ -154,7 +150,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           'Configurações de usuário',
                           style: GoogleFonts.inter(
                             fontSize: 14,
-                            color: borderColorDefault,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -168,7 +164,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             context.read<AuthBloc>().add(LogoutRequested()),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(
-                            color: borderColorDanger,
+                            color: AppColors.error,
                             width: 0.5,
                           ),
                           shape: RoundedRectangleBorder(
@@ -179,7 +175,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           'Sair da conta',
                           style: GoogleFonts.inter(
                             fontSize: 14,
-                            color: borderColorDanger,
+                            color: AppColors.error,
                           ),
                         ),
                       ),
@@ -189,7 +185,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     SectionTitle(
                       title: 'Noticias favoritadas',
-                      accentColor: brandBlue,
+                      accentColor: AppColors.primary,
                     ),
 
                     const SizedBox(height: 24),
@@ -207,7 +203,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 'Você ainda não favoritou nenhuma notícia.',
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
-                                  color: Colors.grey,
+                                  color: AppColors.labelHint,
                                 ),
                               ),
                             ),
