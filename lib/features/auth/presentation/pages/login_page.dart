@@ -1,5 +1,6 @@
 import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
 import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
+import 'package:desafio_loomi_flutter/core/widgets/feedback_balloon.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_event.dart';
 import 'package:desafio_loomi_flutter/features/auth/presentation/bloc/auth_state.dart';
@@ -241,16 +242,10 @@ class _LoginPageState extends State<LoginPage> {
                                   listener: (context, state) {
                                     if (state is AuthAuthenticated) {
                                       if (_isRegisterMode) {
-                                        ScaffoldMessenger.of(
+                                        FeedbackBalloon.showSuccess(
                                           context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
+                                          message:
                                               'Usuário cadastrado com sucesso!',
-                                            ),
-                                            backgroundColor: Colors.green,
-                                            behavior: SnackBarBehavior.floating,
-                                          ),
                                         );
                                         setState(() {
                                           _selectedTab = 0;
@@ -264,13 +259,9 @@ class _LoginPageState extends State<LoginPage> {
                                       }
                                     }
                                     if (state is AuthError) {
-                                      ScaffoldMessenger.of(
+                                      FeedbackBalloon.showError(
                                         context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(state.message),
-                                          backgroundColor: AppColors.error,
-                                        ),
+                                        message: state.message,
                                       );
                                     }
                                   },
@@ -323,10 +314,9 @@ class _LoginPageState extends State<LoginPage> {
                           FooterTextLink(
                             label: 'Esqueci a senha',
                             onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Função não disponível'),
-                                ),
+                              FeedbackBalloon.showInfo(
+                                context,
+                                message: 'Função não disponível',
                               );
                             },
                           ),
@@ -341,10 +331,9 @@ class _LoginPageState extends State<LoginPage> {
                           FooterTextLink(
                             label: 'Continuar sem conta',
                             onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Função não disponível'),
-                                ),
+                              FeedbackBalloon.showInfo(
+                                context,
+                                message: 'Função não disponível',
                               );
                             },
                           ),

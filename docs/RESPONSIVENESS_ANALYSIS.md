@@ -1,50 +1,50 @@
-# Responsiveness Analysis
+# Análise de Responsividade
 
-Analysis of how the app adapts to different screen sizes, densities, and orientations.
+Análise de como o app se adapta a diferentes tamanhos de tela, densidades e orientações.
 
 ---
 
-## What is already good
+## O que já está bom
 
 1. **Scroll**
-   - Main content is inside `SingleChildScrollView`, `ListView`, or `ListView.separated`, so long content scrolls instead of overflowing.
-   - `news_page` and `news_details_page` use `Expanded` + scroll correctly.
+   - O conteúdo principal está dentro de `SingleChildScrollView`, `ListView` ou `ListView.separated`, então conteúdo longo faz scroll em vez de transbordar.
+   - `news_page` e `news_details_page` usam `Expanded` + scroll corretamente.
 
-2. **Text overflow**
-   - Titles and summaries use `maxLines` and `overflow: TextOverflow.ellipsis` in several places (news cards, details, footer), which avoids text overflow.
+2. **Overflow de texto**
+   - Títulos e resumos usam `maxLines` e `overflow: TextOverflow.ellipsis` em vários lugares (cards de notícias, detalhes, footer), o que evita overflow de texto.
 
-3. **Flexible width**
-   - Many widgets use `width: double.infinity` or are inside `Row`/`Column` with `Expanded`, so horizontal space is used without fixed full-width values.
+3. **Largura flexível**
+   - Muitos widgets usam `width: double.infinity` ou estão dentro de `Row`/`Column` com `Expanded`, então o espaço horizontal é usado sem valores fixos de largura total.
 
-4. **Login page**
-   - Uses `MediaQuery.of(context).size` for:
-     - Top padding (`size.height * 0.05`)
-     - Logo position/size (`size.width * 1.6`, `right: -size.width * 0.45`)
-     - Title font size (`size.width * 0.11`)
-   - Uses `SafeArea` for the top content.
+4. **Página de login**
+   - Usa `MediaQuery.of(context).size` para:
+     - Padding superior (`size.height * 0.05`)
+     - Posição/tamanho do logo (`size.width * 1.6`, `right: -size.width * 0.45`)
+     - Tamanho da fonte do título (`size.width * 0.11`)
+   - Usa `SafeArea` para o conteúdo superior.
 
 5. **SafeArea**
-   - Used on **login_page**, **profile_header**, **header**. Helps with notch/status bar on some screens.
+   - Usado em **login_page**, **profile_header**, **header**. Ajuda com notch/barra de status em algumas telas.
 
 ---
 
-## Issues and recommendations
+## Problemas e recomendações
 
-### 1. Little use of MediaQuery and screen size
+### 1. Pouco uso de MediaQuery e tamanho de tela
 
-**Current:** Only the login page uses `MediaQuery` for layout/sizing. Other screens use fixed pixel values.
+**Atual:** Apenas a página de login usa `MediaQuery` para layout/tamanho. Outras telas usam valores fixos em pixels.
 
-**Impact:** On very small phones, fixed paddings (e.g. 24px) take a large share of the width; on tablets, the same 24px looks narrow and content doesn’t use space well.
+**Impacto:** Em telefones muito pequenos, paddings fixos (ex: 24px) ocupam uma grande parte da largura; em tablets, os mesmos 24px parecem estreitos e o conteúdo não usa bem o espaço.
 
-**Recommendation:**
-- Define a small set of horizontal paddings from screen width, e.g. `paddingHorizontal = min(24, MediaQuery.sizeOf(context).width * 0.06)` or breakpoints (phone / tablet).
-- Optionally scale some spacing (e.g. vertical gaps) with height, without exaggerating.
+**Recomendação:**
+- Definir um pequeno conjunto de paddings horizontais a partir da largura da tela, ex: `paddingHorizontal = min(24, MediaQuery.sizeOf(context).width * 0.06)` ou breakpoints (telefone / tablet).
+- Opcionalmente escalar alguns espaçamentos (ex: gaps verticais) com altura, sem exagerar.
 
 ---
 
-### 2. Grid always 2 columns
+### 2. Grid sempre com 2 colunas
 
-**Current:** `news_page` and `news_details_page` use:
+**Atual:** `news_page` e `news_details_page` usam:
 
 ```dart
 SliverGridDelegateWithFixedCrossAxisCount(
@@ -53,124 +53,124 @@ SliverGridDelegateWithFixedCrossAxisCount(
 )
 ```
 
-**Impact:** On phones it’s fine. On tablets (e.g. width > 600px), 2 columns leave a lot of empty space; on very narrow devices, 2 columns can feel tight.
+**Impacto:** Em telefones está bom. Em tablets (ex: largura > 600px), 2 colunas deixam muito espaço vazio; em dispositivos muito estreitos, 2 colunas podem parecer apertadas.
 
-**Recommendation:**
-- Use `crossAxisCount` based on width, e.g.:
+**Recomendação:**
+- Usar `crossAxisCount` baseado na largura, ex:
   - `width < 400` → 2
   - `400 <= width < 600` → 2
-  - `width >= 600` → 3 or 4
-- Optionally adjust `childAspectRatio` per breakpoint so cards don’t look too tall or too flat.
+  - `width >= 600` → 3 ou 4
+- Opcionalmente ajustar `childAspectRatio` por breakpoint para que os cards não pareçam muito altos ou muito achatados.
 
 ---
 
-### 3. Fixed image heights
+### 3. Alturas de imagem fixas
 
-**Current:**
-- **news_card**: image `height: 200`
-- **news_details_page**: hero image `height: 250`
-- **news_page** hero cards: `height: 200`
-- **news_page** grid/recent cards: `height: 120`, `height: 80`, etc.
+**Atual:**
+- **news_card**: imagem `height: 200`
+- **news_details_page**: imagem hero `height: 250`
+- Cards hero de **news_page**: `height: 200`
+- Cards grid/recentes de **news_page**: `height: 120`, `height: 80`, etc.
 
-**Impact:** Same pixel height on all devices. On small screens the image can dominate; on large screens it can look small. Aspect ratio is not tied to screen.
+**Impacto:** Mesma altura em pixels em todos os dispositivos. Em telas pequenas a imagem pode dominar; em telas grandes pode parecer pequena. A proporção não está vinculada à tela.
 
-**Recommendation:**
-- Use a maximum height and keep aspect ratio, e.g. `height: min(250, MediaQuery.sizeOf(context).height * 0.3)` and `fit: BoxFit.cover`, or use `AspectRatio` + `BoxFit.cover` so the image adapts to width.
-
----
-
-### 4. Fixed font sizes
-
-**Current:** Font sizes are fixed (e.g. 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 48) in `GoogleFonts.inter(...)` / `GoogleFonts.spaceGrotesk(...)`.
-
-**Impact:** Doesn’t respect the system “font size” (accessibility). Users who set large text may see overflow or clipping.
-
-**Recommendation:**
-- Use `MediaQuery.textScalerOf(context)` when building `TextStyle`, e.g. `fontSize: 16` with `textScaler: MediaQuery.textScalerOf(context)` (or pass the scaler into your text theme).
-- Prefer defining a base theme in `ThemeData` (e.g. `textTheme`) and using `Theme.of(context).textTheme` so one place controls scaling.
+**Recomendação:**
+- Usar uma altura máxima e manter proporção, ex: `height: min(250, MediaQuery.sizeOf(context).height * 0.3)` e `fit: BoxFit.cover`, ou usar `AspectRatio` + `BoxFit.cover` para que a imagem se adapte à largura.
 
 ---
 
-### 5. SafeArea not used everywhere
+### 4. Tamanhos de fonte fixos
 
-**Current:** SafeArea is used on login, profile header, and header. It is **not** used on:
-- `news_page` (body under AppBar)
+**Atual:** Tamanhos de fonte são fixos (ex: 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 48) em `GoogleFonts.inter(...)` / `GoogleFonts.spaceGrotesk(...)`.
+
+**Impacto:** Não respeita o "tamanho de fonte" do sistema (acessibilidade). Usuários que definem texto grande podem ver overflow ou corte.
+
+**Recomendação:**
+- Usar `MediaQuery.textScalerOf(context)` ao construir `TextStyle`, ex: `fontSize: 16` com `textScaler: MediaQuery.textScalerOf(context)` (ou passar o scaler para o tema de texto).
+- Preferir definir um tema base em `ThemeData` (ex: `textTheme`) e usar `Theme.of(context).textTheme` para que um lugar controle o escalonamento.
+
+---
+
+### 5. SafeArea não usado em todos os lugares
+
+**Atual:** SafeArea é usado em login, header do perfil e header. **Não** é usado em:
+- `news_page` (body sob AppBar)
 - `news_details_page`
 - `edit_profile_page`
 - `profile_page` (body)
 - `splash_page`
-- `custom_footer` (only at bottom of scroll)
+- `custom_footer` (apenas no final do scroll)
 
-**Impact:** On devices with notch, rounded corners, or gesture areas, content can draw under the system UI or be hard to tap near the edges.
+**Impacto:** Em dispositivos com notch, cantos arredondados ou áreas de gestos, o conteúdo pode ser desenhado sob a UI do sistema ou ser difícil de tocar perto das bordas.
 
-**Recommendation:**
-- Wrap the main body (or scaffold body) with `SafeArea` where the content should stay below the status bar and above the home indicator, especially on:
+**Recomendação:**
+- Envolver o body principal (ou body do scaffold) com `SafeArea` onde o conteúdo deve ficar abaixo da barra de status e acima do indicador inicial, especialmente em:
   - news_page
   - news_details_page
   - profile_page
   - edit_profile_page
-- Splash can stay full-screen; the rest of the app benefits from SafeArea.
+- Splash pode permanecer em tela cheia; o resto do app se beneficia do SafeArea.
 
 ---
 
-### 6. Fixed padding values
+### 6. Valores de padding fixos
 
-**Current:** Padding is mostly fixed, e.g. `EdgeInsets.symmetric(horizontal: 24, vertical: 16)`, `padding: 24`, `EdgeInsets.all(20)`.
+**Atual:** Padding é principalmente fixo, ex: `EdgeInsets.symmetric(horizontal: 24, vertical: 16)`, `padding: 24`, `EdgeInsets.all(20)`.
 
-**Impact:** On small screens, 24px horizontal is a large fraction of width; on tablets, it stays 24px and doesn’t use the extra space.
+**Impacto:** Em telas pequenas, 24px horizontal é uma grande fração da largura; em tablets, permanece 24px e não usa o espaço extra.
 
-**Recommendation:**
-- Centralize horizontal padding in a helper or constant derived from `MediaQuery.sizeOf(context).width`, e.g. `min(24, width * 0.06)` for phones and a larger value (or percentage) for tablets.
-- Use the same logic in news, profile, and edit-profile so behavior is consistent.
-
----
-
-### 7. Orientation
-
-**Current:** No `OrientationBuilder` or layout changes for landscape.
-
-**Impact:** In landscape, list/detail and grid keep the same structure; on phones the content can feel narrow and tall.
-
-**Recommendation (optional):**
-- For tablets or when supporting landscape in the future: use `OrientationBuilder` or width breakpoints to switch layout (e.g. list + detail side by side in landscape, or more grid columns).
+**Recomendação:**
+- Centralizar padding horizontal em um helper ou constante derivada de `MediaQuery.sizeOf(context).width`, ex: `min(24, width * 0.06)` para telefones e um valor maior (ou porcentagem) para tablets.
+- Usar a mesma lógica em news, profile e edit-profile para que o comportamento seja consistente.
 
 ---
 
-### 8. Logo and icons
+### 7. Orientação
 
-**Current:**  
-- **profile_header** / **header**: logo `width: 89, height: 20` (fixed).  
-- **custom_home_app_bar**: logo `height: 32`, spacings `SizedBox(width: 32)`, `SizedBox(width: 24)`.
+**Atual:** Sem `OrientationBuilder` ou mudanças de layout para paisagem.
 
-**Impact:** Same size on all devices. On very small screens the header can feel crowded; on tablets it can look small.
+**Impacto:** Em paisagem, lista/detalhe e grid mantêm a mesma estrutura; em telefones o conteúdo pode parecer estreito e alto.
 
-**Recommendation:**  
-- Optionally scale logo size with `MediaQuery.sizeOf(context).width` (e.g. clamp between 70 and 100) and use proportional spacing so the header stays balanced.
+**Recomendação (opcional):**
+- Para tablets ou ao suportar paisagem no futuro: usar `OrientationBuilder` ou breakpoints de largura para alternar layout (ex: lista + detalhe lado a lado em paisagem, ou mais colunas no grid).
 
 ---
 
-## Summary table
+### 8. Logo e ícones
 
-| Topic              | Current state              | Risk / impact              | Priority |
+**Atual:**  
+- **profile_header** / **header**: logo `width: 89, height: 20` (fixo).  
+- **custom_home_app_bar**: logo `height: 32`, espaçamentos `SizedBox(width: 32)`, `SizedBox(width: 24)`.
+
+**Impacto:** Mesmo tamanho em todos os dispositivos. Em telas muito pequenas o header pode parecer lotado; em tablets pode parecer pequeno.
+
+**Recomendação:**  
+- Opcionalmente escalar tamanho do logo com `MediaQuery.sizeOf(context).width` (ex: clamp entre 70 e 100) e usar espaçamento proporcional para que o header permaneça balanceado.
+
+---
+
+## Tabela resumo
+
+| Tópico              | Estado atual              | Risco / impacto              | Prioridade |
 |--------------------|----------------------------|----------------------------|----------|
-| MediaQuery / size  | Only login uses it         | Cramped on small, narrow on tablet | Medium   |
-| Grid columns       | Always 2                    | Wasted space on tablet     | Medium   |
-| Image heights      | Fixed (200, 250, etc.)      | Doesn’t adapt to screen    | Low      |
-| Font scaling       | Fixed sizes                | Accessibility (large text) | Medium   |
-| SafeArea           | Only 3 screens             | Content under notch/gestures | High     |
-| Padding            | Fixed 24/16/20             | Not adaptive               | Low      |
-| Orientation        | No special handling        | Landscape not optimized     | Low      |
-| Logo/header size   | Fixed                      | Minor visual imbalance     | Low      |
+| MediaQuery / size  | Apenas login usa         | Apertado em pequeno, estreito em tablet | Média   |
+| Colunas do grid       | Sempre 2                    | Espaço desperdiçado em tablet     | Média   |
+| Alturas de imagem      | Fixas (200, 250, etc.)      | Não se adapta à tela    | Baixa      |
+| Escalonamento de fonte       | Tamanhos fixos                | Acessibilidade (texto grande) | Média   |
+| SafeArea           | Apenas 3 telas             | Conteúdo sob notch/gestos | Alta     |
+| Padding            | Fixo 24/16/20             | Não adaptativo               | Baixa      |
+| Orientação        | Sem tratamento especial        | Paisagem não otimizada     | Baixa      |
+| Tamanho logo/header   | Fixo                      | Desequilíbrio visual menor     | Baixa      |
 
 ---
 
-## Suggested order of work
+## Ordem sugerida de trabalho
 
-1. **SafeArea** – Add where needed (news, details, profile, edit-profile) so content never goes under system UI.
-2. **Text scaling** – Use `MediaQuery.textScalerOf(context)` (or theme) so font sizes respect system accessibility.
-3. **Horizontal padding** – One helper based on `MediaQuery.sizeOf(context).width` and use it on main screens.
-4. **Grid columns** – Breakpoint by width (e.g. 2 on phone, 3–4 on tablet).
-5. **Image height / aspect ratio** – Replace fixed heights with max height + aspect ratio or similar.
-6. **Orientation / tablet** – Only if you need to support landscape or tablet layouts explicitly.
+1. **SafeArea** – Adicionar onde necessário (news, details, profile, edit-profile) para que o conteúdo nunca fique sob a UI do sistema.
+2. **Escalonamento de texto** – Usar `MediaQuery.textScalerOf(context)` (ou tema) para que tamanhos de fonte respeitem acessibilidade do sistema.
+3. **Padding horizontal** – Um helper baseado em `MediaQuery.sizeOf(context).width` e usá-lo nas telas principais.
+4. **Colunas do grid** – Breakpoint por largura (ex: 2 em telefone, 3–4 em tablet).
+5. **Altura de imagem / proporção** – Substituir alturas fixas por altura máxima + proporção ou similar.
+6. **Orientação / tablet** – Apenas se precisar suportar layouts de paisagem ou tablet explicitamente.
 
-If you want, the next step can be implementing SafeArea and one of the items above (e.g. responsive padding or grid) in the code.
+Se quiser, o próximo passo pode ser implementar SafeArea e um dos itens acima (ex: padding responsivo ou grid) no código.

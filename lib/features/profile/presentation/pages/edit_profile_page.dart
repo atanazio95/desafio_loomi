@@ -2,6 +2,7 @@ import 'package:desafio_loomi_flutter/core/presentation/custom_footer.dart';
 import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
 import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
 import 'package:desafio_loomi_flutter/core/widgets/app_dropdown.dart';
+import 'package:desafio_loomi_flutter/core/widgets/feedback_balloon.dart';
 import 'package:desafio_loomi_flutter/core/widgets/app_text_field.dart';
 import 'package:desafio_loomi_flutter/core/widgets/form_section_header.dart';
 import 'package:desafio_loomi_flutter/features/user/domain/entities/user_entity.dart';
@@ -207,11 +208,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
           }
 
           if (state is UserUpdated) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Dados atualizados com sucesso!'),
-                backgroundColor: AppColors.success,
-              ),
+            FeedbackBalloon.showSuccess(
+              context,
+              message: 'Dados atualizados com sucesso!',
             );
             Future.delayed(const Duration(milliseconds: 500), () {
               if (context.mounted) context.pop();
@@ -219,12 +218,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           }
 
           if (state is UserError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: AppColors.error,
-              ),
-            );
+            FeedbackBalloon.showError(context, message: state.message);
           }
         },
         child: SingleChildScrollView(
@@ -405,8 +399,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   height: 48,
                                   child: ElevatedButton(
                                     onPressed: isLoading ? null : _onSubmit,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.primary,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(48),
                                       ),
@@ -423,11 +417,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                           )
                                         : Text(
                                             'Salvar',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.surfaceWhite,
-                                      ),
+                                            style: GoogleFonts.inter(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.surfaceWhite,
+                                            ),
                                           ),
                                   ),
                                 ),

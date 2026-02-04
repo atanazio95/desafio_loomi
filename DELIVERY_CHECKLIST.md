@@ -1,127 +1,127 @@
-# Delivery checklist – Loomi Flutter Challenge
+# Checklist de entrega – Desafio Flutter Loomi
 
-Use this document to verify what must be delivered according to the challenge PDF.
+Use este document para verificar o que deve ser entregue de acordo com o PDF do desafio.
 
 ---
 
-## Deadline and submission
+## Prazo e submissão
 
-| Item | Detail |
+| Item | Detalhe |
 |------|--------|
-| **Deadline** | 03/02/2026 at 14:00 |
-| **Format** | Full project as **ZIP** |
-| **Submit to** | Email **processoseletivo@loomi.com.br** |
+| **Prazo** | 03/02/2026 às 14:00 |
+| **Formato** | Projeto completo como **ZIP** |
+| **Enviar para** | Email **processoseletivo@loomi.com.br** |
 
 ---
 
-## 1. Progress report (separate document or attachment)
+## 1. Relatório de progresso (separate document ou anexo)
 
 **Report document:** [PROGRESS_REPORT.md](PROGRESS_REPORT.md)
 
-Deliver a **Progress Report** containing:
+Entregar um **Relatório de Progresso** contendo:
 
-- [ ] **Link to the management platform** used for the backlog: [Trello - Desafio Loomi](https://trello.com/b/KCoxyq0E/desafio-loomi)
-- [ ] **How you organized** demands and activities.
-- [ ] **How you prioritized** deliveries.
-- [ ] **Main difficulties** and how you dealt with them.
-- [ ] **What you would do differently** with more time or in a real project context.
+- [ ] **Link para a plataforma de gestão** usada para o backlog: [Trello - Desafio Loomi](https://trello.com/b/KCoxyq0E/desafio-loomi)
+- [ ] **Como você organizou** demandas e atividades.
+- [ ] **Como você priorizou** entregas.
+- [ ] **Principais dificuldades** e como você lidou com elas.
+- [ ] **O que você faria diferente** com mais tempo ou em um contexto de projeto real.
 
 ---
 
-## 2. Git workflow (#Essential)
+## 2. Fluxo Git (#Essencial)
 
-| Item | What to do |
+| Item | O que fazer |
 |------|------------|
-| **Versioning** | Use Git throughout the project. |
-| **Commits** | **Descriptive** messages (recommended: Conventional Commits – see [CONTRIBUTING.md](CONTRIBUTING.md)). |
-| **Branches** | **One branch per feature**. |
-| **Pull Requests** | Open **PR to the main branch** (e.g. `develop` or `main`) when finishing each feature. |
+| **Versionamento** | Usar Git durante todo o projeto. |
+| **Commits** | Mensagens **descritivas** (recomendado: Conventional Commits – veja [CONTRIBUTING.md](CONTRIBUTING.md)). |
+| **Branches** | **Uma branch por feature**. |
+| **Pull Requests** | Abrir **PR para a branch principal** (ex: `develop` ou `main`) ao finalizar cada feature. |
 
-Before sending the ZIP, verify:
+Antes de enviar o ZIP, verifique:
 
-- [ ] Use of branches per feature.
-- [ ] PR(s) opened/merged to the main branch (develop or equivalent).
+- [ ] Uso de branches por feature.
+- [ ] PR(s) abertos/mergeados para a branch principal (develop ou equivalente).
 
 ---
 
-## 3. Technical deliverables (challenge scope)
+## 3. Entregas técnicas (escopo do desafio)
 
-### Required features
+### Features obrigatórias
 
-| Feature | What it must have | Status |
+| Feature | O que deve ter | Status |
 |---------|-------------------|--------|
-| **Splash Screen** | Simple initial screen for app loading. | Done |
-| **Register and Login** | Create account and authenticate; **"Keep me logged in"** option. | Done |
-| **Home screen** | News list with **infinite pagination**; **text search** (local, in-memory data); each item with **title, image and short description**. | Done |
-| **Details screen** | **Title, image and full content**; **"Related news"** section at the bottom. | Done |
-| **Favorites** | Mark/unmark favorite **in memory** (no persistence across runs). | Done (in-memory + optional persistence via SharedPreferences) |
-| **Profile screen** | Display user data and **edit** (name, email, etc. — **no photo**). | Done |
+| **Splash Screen** | Tela inicial simples para carregamento do app. | Concluído |
+| **Cadastro e Login** | Criar conta e autenticar; opção **"Manter-me logado"**. | Concluído |
+| **Tela inicial** | Lista de notícias com **paginação infinita**; **busca de texto** (local, dados em memória); cada item com **título, imagem e descrição curta**. | Concluído |
+| **Tela de detalhes** | **Título, imagem e conteúdo completo**; seção **"Notícias relacionadas"** na parte inferior. | Concluído |
+| **Favoritos** | Marcar/desmarcar favorito **em memória** (sem persistência entre execuções). | Concluído (em memória + persistência opcional via SharedPreferences) |
+| **Tela de perfil** | Exibir dados do usuário e **editar** (nome, email, etc. — **sem foto**). | Concluído |
 
-### Rules and important details
+### Regras e detalhes importantes
 
-| Rule | Requirement |
+| Regra | Requisito |
 |------|-------------|
-| **API** | Requests to a WireMock API (mocked). **This project uses** `https://le43j.wiremockapi.cloud/` (see README). |
-| **Design** | Follow the provided **Figma** (Nortus). |
-| **"Forgot password" / "Continue without account"** | **Do not implement** the flows; only **have the option on screen**. |
-| **Language / date / timezone** | **Mocked** list with a few options for illustration. |
-| **Search** | **Local only**, on already loaded data (no new request). |
-| **Profile edit** | **Simulate** update locally; **3 second delay** on "response". |
-| **Favorites** | **In memory** while in use; do not persist across runs. |
-| **Keep me logged in** | Use **local persistence** (e.g. SharedPreferences). |
-| **Validation** | **Password**: at least 8 characters, at least one letter and one number. **Email**: valid format (e.g. user@domain.com). |
-| **Errors and loading** | **Snackbar** for errors (style similar to favorites success); **loadings** during requests; **fixed 3 second delay** to simulate API response. |
+| **API** | Requisições para uma API WireMock (mockada). **Este projeto usa** `https://le43j.wiremockapi.cloud/` (veja README). |
+| **Design** | Seguir o **Figma** fornecido (Nortus). |
+| **"Esqueci a senha" / "Continuar sem conta"** | **Não implementar** os fluxos; apenas **ter a opção na tela**. |
+| **Idioma / data / timezone** | Lista **mockada** com algumas opções para ilustração. |
+| **Busca** | **Apenas local**, em dados já carregados (sem nova requisição). |
+| **Edição de perfil** | **Simular** atualização localmente; **atraso de 3 segundos** na "resposta". |
+| **Favoritos** | **Em memória** durante o uso; não persistir entre execuções. |
+| **Manter-me logado** | Usar **persistência local** (ex: SharedPreferences). |
+| **Validação** | **Senha**: pelo menos 8 caracteres, pelo menos uma letra e um número. **Email**: formato válido (ex: user@domain.com). |
+| **Erros e loading** | **Snackbar** para erros (estilo similar ao sucesso de favoritos); **loadings** durante requisições; **atraso fixo de 3 segundos** para simular resposta da API. |
 
-### Optional features (differentiators)
+### Features opcionais (diferenciais)
 
-- [ ] **Favorites-only screen** (list of favorited news only) — not implemented.
-- [x] **Category list** — Drawer loads categories from `GET /categories` (list only; no filter applied to news list).
-- [x] **Local cache** — **News list and details** cached with SharedPreferences; **images** cached with `cached_network_image`. Improves perceived performance and reduces redundant requests.
+- [ ] **Tela apenas de favoritos** (lista de notícias favoritadas apenas) — não implementado.
+- [x] **Lista de categorias** — Drawer carrega categorias de `GET /categories` (apenas lista; filtro não aplicado à lista de notícias).
+- [x] **Cache local** — **Lista e detalhes de notícias** cacheados com SharedPreferences; **imagens** cacheadas com `cached_network_image`. Melhora a performance percebida e reduz requisições redundantes.
 
 ---
 
-## 4. APIs used (challenge reference)
+## 4. APIs usadas (referência do desafio)
 
-| Method | Route | Use |
+| Método | Rota | Uso |
 |--------|------|-----|
-| GET | `/news?page={page}` | Paginated news list. |
-| GET | `/news/{id}/details` | News details. |
-| GET | `/categories` | Categories list. |
-| POST | `/auth` | Login (e.g. `{"login":"desafioLoomi","password":"senha123"}`). |
-| GET | `/user` | User data. |
-| PATCH | `/user` | Profile update (simulate with 3s delay). |
+| GET | `/news?page={page}` | Lista paginada de notícias. |
+| GET | `/news/{id}/details` | Detalhes da notícia. |
+| GET | `/categories` | Lista de categorias. |
+| POST | `/auth` | Login (ex: `{"login":"desafioLoomi","password":"senha123"}`). |
+| GET | `/user` | Dados do usuário. |
+| PATCH | `/user` | Atualização de perfil (simular com atraso de 3s). |
 
-**Challenge reference base URL:** `https://flutter-challenge.wiremockapi.cloud`  
-**This project uses:** `https://le43j.wiremockapi.cloud` (configured in `lib/core/network/` or DI).
+**URL base de referência do desafio:** `https://flutter-challenge.wiremockapi.cloud`  
+**Este projeto usa:** `https://le43j.wiremockapi.cloud` (configurado em `lib/core/network/` ou DI).
 
 ---
 
-## 5. Documentation and communication (evaluated)
+## 5. Documentação e comunicação (avaliado)
 
-| Item | Where in the project |
+| Item | Onde no projeto |
 |------|----------------------|
-| **README** with setup and main decisions | [README.md](README.md) |
-| **Clear commits** | Standard in [CONTRIBUTING.md](CONTRIBUTING.md) |
-| **Clear Pull Requests** | Guide in [CONTRIBUTING.md](CONTRIBUTING.md) |
+| **README** com configuração e principais decisões | [README.md](README.md) |
+| **Commits claros** | Padrão em [CONTRIBUTING.md](CONTRIBUTING.md) |
+| **Pull Requests claros** | Guia em [CONTRIBUTING.md](CONTRIBUTING.md) |
 
-Challenge recommendations (already reflected in the project):
+Recomendações do desafio (já refletidas no projeto):
 
 - Conventional Commits.
-- Code in **English** (commits, variables, comments).
-- Clean, readable, well-structured code.
-- Responsiveness and good UX practices (pagination, loadings).
+- Código em **inglês** (commits, variáveis, comentários).
+- Código limpo, legível e bem estruturado.
+- Responsividade e boas práticas de UX (paginação, loadings).
 
 ---
 
-## 6. Summary before submitting
+## 6. Resumo antes de enviar
 
-- [ ] Progress Report ready (with backlog link, prioritization, difficulties, and improvements).
-- [ ] Git with descriptive commits, branches per feature, and PR(s) to the main branch.
-- [ ] All required features implemented and checked.
-- [ ] Rules met (API, Figma, validation, 3s delay, in-memory favorites, keep me logged in with persistence).
-- [ ] README and CONTRIBUTING reviewed.
-- [ ] Project zipped and sent to **processoseletivo@loomi.com.br** by **03/02/2026 at 14:00**.
+- [ ] Relatório de Progresso pronto (com link do backlog, priorização, dificuldades e melhorias).
+- [ ] Git com commits descritivos, branches por feature e PR(s) para a branch principal.
+- [ ] Todas as features obrigatórias implementadas e verificadas.
+- [ ] Regras atendidas (API, Figma, validação, atraso de 3s, favoritos em memória, manter-me logado com persistência).
+- [ ] README e CONTRIBUTING revisados.
+- [ ] Projeto zipado e enviado para **processoseletivo@loomi.com.br** até **03/02/2026 às 14:00**.
 
 ---
 
-*Document based on the "Desafio Flutter | Loomi" (PDF).*
+*Document baseado no "Desafio Flutter | Loomi" (PDF).*

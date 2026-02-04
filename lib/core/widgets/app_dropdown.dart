@@ -3,7 +3,7 @@ import 'package:desafio_loomi_flutter/core/widgets/form_label.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Dropdown form field with label.
+/// Dropdown selection field for forms.
 class AppDropdown extends StatelessWidget {
   final String label;
   final String? value;
@@ -26,17 +26,26 @@ class AppDropdown extends StatelessWidget {
         FormLabel(text: label),
         DropdownButtonFormField<String>(
           value: value,
-          icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.labelHint),
+          icon: const Icon(
+            Icons.keyboard_arrow_down,
+            color: AppColors.labelHint,
+          ),
           style: GoogleFonts.inter(fontSize: 14, color: AppColors.formText),
           isExpanded: true,
           decoration: InputDecoration(
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primaryDark, width: 0.75),
+              borderSide: const BorderSide(
+                color: AppColors.primaryDark,
+                width: 0.75,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primaryDark, width: 0.75),
+              borderSide: const BorderSide(
+                color: AppColors.primaryDark,
+                width: 0.75,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),

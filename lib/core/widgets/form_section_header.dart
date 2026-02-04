@@ -2,7 +2,7 @@ import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Section header text for forms (e.g. language, timezone and date settings).
+/// Section header text for forms.
 class FormSectionHeader extends StatelessWidget {
   final String title;
 

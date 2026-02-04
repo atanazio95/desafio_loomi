@@ -3,7 +3,7 @@ import 'package:desafio_loomi_flutter/core/widgets/form_label.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Text form field with label and consistent styling.
+/// Text input field for forms.
 class AppTextField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
@@ -31,11 +31,17 @@ class AppTextField extends StatelessWidget {
           decoration: InputDecoration(
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primaryDark, width: 0.75),
+              borderSide: const BorderSide(
+                color: AppColors.primaryDark,
+                width: 0.75,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primaryDark, width: 0.75),
+              borderSide: const BorderSide(
+                color: AppColors.primaryDark,
+                width: 0.75,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -50,7 +56,9 @@ class AppTextField extends StatelessWidget {
             ),
             isDense: true,
           ),
-          validator: validator ?? (value) => value == null || value.isEmpty ? 'Obrigatório' : null,
+          validator:
+              validator ??
+              (value) => value == null || value.isEmpty ? 'Obrigatório' : null,
         ),
       ],
     );

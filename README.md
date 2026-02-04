@@ -1,28 +1,30 @@
 # Nortus (Loomi Flutter Challenge)
 
-Flutter app for the Loomi Challenge: news feed with authentication, user profile, and favorites.
+Aplicativo Flutter para o Desafio Loomi: feed de notícias com autenticação, perfil de usuário e favoritos.
 
-> **Challenge delivery:** use the checklist in [DELIVERY_CHECKLIST.md](DELIVERY_CHECKLIST.md) to verify progress report, Git, technical scope, and deadline. **Backlog:** [Trello - Desafio Loomi](https://trello.com/b/KCoxyq0E/desafio-loomi)
+**Repositório:** [https://github.com/atanazio95/desafio_loomi](https://github.com/atanazio95/desafio_loomi)
 
-## Table of contents
+> **Entrega do desafio:** use a checklist em [DELIVERY_CHECKLIST.md](DELIVERY_CHECKLIST.md) para verificar relatório de progresso, Git, escopo técnico e prazo. **Backlog:** [Trello - Desafio Loomi](https://trello.com/b/KCoxyq0E/desafio-loomi)
 
-- [Requirements](#requirements)
-- [Project setup](#project-setup)
-- [Project structure](#project-structure)
-- [Main decisions](#main-decisions)
-- [Routes](#routes)
-- [Tests](#tests)
-- [Documentation](#documentation)
-- [Commits and Pull Requests](#commits-and-pull-requests)
+## Índice
+
+- [Requisitos](#requisitos)
+- [Configuração do projeto](#configuração-do-projeto)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Principais decisões](#principais-decisões)
+- [Rotas](#rotas)
+- [Testes](#testes)
+- [Documentação](#documentação)
+- [Commits e Pull Requests](#commits-e-pull-requests)
 
 ---
 
-## Requirements
+## Requisitos
 
-- **Flutter** 3.8.1 or higher (`sdk: ^3.8.1`)
+- **Flutter** 3.8.1 ou superior (`sdk: ^3.8.1`)
 - **Dart** 3.x
 
-Check your setup:
+Verifique sua configuração:
 
 ```bash
 flutter doctor
@@ -30,23 +32,23 @@ flutter doctor
 
 ---
 
-## Project setup
+## Configuração do projeto
 
-### 1. Clone and install dependencies
+### 1. Clonar e instalar dependências
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/atanazio95/desafio_loomi.git
 cd desafio_loomi_flutter
 flutter pub get
 ```
 
 ### 2. Assets
 
-Ensure assets exist under:
+Certifique-se de que os assets existem em:
 
-- `assets/` and `assets/assets/` (e.g. `logo_shield.png` for login, `icon_details_nortus.png` for news details, `menu_loomi.png`, `nortus.png`)
+- `assets/` e `assets/assets/` (ex: `logo_shield.png` para login, `icon_details_nortus.png` para detalhes de notícias, `menu_loomi.png`, `nortus.png`)
 
-The `pubspec.yaml` already declares:
+O `pubspec.yaml` já declara:
 
 ```yaml
 flutter:
@@ -56,17 +58,17 @@ flutter:
     - assets/assets/logo_shield.png
 ```
 
-### 3. Run the app
+### 3. Executar o app
 
 ```bash
-# Development
+# Desenvolvimento
 flutter run
 
-# Release build (e.g. Android)
+# Build de release (ex: Android)
 flutter build apk
 ```
 
-### 4. Analyze and test
+### 4. Analisar e testar
 
 ```bash
 flutter analyze
@@ -75,96 +77,96 @@ flutter test
 
 ---
 
-## Project structure
+## Estrutura do projeto
 
-The codebase follows **Clean Architecture** by feature, with **data**, **domain**, and **presentation** layers.
+O código segue **Clean Architecture** por feature, com camadas **data**, **domain** e **presentation**.
 
 ```
 lib/
-├── main.dart                 # Entry point, MultiBlocProvider, MaterialApp.router
-├── core/                      # Shared resources
-│   ├── di/                    # Dependency injection (GetIt)
-│   ├── errors/                # Failures and error handling
-│   ├── network/               # Dio client
-│   ├── presentation/          # Reusable UI (drawer, footer, app bar, headers)
+├── main.dart                 # Ponto de entrada, MultiBlocProvider, MaterialApp.router
+├── core/                      # Recursos compartilhados
+│   ├── di/                    # Injeção de dependências (GetIt)
+│   ├── errors/                # Failures e tratamento de erros
+│   ├── network/               # Cliente Dio
+│   ├── presentation/          # UI reutilizável (drawer, footer, app bar, headers)
 │   ├── router/                # GoRouter
-│   ├── theme/                 # Colors (app_colors) and responsiveness (responsive, footerTopSpacing)
-│   └── widgets/              # Shared form/UI widgets (FormLabel, AppDropdown, AppTextField, FormSectionHeader)
+│   ├── theme/                 # Cores (app_colors) e responsividade (responsive, footerTopSpacing)
+│   └── widgets/              # Widgets compartilhados de formulário/UI (FormLabel, AppDropdown, AppTextField, FormSectionHeader)
 └── features/
-    ├── auth/                  # Login, splash, auth state
+    ├── auth/                  # Login, splash, estado de autenticação
     │   ├── data/              # Datasources, models, repository impl
-    │   ├── domain/            # Entities, repository interface, use cases
+    │   ├── domain/            # Entities, interface do repository, use cases
     │   └── presentation/      # Bloc, pages (Splash, Login), widgets (AuthTextFormField, AuthPrimaryButton, TabButton, FooterTextLink)
-    ├── categories/            # Drawer categories from API
+    ├── categories/            # Categorias do drawer da API
     │   ├── data/              # Datasource, repository impl
-    │   ├── domain/            # Repository interface, use case
-    │   └── presentation/      # Cubit, state (used by CustomDrawer)
-    ├── news/                  # News feed and details
-    │   └── presentation/      # Bloc, pages, widgets (NewsCard, HeroNewsCard, GridNewsCard, RecentNewsCard, FavoriteFeedbackBalloon, TagsSection, VerMaisButton, LoadMoreButton)
-    ├── profile/               # Profile and edit
+    │   ├── domain/            # Interface do repository, use case
+    │   └── presentation/      # Cubit, state (usado pelo CustomDrawer)
+    ├── news/                  # Feed de notícias e detalhes
+    │   └── presentation/      # Bloc, pages, widgets (NewsCard, HeroNewsCard, GridNewsCard, RecentNewsCard, TagsSection, VerMaisButton, LoadMoreButton)
+    ├── profile/               # Perfil e edição
     │   └── presentation/      # Pages, widgets (SectionTitle)
-    └── user/                  # User data and update
+    └── user/                  # Dados do usuário e atualização
 ```
 
-Each feature follows:
+Cada feature segue:
 
-- **data**: concrete implementations (API, cache), models, `*RepositoryImpl`
-- **domain**: entities, repository contracts, use cases (business rules)
-- **presentation**: BLoC/Cubit, pages, and **widgets** (reusable UI components extracted from pages)
+- **data**: implementações concretas (API, cache), models, `*RepositoryImpl`
+- **domain**: entities, contratos de repository, use cases (regras de negócio)
+- **presentation**: BLoC/Cubit, pages e **widgets** (componentes de UI reutilizáveis extraídos das pages)
 
 ---
 
-## Main decisions
+## Principais decisões
 
-| Layer   | Library | Why |
+| Camada   | Biblioteca | Por quê |
 |---------|---------|-----|
-| **State** | **flutter_bloc** (BLoC) | Predictable state, easy to test, clear separation of events and states; aligned with Clean Architecture. |
-| **DI** | **get_it** | Lightweight service locator; no build context; explicit registration in `injection_container.dart`; easy to mock in tests. |
-| **Routing** | **go_router** | Declarative routes, deep linking, type-safe `extra` (e.g. pass `NewsEntity` to details). |
-| **HTTP** | **dio** | Configurable client (timeouts, interceptors); used for auth, news, and user. |
-| **FP / errors** | **dartz** (Either) | Typed success/failure in use cases (`Either<Failure, T>`); avoids try/catch in business logic. |
-| **Equality** | **equatable** | `==` and `hashCode` on entities, events, and states; fewer rebuilds and simpler test assertions. |
-| **Fonts** | **google_fonts** (Inter, Space Grotesk) | Matches Figma (Nortus); consistent typography without bundling fonts manually. |
-| **Storage** | **shared_preferences** | Persist “keep me logged in”, favorites, and **news cache** (list and details). Simple key-value API; cache avoids redundant requests and improves perceived performance. |
-| **Images** | **cached_network_image** | Load and cache network images for news (list, details, related). Reduces bandwidth and speeds up repeat visits. |
+| **State** | **flutter_bloc** (BLoC) | Estado previsível, fácil de testar, separação clara de eventos e estados; alinhado com Clean Architecture. |
+| **DI** | **get_it** | Service locator leve; sem build context; registro explícito em `injection_container.dart`; fácil de mockar em testes. |
+| **Routing** | **go_router** | Rotas declarativas, deep linking, `extra` type-safe (ex: passar `NewsEntity` para detalhes). |
+| **HTTP** | **dio** | Cliente configurável (timeouts, interceptors); usado para auth, news e user. |
+| **FP / errors** | **dartz** (Either) | Sucesso/falha tipado em use cases (`Either<Failure, T>`); evita try/catch na lógica de negócio. |
+| **Equality** | **equatable** | `==` e `hashCode` em entities, events e states; menos rebuilds e asserções de teste mais simples. |
+| **Fonts** | **google_fonts** (Inter, Space Grotesk) | Compatível com Figma (Nortus); tipografia consistente sem bundling manual de fontes. |
+| **Storage** | **shared_preferences** | Persistir "manter-me logado", favoritos e **cache de notícias** (lista e detalhes). API simples de chave-valor; cache evita requisições redundantes e melhora a performance percebida. |
+| **Images** | **cached_network_image** | Carregar e cachear imagens de rede para notícias (lista, detalhes, relacionadas). Reduz largura de banda e acelera visitas repetidas. |
 
-### Core theme: colors and responsiveness
+### Tema core: cores e responsividade
 
-- **`lib/core/theme/app_colors.dart`** – Central app color palette (primary, outline, error, success, text, surface, border) for buttons, AppBar, SnackBars, and screens; keeps the UI aligned with Figma and avoids hardcoded colors.
-- **`lib/core/theme/responsive.dart`** – Responsive layout helpers based on `MediaQuery`: horizontal padding, image heights (hero, grid, card, thumbnail), and logo size in headers. Used in news list, details, profile, and shared headers to adapt to different screen sizes.
+- **`lib/core/theme/app_colors.dart`** – Paleta de cores central do app (primary, outline, error, success, text, surface, border) para botões, AppBar, SnackBars e telas; mantém a UI alinhada com Figma e evita cores hardcoded.
+- **`lib/core/theme/responsive.dart`** – Helpers de layout responsivo baseados em `MediaQuery`: padding horizontal, alturas de imagem (hero, grid, card, thumbnail) e tamanho do logo em headers. Usado em lista de notícias, detalhes, perfil e headers compartilhados para adaptar a diferentes tamanhos de tela.
 
 ---
 
-## Routes
+## Rotas
 
-| Route | Description |
+| Rota | Descrição |
 |-------|-------------|
-| `/` | Splash (checks auth and redirects) |
-| `/login` | Login (email + “continue without account” flow) |
-| `/news` | News feed |
-| `/news/details` | News details (passes `NewsEntity` via `extra`) |
-| `/profile` | User profile |
-| `/edit-profile` | Edit profile |
+| `/` | Splash (verifica auth e redireciona) |
+| `/login` | Login (email + fluxo "continuar sem conta") |
+| `/news` | Feed de notícias |
+| `/news/details` | Detalhes da notícia (passa `NewsEntity` via `extra`) |
+| `/profile` | Perfil do usuário |
+| `/edit-profile` | Editar perfil |
 
-Configuration is centralized in `lib/core/router/router_config.dart`.
+A configuração está centralizada em `lib/core/router/router_config.dart`.
 
 ---
 
-## Tests
+## Testes
 
-Tests live under `test/` and mirror `lib/` (e.g. `test/features/auth/`, `test/features/news/`, `test/features/user/`, `test/core/`). **Test descriptions and group names are in English.** Structure includes:
+Os testes ficam em `test/` e espelham `lib/` (ex: `test/features/auth/`, `test/features/news/`, `test/features/user/`, `test/core/`). **As descrições e nomes de grupos dos testes estão em inglês.** A estrutura inclui:
 
-- **Bloc/Cubit:** subgroups by event (e.g. GetNewsEvent, LoadNewsDetailsEvent, Login, Register).
-- **Use cases and repositories:** one group per class; descriptions state expected outcome (e.g. “returns Right when … succeeds”).
-- **Models:** fromJson/toJson and entity subclass behavior.
+- **Bloc/Cubit:** subgrupos por evento (ex: GetNewsEvent, LoadNewsDetailsEvent, Login, Register).
+- **Use cases e repositories:** um grupo por classe; descrições indicam o resultado esperado (ex: "returns Right when … succeeds").
+- **Models:** comportamento de fromJson/toJson e subclasse de entity.
 
-Run all tests:
+Execute todos os testes:
 
 ```bash
 flutter test
 ```
 
-Run a single file (e.g. news bloc):
+Execute um arquivo específico (ex: `news_bloc_test.dart`):
 
 ```bash
 flutter test test/features/news/presentation/bloc/news_bloc_test.dart
@@ -172,63 +174,63 @@ flutter test test/features/news/presentation/bloc/news_bloc_test.dart
 
 ---
 
-## Documentation
+## Documentação
 
-| Document | Description |
+| Documento | Descrição |
 |----------|-------------|
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Commit and PR conventions. |
-| [DELIVERY_CHECKLIST.md](DELIVERY_CHECKLIST.md) | Challenge delivery checklist (deadline, scope, APIs). |
-| [PROGRESS_REPORT.md](PROGRESS_REPORT.md) | Progress report (backlog, prioritization, difficulties). |
-| [docs/](docs/) | Additional analyses: [Architecture](docs/ARCHITECTURE_ANALYSIS.md), [Responsiveness](docs/RESPONSIVENESS_ANALYSIS.md). |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Convenções de commit e PR. |
+| [DELIVERY_CHECKLIST.md](DELIVERY_CHECKLIST.md) | Checklist de entrega do desafio (prazo, escopo, APIs). |
+| [PROGRESS_REPORT.md](PROGRESS_REPORT.md) | Relatório de progresso (backlog, priorização, dificuldades). |
+| [docs/](docs/) | Análises adicionais: [Arquitetura](docs/ARCHITECTURE_ANALYSIS.md), [Responsividade](docs/RESPONSIVENESS_ANALYSIS.md). |
 
 ---
 
-## What's been done (recent)
+## O que foi feito (recente)
 
-- **Widget refactor** – UI extracted into reusable widgets: **core** (FormLabel, AppDropdown, AppTextField, FormSectionHeader); **auth** (AuthTextFormField, AuthPrimaryButton, TabButton, FooterTextLink); **news** (HeroNewsCard, GridNewsCard, RecentNewsCard, FavoriteFeedbackBalloon, TagsSection, VerMaisButton, LoadMoreButton); **profile** (SectionTitle). Pages use these components instead of inline or private builders.
-- **API** – Base URL: `https://le43j.wiremockapi.cloud/`. News list and details from API; no mock fallback. Errors return `ServerFailure`. News details: `GET /news/{id}/details`; the response body is used to build the full details screen (loading and error states; works with mocked API that returns the same object for any id). Categories: `GET /categories` returns `{ "data": ["Ciência", "Educação", ...] }` and fills the drawer.
-- **Cache** – **SharedPreferences** for news list and news details (reduces repeated API calls). **cached_network_image** for all news images (list, details, related). No Hive or other local DB; only SharedPreferences + image cache.
-- **Edit profile** – Footer at end of scroll (full-width); responsive spacing above footer (`Responsive.footerTopSpacing`); borders and form text color (#0D478C, #666666 in `AppColors`); back button/arrow Inter Medium 14px #0D478C.
-- **Login** – Email field: white background, 1px gray border (#B4B4B4), label in gray; maxLength 64 for email; character counter hidden. Password fields: label as placeholder only (hintText), no floating label.
-- **News** – Responsive spacing between “Ver mais” / LoadMoreButton and footer; recent-news cards with bottom border 1px #B4B4B4.
-- **Categories (drawer)** – Feature: datasource, repository, use case, `CategoriesCubit`. Drawer loads categories from API on open; shows loading/error or list of category names.
-- **News details** – Always fetches `GET /news/{id}/details` when opening a news item; screen is built only from the API response. "Resumo NortusAI" block with icon `icon_details_nortus.png`, title and summary. Related news and tags from response.
-- **Tests** – Unit tests for auth, news, user (repositories, use cases, BLoCs), plus core (e.g. Responsive). Descriptions and group names in **English**; BLoC tests grouped by event (GetNewsEvent, LoadNewsDetailsEvent, etc.). NewsBloc tests include `GetNewsDetailsUseCase` mock and LoadNewsDetails success/failure cases.
-- **Code** – In-code comments kept in English.
-
----
-
-## Addenda
-
-- **Persistence and cache:** “Keep me logged in” and favorites use **SharedPreferences**. News list and news details are also cached in SharedPreferences to reduce API calls. Network images are cached with **cached_network_image** (no Hive or other local DB).
-- **Colors file (`app_colors.dart`):** Centralizes the app palette (primary, outline, error, success, text, surface, border) for buttons, AppBar, SnackBars, and screens, keeping the look aligned with Figma and avoiding scattered color values in the code.
-- **Responsiveness file (`responsive.dart`):** Provides functions that compute horizontal padding, image heights (hero, grid, card, thumbnail), and logo size from screen size (`MediaQuery`), so lists, details, and headers adapt to different devices.
-- **Scope and deadline:** Other features (e.g. favorites-only screen, category filters, full local cache for offline access) were not implemented because the challenge deadline was reached; what was delivered covers the required scope and part of the optional items.
+- **Refatoração de widgets** – UI extraída em widgets reutilizáveis: **core** (FormLabel, AppDropdown, AppTextField, FormSectionHeader, FeedbackBalloon); **auth** (AuthTextFormField, AuthPrimaryButton, TabButton, FooterTextLink); **news** (HeroNewsCard, GridNewsCard, RecentNewsCard, TagsSection, VerMaisButton, LoadMoreButton); **profile** (SectionTitle). As pages usam esses componentes em vez de builders inline ou privados.
+- **API** – URL base: `https://le43j.wiremockapi.cloud/`. Lista e detalhes de notícias da API; sem fallback mock. Erros retornam `ServerFailure`. Detalhes de notícias: `GET /news/{id}/details`; o corpo da resposta é usado para construir a tela completa de detalhes (estados de loading e erro; funciona com API mockada que retorna o mesmo objeto para qualquer id). Categorias: `GET /categories` retorna `{ "data": ["Ciência", "Educação", ...] }` e preenche o drawer.
+- **Cache** – **SharedPreferences** para lista e detalhes de notícias (reduz chamadas repetidas à API). **cached_network_image** para todas as imagens de notícias (lista, detalhes, relacionadas). Sem Hive ou outro banco local; apenas SharedPreferences + cache de imagens.
+- **Editar perfil** – Footer no final do scroll (largura total); espaçamento responsivo acima do footer (`Responsive.footerTopSpacing`); bordas e cor do texto do formulário (#0D478C, #666666 em `AppColors`); botão/seta de voltar Inter Medium 14px #0D478C.
+- **Login** – Campo de email: fundo branco, borda cinza de 1px (#B4B4B4), label em cinza; maxLength 64 para email; contador de caracteres oculto. Campos de senha: label apenas como placeholder (hintText), sem label flutuante.
+- **Notícias** – Espaçamento responsivo entre "Ver mais" / LoadMoreButton e footer; cards de notícias recentes com borda inferior de 1px #B4B4B4.
+- **Categorias (drawer)** – Feature: datasource, repository, use case, `CategoriesCubit`. Drawer carrega categorias da API ao abrir; mostra loading/erro ou lista de nomes de categorias.
+- **Detalhes de notícias** – Sempre busca `GET /news/{id}/details` ao abrir uma notícia; a tela é construída apenas a partir da resposta da API. Bloco "Resumo NortusAI" com ícone `icon_details_nortus.png`, título e resumo. Notícias relacionadas e tags da resposta.
+- **Testes** – Testes unitários para auth, news, user (repositories, use cases, BLoCs), além de core (ex: Responsive). Descrições e nomes de grupos em **inglês**; testes de BLoC agrupados por evento (GetNewsEvent, LoadNewsDetailsEvent, etc.). Testes do NewsBloc incluem mock de `GetNewsDetailsUseCase` e casos de sucesso/falha de LoadNewsDetails.
+- **Código** – Comentários no código mantidos em inglês.
 
 ---
 
-## Commits and Pull Requests
+## Adendos
 
-To keep history and reviews consistent, we follow the conventions below. Details in [CONTRIBUTING.md](CONTRIBUTING.md).
+- **Persistência e cache:** "Manter-me logado" e favoritos usam **SharedPreferences**. Lista e detalhes de notícias também são cacheados em SharedPreferences para reduzir chamadas à API. Imagens de rede são cacheadas com **cached_network_image** (sem Hive ou outro banco local).
+- **Colors file (`app_colors.dart`):** Centraliza a paleta do app (primary, outline, error, success, text, surface, border) para botões, AppBar, SnackBars e telas, mantendo o visual alinhado com Figma e evitando valores de cor espalhados no código.
+- **Responsiveness file (`responsive.dart`):** Fornece funções que calculam padding horizontal, alturas de imagem (hero, grid, card, thumbnail) e tamanho do logo a partir do tamanho da tela (`MediaQuery`), para que listas, detalhes e headers se adaptem a diferentes dispositivos.
+- **Escopo e prazo:** Outras features (ex: tela apenas de favoritos, filtros de categoria, cache local completo para acesso offline) não foram implementadas porque o prazo do desafio foi atingido; o que foi entregue cobre o escopo obrigatório e parte dos itens opcionais.
 
-### Commit messages
+---
 
-- **Format**: `type(scope): short description`
-- **Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
-- **Examples**:
+## Commits e Pull Requests
+
+Para manter histórico e revisões consistentes, seguimos as convenções abaixo. Detalhes em [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### Mensagens de commit
+
+- **Formato**: `type(scope): descrição curta`
+- **Tipos**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+- **Exemplos**:
   - `feat(auth): add login with email`
   - `fix(news): correct loading state in feed`
   - `docs: update README setup`
 
 ### Pull Requests
 
-- Clear, objective title (can follow the same pattern as the commit).
-- Description with: **what** changed, **why**, and **how to test**.
-- Reference to issue/task when applicable.
+- Título claro e objetivo (pode seguir o mesmo padrão do commit).
+- Descrição com: **o que** mudou, **por quê** e **como testar**.
+- Referência a issue/tarefa quando aplicável.
 
 ---
 
-## References
+## Referências
 
 - [Flutter](https://docs.flutter.dev/)
 - [flutter_bloc](https://bloclibrary.dev/)
