@@ -4,6 +4,7 @@ import 'package:desafio_loomi_flutter/core/presentation/custom_home_app_bar.dart
 import 'package:desafio_loomi_flutter/core/presentation/header.dart';
 import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
 import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
+import 'package:desafio_loomi_flutter/core/widgets/feedback_balloon.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/widgets/grid_news_card.dart';
@@ -68,7 +69,9 @@ class _NewsPageState extends State<NewsPage> {
                 return SingleChildScrollView(
                   padding: EdgeInsets.zero,
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +92,9 @@ class _NewsPageState extends State<NewsPage> {
                                       color: AppColors.categoryGray,
                                     ),
                                     children: [
-                                      const TextSpan(text: 'Resultado da busca por '),
+                                      const TextSpan(
+                                        text: 'Resultado da busca por ',
+                                      ),
                                       TextSpan(
                                         text: '"${state.searchQuery}"',
                                         style: const TextStyle(
@@ -113,7 +118,9 @@ class _NewsPageState extends State<NewsPage> {
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            SizedBox(height: Responsive.footerTopSpacing(context)),
+                            SizedBox(
+                              height: Responsive.footerTopSpacing(context),
+                            ),
                             const CustomFooter(),
                           ],
                         ),
@@ -230,10 +237,11 @@ class _NewsPageState extends State<NewsPage> {
                 ),
               ),
               VerMaisButton(
-                              onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Funcionalidade em breve.")),
-                              ),
-                            ),
+                onTap: () => FeedbackBalloon.showInfo(
+                  context,
+                  message: "Funcionalidade em breve.",
+                ),
+              ),
             ],
           ),
         ),
@@ -259,11 +267,11 @@ class _NewsPageState extends State<NewsPage> {
         Padding(
           padding: EdgeInsets.all(padH),
           child: LoadMoreButton(
-                          isLoading: state.isLoading,
-                          onPressed: () => context.read<NewsBloc>().add(
-                            GetNewsEvent(page: state.currentPage + 1),
-                          ),
-                        ),
+            isLoading: state.isLoading,
+            onPressed: () => context.read<NewsBloc>().add(
+              GetNewsEvent(page: state.currentPage + 1),
+            ),
+          ),
         ),
       ],
     );

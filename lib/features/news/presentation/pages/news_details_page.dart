@@ -2,9 +2,9 @@ import 'package:desafio_loomi_flutter/core/presentation/custom_footer.dart';
 import 'package:desafio_loomi_flutter/core/presentation/custom_home_app_bar.dart';
 import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
 import 'package:desafio_loomi_flutter/core/theme/responsive.dart';
+import 'package:desafio_loomi_flutter/core/widgets/feedback_balloon.dart';
 import 'package:desafio_loomi_flutter/features/news/domain/entities/news_entity.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_bloc.dart';
-import 'package:desafio_loomi_flutter/features/news/presentation/widgets/favorite_feedback_balloon.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/widgets/tags_section.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_event.dart';
 import 'package:desafio_loomi_flutter/features/news/presentation/bloc/news_state.dart';
@@ -74,11 +74,10 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
     await Future.delayed(const Duration(seconds: 1)); // Simulate delay
     if (mounted) {
       setState(() => _isLoadingMore = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Não há mais notícias relacionadas."),
-          duration: Duration(seconds: 2),
-        ),
+      FeedbackBalloon.showInfo(
+        context,
+        message: "Não há mais notícias relacionadas.",
+        duration: const Duration(seconds: 2),
       );
     }
   }
@@ -113,7 +112,7 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                 top: 10,
                 left: 16,
                 right: 16,
-                child: FavoriteFeedbackBalloon(
+                child: FeedbackBalloon(
                   title: _ballonTitle,
                   subtitle: _ballonSubtitle,
                   color: _ballonColor,
@@ -140,7 +139,11 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                 onTap: () => context.pop(),
                 child: Row(
                   children: [
-                    Icon(Icons.arrow_back, color: AppColors.primaryDark, size: 20),
+                    Icon(
+                      Icons.arrow_back,
+                      color: AppColors.primaryDark,
+                      size: 20,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       'Voltar',
@@ -179,7 +182,11 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                 onTap: () => context.pop(),
                 child: Row(
                   children: [
-                    Icon(Icons.arrow_back, color: AppColors.primaryDark, size: 20),
+                    Icon(
+                      Icons.arrow_back,
+                      color: AppColors.primaryDark,
+                      size: 20,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       'Voltar',
@@ -213,8 +220,8 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                   const SizedBox(height: 24),
                   TextButton(
                     onPressed: () => context.read<NewsBloc>().add(
-                          LoadNewsDetailsEvent(widget.news.id),
-                        ),
+                      LoadNewsDetailsEvent(widget.news.id),
+                    ),
                     child: const Text('Tentar novamente'),
                   ),
                 ],
@@ -226,10 +233,7 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
     );
   }
 
-  Widget _buildDetailsContent(
-    BuildContext context,
-    NewsEntity displayNews,
-  ) {
+  Widget _buildDetailsContent(BuildContext context, NewsEntity displayNews) {
     final formattedDate = DateFormat(
       "dd/MM/yyyy 'ás' HH:mm",
     ).format(DateTime.tryParse(displayNews.datePublished) ?? DateTime.now());
@@ -238,307 +242,305 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
       children: [
         // Back button
         Builder(
+          builder: (context) {
+            final padH = Responsive.horizontalPadding(context);
+            return Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: padH, vertical: 16),
+              child: InkWell(
+                onTap: () => context.pop(),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.arrow_back,
+                      color: AppColors.primaryDark,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Voltar',
+                      style: GoogleFonts.inter(
+                        color: AppColors.primaryDark,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Builder(
                   builder: (context) {
                     final padH = Responsive.horizontalPadding(context);
-                    return Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: padH,
-                        vertical: 16,
-                      ),
-                      child: InkWell(
-                        onTap: () => context.pop(),
-                        child: Row(
-                          children: [
-                            Icon(Icons.arrow_back, color: AppColors.primaryDark, size: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Voltar',
-                              style: GoogleFonts.inter(
-                                color: AppColors.primaryDark,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: padH),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 8),
+                          // Header: category and favorite
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.sectionBg,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: const Color(0xFFB3D4E5),
+                                  ),
+                                ),
+                                child: Text(
+                                  displayNews.category.toUpperCase(),
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textSlate,
+                                  ),
+                                ),
+                              ),
+                              BlocBuilder<NewsBloc, NewsState>(
+                                builder: (context, state) {
+                                  final isFavorited = state.savedNews.any(
+                                    (n) => n.id == displayNews.id,
+                                  );
+                                  return GestureDetector(
+                                    onTap: () => _onFavoriteToggle(
+                                      context,
+                                      displayNews.id,
+                                      isFavorited,
+                                    ),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: const Color(0xFFD0D0D0),
+                                        ),
+                                      ),
+                                      child: Icon(
+                                        isFavorited
+                                            ? Icons.star
+                                            : Icons.star_border,
+                                        color: isFavorited
+                                            ? Colors.yellow
+                                            : Colors.black,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            displayNews.title,
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Publicado: $formattedDate',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              displayNews.imageUrl,
+                              height: Responsive.imageHeightHero(context),
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          // Resumo NortusAI block (icon + title + summary)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF0F2F5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: const Color(0xFFE2E8F0),
                               ),
                             ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Image.asset(
+                                      'assets/assets/icon_details_nortus.png',
+                                      height: 20,
+                                      width: 20,
+                                      fit: BoxFit.contain,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'Resumo ',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: const Color(0xFF334155),
+                                      ),
+                                    ),
+                                    Text(
+                                      'NortusAI',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: const Color(0xFF334155),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  displayNews.summary,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    height: 1.5,
+                                    color: const Color(0xFF334155),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          Text(
+                            displayNews.description.isNotEmpty
+                                ? displayNews.description
+                                : displayNews.summary,
+                            style: GoogleFonts.inter(fontSize: 16, height: 1.6),
+                          ),
+
+                          // Tags (categories) section – no title
+                          const SizedBox(height: 32),
+                          TagsSection(
+                            tags: [
+                              displayNews.category.toUpperCase(),
+                              "NOTÍCIAS",
+                              "LEITURA",
+                            ],
+                          ),
+                          const SizedBox(height: 48),
+
+                          // Related news section – same style as "Mais recentes" on news page
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: padH,
+                              vertical: 16,
+                            ),
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                top: BorderSide(color: AppColors.divider),
+                                bottom: BorderSide(color: AppColors.divider),
+                              ),
+                              color: AppColors.sectionBg,
+                            ),
+                            child: Text(
+                              "Notícias relacionadas",
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1F343A),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          if (displayNews.relatedNews.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 24),
+                              child: Center(
+                                child: Text(
+                                  "Nenhuma notícia relacionada no momento.",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            )
+                          else ...[
+                            _buildRelatedGrid(context, displayNews),
+                            const SizedBox(height: 32),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 56,
+                              child: OutlinedButton(
+                                onPressed: _isLoadingMore
+                                    ? null
+                                    : _onLoadMoreRelated,
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(
+                                    color: Color(0xFF163C43),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                ),
+                                child: _isLoadingMore
+                                    ? const SizedBox(
+                                        height: 24,
+                                        width: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: AppColors.loading,
+                                        ),
+                                      )
+                                    : Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Ver mais",
+                                            style: GoogleFonts.inter(
+                                              color: const Color(0xFF163C43),
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          const Icon(
+                                            Icons.keyboard_arrow_down,
+                                            color: Color(0xFF163C43),
+                                          ),
+                                        ],
+                                      ),
+                              ),
+                            ),
+                            const SizedBox(height: 48),
                           ],
-                        ),
+                        ],
                       ),
                     );
                   },
                 ),
-
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Builder(
-                          builder: (context) {
-                            final padH = Responsive.horizontalPadding(context);
-                            return Padding(
-                              padding: EdgeInsets.symmetric(horizontal: padH),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: 8),
-                                  // Header: category and favorite
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                            Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 6,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.sectionBg,
-                                          borderRadius: BorderRadius.circular(20),
-                                          border: Border.all(
-                                            color: const Color(0xFFB3D4E5),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          displayNews.category.toUpperCase(),
-                                          style: GoogleFonts.inter(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w700,
-                                            color: AppColors.textSlate,
-                                          ),
-                                        ),
-                                      ),
-                                      BlocBuilder<NewsBloc, NewsState>(
-                                        builder: (context, state) {
-                                          final isFavorited = state.savedNews.any(
-                                            (n) => n.id == displayNews.id,
-                                          );
-                                          return GestureDetector(
-                                            onTap: () => _onFavoriteToggle(
-                                              context,
-                                              displayNews.id,
-                                              isFavorited,
-                                            ),
-                                            child: Container(
-                                              padding: const EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                  color: const Color(0xFFD0D0D0),
-                                                ),
-                                              ),
-                                              child: Icon(
-                                                isFavorited
-                                                    ? Icons.star
-                                                    : Icons.star_border,
-                                                color: isFavorited
-                                                    ? Colors.yellow
-                                                    : Colors.black,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    displayNews.title,
-                                    style: GoogleFonts.spaceGrotesk(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'Publicado: $formattedDate',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 24),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(
-                                      displayNews.imageUrl,
-                                      height: Responsive.imageHeightHero(context),
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 32),
-                                  // Resumo NortusAI block (icon + title + summary)
-                                  Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF0F2F5),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: const Color(0xFFE2E8F0),
-                                      ),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Image.asset(
-                                              'assets/assets/icon_details_nortus.png',
-                                              height: 20,
-                                              width: 20,
-                                              fit: BoxFit.contain,
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Text(
-                                              'Resumo ',
-                                              style: GoogleFonts.inter(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w700,
-                                                color: const Color(0xFF334155),
-                                              ),
-                                            ),
-                                            Text(
-                                              'NortusAI',
-                                              style: GoogleFonts.inter(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w700,
-                                                color: const Color(0xFF334155),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 12),
-                                        Text(
-                                          displayNews.summary,
-                                          style: GoogleFonts.inter(
-                                            fontSize: 14,
-                                            height: 1.5,
-                                            color: const Color(0xFF334155),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 32),
-                                  Text(
-                                    displayNews.description.isNotEmpty
-                                        ? displayNews.description
-                                        : displayNews.summary,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 16,
-                                      height: 1.6,
-                                    ),
-                                  ),
-
-                                  // Tags (categories) section – no title
-                                  const SizedBox(height: 32),
-                                  TagsSection(
-                                    tags: [
-                                      displayNews.category.toUpperCase(),
-                                      "NOTÍCIAS",
-                                      "LEITURA",
-                                    ],
-                                  ),
-                                  const SizedBox(height: 48),
-
-                                  // Related news section – same style as "Mais recentes" on news page
-                                  Container(
-                                    width: double.infinity,
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: padH,
-                                      vertical: 16,
-                                    ),
-                                    decoration: const BoxDecoration(
-                                      border: Border(
-                                        top: BorderSide(color: AppColors.divider),
-                                        bottom: BorderSide(color: AppColors.divider),
-                                      ),
-                                      color: AppColors.sectionBg,
-                                    ),
-                                    child: Text(
-                                      "Notícias relacionadas",
-                                      style: GoogleFonts.spaceGrotesk(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xFF1F343A),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 24),
-                                  if (displayNews.relatedNews.isEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 24),
-                                      child: Center(
-                                        child: Text(
-                                          "Nenhuma notícia relacionada no momento.",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 14,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  else ...[
-                                    _buildRelatedGrid(context, displayNews),
-                                    const SizedBox(height: 32),
-                                    SizedBox(
-                                      width: double.infinity,
-                                      height: 56,
-                                      child: OutlinedButton(
-                                        onPressed: _isLoadingMore
-                                            ? null
-                                            : _onLoadMoreRelated,
-                                        style: OutlinedButton.styleFrom(
-                                          side: const BorderSide(
-                                            color: Color(0xFF163C43),
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(100),
-                                          ),
-                                        ),
-                                        child: _isLoadingMore
-                                            ? const SizedBox(
-                                                height: 24,
-                                                width: 24,
-                                                child: CircularProgressIndicator(
-                                                  strokeWidth: 2,
-                                                  color: AppColors.loading,
-                                                ),
-                                              )
-                                            : Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    "Ver mais",
-                                                    style: GoogleFonts.inter(
-                                                      color: const Color(0xFF163C43),
-                                                      fontWeight: FontWeight.w600,
-                                                      fontSize: 16,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 10),
-                                                  const Icon(
-                                                    Icons.keyboard_arrow_down,
-                                                    color: Color(0xFF163C43),
-                                                  ),
-                                                ],
-                                              ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 48),
-                                  ],
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                        const CustomFooter(),
-                      ],
-                    ),
-                  ),
-                ),
+                const CustomFooter(),
               ],
-            );
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildRelatedGrid(BuildContext context, NewsEntity news) {

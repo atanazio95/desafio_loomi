@@ -2,7 +2,7 @@ import 'package:desafio_loomi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Small label text for form fields.
+/// Label text for form fields.
 class FormLabel extends StatelessWidget {
   final String text;
 

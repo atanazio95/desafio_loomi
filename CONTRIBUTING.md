@@ -1,45 +1,45 @@
-# Contribution guide
+# Guia de contribuição
 
-This document defines good practices for **commit messages** and **Pull Requests**, ensuring clarity and consistency in the project history.
+Este documento define boas práticas para **mensagens de commit** e **Pull Requests**, garantindo clareza e consistência no histórico do projeto.
 
 ---
 
-## Commit messages
+## Mensagens de commit
 
-### Format
+### Formato
 
 ```
-type(scope): short description in imperative mood
+type(scope): descrição curta no modo imperativo
 
-Optional body with more details, wrap at 72 characters.
+Corpo opcional com mais detalhes, quebrar linha em 72 caracteres.
 ```
 
-- **type**: what changed (feat, fix, docs, etc.)
-- **scope**: module/area affected (auth, news, profile, core)
-- **description**: short phrase, imperative (“add” not “added”)
+- **type**: o que mudou (feat, fix, docs, etc.)
+- **scope**: módulo/área afetada (auth, news, profile, core)
+- **description**: frase curta, imperativo ("add" não "added")
 
-### Allowed types
+### Tipos permitidos
 
-| Type       | Use |
+| Tipo       | Uso |
 |-----------|-----|
-| `feat`    | New feature |
-| `fix`     | Bug fix |
-| `docs`    | Documentation only (README, CONTRIBUTING, comments) |
-| `style`   | Formatting, spaces, semicolons (no logic change) |
-| `refactor`| Refactor (no new feature or bug fix) |
-| `test`    | Adding or updating tests |
-| `chore`   | Build, CI, dependencies, config (e.g. pubspec, analysis_options) |
+| `feat`    | Nova feature |
+| `fix`     | Correção de bug |
+| `docs`    | Apenas documentação (README, CONTRIBUTING, comentários) |
+| `style`   | Formatação, espaços, ponto e vírgula (sem mudança de lógica) |
+| `refactor`| Refatoração (sem nova feature ou correção de bug) |
+| `test`    | Adicionar ou atualizar testes |
+| `chore`   | Build, CI, dependências, config (ex: pubspec, analysis_options) |
 
-### Suggested scopes
+### Escopos sugeridos
 
-- `auth` – login, splash, authentication
-- `news` – feed, details, favorites
-- `categories` – drawer categories from API
-- `profile` / `user` – profile and user data
+- `auth` – login, splash, autenticação
+- `news` – feed, detalhes, favoritos
+- `categories` – categorias do drawer da API
+- `profile` / `user` – perfil e dados do usuário
 - `core` – router, DI, network, errors, services
-- *(omit scope when the change is general, e.g. `docs: update README`)*
+- *(omitir scope quando a mudança for geral, ex: `docs: update README`)*
 
-### Examples
+### Exemplos
 
 ```text
 feat(auth): add login screen with email and "continue without account"
@@ -51,67 +51,67 @@ test(auth): add AuthBloc login success and failure cases
 chore: upgrade flutter_lints to 5.0.0
 ```
 
-### What to avoid
+### O que evitar
 
-- Generic messages: `fix bug`, `update`, `changes`
-- Past tense: prefer “add” over “added”
-- Mixing several types in one commit: keep commits atomic
+- Mensagens genéricas: `fix bug`, `update`, `changes`
+- Passado: preferir "add" em vez de "added"
+- Misturar vários tipos em um commit: manter commits atômicos
 
 ---
 
 ## Pull Requests
 
-### Title
+### Título
 
-- Clear and short.
-- Can follow the commit pattern: `type(scope): description`.
+- Claro e curto.
+- Pode seguir o padrão do commit: `type(scope): description`.
 
-Examples:
+Exemplos:
 
 - `feat(auth): login screen per Figma`
 - `fix(news): loading state in feed`
 
-### Description
+### Descrição
 
-Clearly include:
+Incluir claramente:
 
-1. **What** was changed (summary of changes).
-2. **Why** (reason/context, link to issue if any).
-3. **How to test** (steps for a reviewer to validate).
+1. **O que** foi mudado (resumo das mudanças).
+2. **Por quê** (motivo/contexto, link para issue se houver).
+3. **Como testar** (passos para um revisor validar).
 
-Example:
+Exemplo:
 
 ```markdown
-## What
-- New login screen with "Sign in" and "Create account" tabs
-- Email field and "Sign in" button with color #1876D2
-- "Forgot password" and "Continue without account" links
+## O que
+- Nova tela de login com abas "Entrar" e "Criar conta"
+- Campo de email e botão "Entrar" com cor #1876D2
+- Links "Esqueci a senha" e "Continuar sem conta"
 
-## Why
-Align login screen with Figma design (issue #XX).
+## Por quê
+Alinhar tela de login com design do Figma (issue #XX).
 
-## How to test
-1. Run `flutter run`
-2. On splash, wait for redirect to /login
-3. Check layout (Nortus, logo, tabs, blue card)
-4. Test "Sign in" with valid email and "Continue without account"
+## Como testar
+1. Executar `flutter run`
+2. No splash, aguardar redirecionamento para /login
+3. Verificar layout (Nortus, logo, abas, card azul)
+4. Testar "Entrar" com email válido e "Continuar sem conta"
 ```
 
-### Good practices
+### Boas práticas
 
-- Commits in the PR with messages following the format above.
-- One PR per goal (one feature or one fix).
-- Update documentation (README, CONTRIBUTING) if the change affects setup or flow.
-- Run `flutter analyze` and `flutter test` before opening the PR.
+- Commits no PR com mensagens seguindo o formato acima.
+- Um PR por objetivo (uma feature ou uma correção).
+- Atualizar documentação (README, CONTRIBUTING) se a mudança afetar configuração ou fluxo.
+- Executar `flutter analyze` e `flutter test` antes de abrir o PR.
 
 ---
 
-## Quick summary
+## Resumo rápido
 
-| Item | Rule |
+| Item | Regra |
 |------|------|
-| Commit | `type(scope): description in imperative` |
-| PR title | Clear and objective (can use same pattern as commit) |
-| PR description | What, why, and how to test |
+| Commit | `type(scope): descrição no modo imperativo` |
+| Título do PR | Claro e objetivo (pode usar mesmo padrão do commit) |
+| Descrição do PR | O que, por quê e como testar |
 
-Following this guide keeps history readable and reviews faster.
+Seguir este guia mantém o histórico legível e revisões mais rápidas.
