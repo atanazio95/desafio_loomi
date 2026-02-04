@@ -1,7 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:desafio_loomi_flutter/core/network/dio_client.dart';
 import 'package:desafio_loomi_flutter/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:desafio_loomi_flutter/features/auth/data/repositories/auth_repository_impl.dart';
@@ -54,16 +52,10 @@ Future<void> init() async {
   sl.registerLazySingleton(() => RegisterUseCase(sl()));
   sl.registerLazySingleton(() => CheckAuthStatusUseCase(sl()));
   sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(
-      dataSource: sl(),
-      sharedPreferences: sl(),
-    ),
+    () => AuthRepositoryImpl(dataSource: sl(), sharedPreferences: sl()),
   );
   sl.registerLazySingleton<AuthRemoteDatasource>(
-    () => AuthRemoteDataSourceImpl(
-      dioClient: sl(),
-      sharedPreferences: sl(),
-    ),
+    () => AuthRemoteDataSourceImpl(dioClient: sl(), sharedPreferences: sl()),
   );
 
   // Features - News
@@ -73,10 +65,7 @@ Future<void> init() async {
     () => NewsLocalDataSourceImpl(sharedPreferences: sl()),
   );
   sl.registerLazySingleton<NewsRepository>(
-    () => NewsRepositoryImpl(
-      remoteDataSource: sl(),
-      localDataSource: sl(),
-    ),
+    () => NewsRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
   );
   sl.registerLazySingleton<NewsRemoteDataSource>(
     () => NewsRemoteDataSourceImpl(dioClient: sl()),
@@ -92,17 +81,13 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetCategoriesUseCase(sl()));
   sl.registerLazySingleton(() => CategoriesCubit(sl()));
 
-  sl.registerLazySingleton(() => NewsBloc(
-        getNewsUseCase: sl(),
-        getNewsDetailsUseCase: sl(),
-      ));
+  sl.registerLazySingleton(
+    () => NewsBloc(getNewsUseCase: sl(), getNewsDetailsUseCase: sl()),
+  );
 
   // Features - User
   sl.registerLazySingleton(
-    () => UserBloc(
-      getUserProfileUseCase: sl(),
-      updateUserProfileUseCase: sl(),
-    ),
+    () => UserBloc(getUserProfileUseCase: sl(), updateUserProfileUseCase: sl()),
   );
   sl.registerLazySingleton(() => GetUserProfileUseCase(sl()));
   sl.registerLazySingleton(() => UpdateUserProfileUseCase(sl()));
